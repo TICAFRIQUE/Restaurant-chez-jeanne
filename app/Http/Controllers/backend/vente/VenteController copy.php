@@ -494,10 +494,6 @@ class VenteController extends Controller
                 'numero_table' => $numeroDeTable,
                 'nombre_couverts' => $nombreDeCouverts,
                 'statut' => 'confirmée',
-
-                'montant_restant' => $montantApresRemise - $montantRecu,
-                'statut_paiement' => $montantRecu >= $montantApresRemise ? 'paye' : 'impaye',
-                'statut_reglement' => $montantRecu >= $montantApresRemise ? 1 : 0, // 0 = non reglé, 1 = réglé
                 'type_vente' => 'normale'
             ]);
 
@@ -593,11 +589,7 @@ class VenteController extends Controller
     {
         try {
             $vente = Vente::findOrFail($id);
-
-            $client = User::whereHas('roles', function ($query) {
-                $query->where('name', 'client');
-            })->get();
-            return view('backend.pages.vente.show', compact('vente', 'client'));
+            return view('backend.pages.vente.show', compact('vente'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return redirect()->route('vente.index')->with('error', "La vente demandée n'existe plus.");
         } catch (\Exception $e) {

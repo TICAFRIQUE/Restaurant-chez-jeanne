@@ -47,6 +47,7 @@
                                                         'Wave' => 'wave',
                                                         'Visa' => 'visa',
                                                         'MasterCard' => 'mastercard',
+                                                        'Impayé' => 'impaye',
                                                     ];
                                                 @endphp
 
@@ -70,8 +71,8 @@
 
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Montant récu</label>
-                                            <input type="number" value="{{ $vente->montant_total }}"
-                                                name="montant_recu" class="form-control" id="montantRecu">
+                                            <input type="number" name="montant_recu" class="form-control"
+                                                id="montantRecu" required>
                                         </div>
                                     </div>
 
@@ -125,30 +126,74 @@
 
 
                                 <!-- ========== Start Client si impayé ========== -->
+
+
+
+
                                 <div class="row" id="client">
                                     <h4 class="fw-bold my-3 text-center ">Informations sur le client</h4>
+
+
+                                    <!-- ========== Start selectionner un client si il existe ========== -->
+
+                                    <div class="col-md-9 mb-4">
+                                        <div class="mb-3">
+                                            <label for="username" class="form-label">Choisir un client existant</label>
+                                            <select class="form-select" name="client_id" id="client_id" data-choices
+                                                data-choices-sorting-true>
+                                                <option value="" selected>Selectionner...</option>
+                                                @foreach ($client as $item)
+                                                    <option value="{{ $item->id }}">
+                                                        {{ $item->last_name }} {{ $item->first_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+
+
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+
+                                            <button class="btn btn-primary mt-4 w-100" type="button"
+                                                id="ajouterClient"><i class="ri-add-line"></i>
+                                                Nouveau client</button>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- ========== End selectionner un client si il existe ========== -->
+
+                                    <div class="col-md-12 d-flex justify-content-between mb-2">
+                                        <hr class="text-primary w-50 fw-bold">
+                                        <h4 class="fw-bold text-center my-3 text-danger">OU créer un nouveau client</h4>
+                                        <hr class="text-primary w-50 fw-bold">
+                                    </div>
+
+
+
 
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Nom</label>
-                                            <input type="text" name="last_name" class="form-control" id="username"
-                                                required>
+                                            <input type="text" name="last_name" class="form-control" id="nomClient">
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Prenoms</label>
-                                            <input type="text" name="first_name" class="form-control" id="username"
-                                                required>
+                                            <input type="text" name="first_name" class="form-control"
+                                                id="prenomClient">
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Telephone</label>
-                                            <input type="number" name="phone" class="form-control" id="username"
-                                                required>
+                                            <input type="number" name="phone" class="form-control"
+                                                id="telephoneClient">
                                         </div>
                                     </div>
 

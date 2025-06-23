@@ -31,6 +31,10 @@ class Vente extends Model
         'statut_cloture', // boolean true ou false
         'type_vente', // vente normale , commande , 
         'commande_id',
+        
+        'statut_paiement', // paye ou impaye
+        'montant_restant', // montant restant de la vente
+        'statut_reglement' // reglement effectué ou non [0: non, 1: oui]
     ];
 
     public $incrementing = false;
@@ -67,7 +71,7 @@ class Vente extends Model
     public function produits()
     {
         return $this->belongsToMany(Produit::class, 'produit_vente')
-            ->withPivot('quantite', 'quantite_bouteille',  'prix_unitaire', 'total', 'unite_vente_id' , 'variante_id')
+            ->withPivot('quantite', 'quantite_bouteille',  'prix_unitaire', 'total', 'unite_vente_id', 'variante_id')
             ->withTimestamps();
     }
 
@@ -81,5 +85,5 @@ class Vente extends Model
     public function billetteries()
     {
         return $this->hasMany(Billetterie::class);
-    }    
+    }
 }

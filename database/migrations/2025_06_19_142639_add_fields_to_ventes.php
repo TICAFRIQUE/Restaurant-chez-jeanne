@@ -15,7 +15,7 @@ return new class extends Migration
             //
             $table->enum('statut_paiement', ['paye', 'impaye'])->nullable();
             $table->double('montant_restant')->nullable(); //montant restant de la vente
-
+            $table->boolean('statut_reglement')->nullable(); // reglement effectué ou non [0: non, 1: oui]
         });
     }
 

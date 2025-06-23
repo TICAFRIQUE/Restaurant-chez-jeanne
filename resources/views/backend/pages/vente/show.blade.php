@@ -50,7 +50,26 @@
                     <h6 class="text-muted">Détails de la vente</h6>
                     <div class="row">
                         <div class="col-md-4">
-                            <p><strong>N° vente :</strong> #{{ $vente->code }}</p>
+                            <p>
+                                <strong>N° vente :</strong>
+                                <span id="vente-code">{{ $vente->code }}</span>
+                                <button onclick="copyToClipboard('vente-code')"
+                                    style="border: none; background: none; cursor: pointer;" title="Copier">
+                                    📋
+                                </button>
+                            </p>
+
+                            <script>
+                                function copyToClipboard(elementId) {
+                                    const text = document.getElementById(elementId).textContent;
+                                    navigator.clipboard.writeText(text).then(function() {
+                                        alert("Code copié : " + text);
+                                    }, function(err) {
+                                        alert("Échec de la copie !");
+                                    });
+                                }
+                            </script>
+
                             <p><strong>Date :</strong> {{ \Carbon\Carbon::parse($vente['date_vente'])->format('d-m-Y') }}
                             </p>
                             @if ($vente->type_vente == 'commande')
@@ -60,13 +79,17 @@
                             @else
                                 <p><strong>Type de vente :</strong> {{ $vente->type_vente }}</p>
                             @endif
+
+                            <p> <strong>Statut paiement :</strong> <span
+                                    class="badge bg-{{ $vente->statut_paiement == 'payé' ? 'success' : 'danger' }}">{{ $vente->statut_paiement }}</span>
+                            </p>
                         </div>
                         <div class="col-md-4">
                             @if ($vente->valeur_remise > 0)
                                 <p><strong>Remise :</strong> {{ $vente->valeur_remise }}
                                     {{ $vente->type_remise == 'amount' ? 'FCFA' : '%' }}</p>
                             @endif
-                            <p><strong>Montant vente :</strong> {{ $vente->montant_total }}</p>
+
                             <p><strong>Caissier(e) :</strong> {{ $vente->user->first_name }} {{ $vente->user->last_name }}
                             </p>
                             <p><strong>Caisse :</strong> {{ $vente->caisse->libelle }}</p>
@@ -77,15 +100,13 @@
                         </div>
                         {{-- @if ($vente->type_vente != 'commande') --}}
                         <div class="col-md-4">
-                            @if ($vente->mode_paiement)
-                                <p><strong>Réglement :</strong> {{ $vente->mode_paiement }}</p>
-                            @endif
-                            @if ($vente->montant_recu)
-                                <p><strong>Montant reçu :</strong> {{ $vente->montant_recu }}</p>
-                            @endif
-                            @if ($vente->montant_rendu)
-                                <p><strong>Montant rendu :</strong> {{ $vente->montant_rendu }}</p>
-                            @endif
+                            <p><strong>Réglement :</strong> {{ $vente->mode_paiement ?? 'En attente' }}</p>
+                            <p><strong>Montant vente :</strong> {{ $vente->montant_total }}</p>
+                            <p><strong>Montant reçu :</strong> {{ $vente->montant_recu ?? 'Non definie' }}</p>
+                            <p><strong>Monnaie rendu :</strong> {{ $vente->montant_rendu ?? 'Non definie' }}</p>
+                            <p><strong>Montant Restant :</strong> {{ $vente->montant_restant }}</p>
+
+
                         </div>
                         {{-- @endif --}}
                     </div>
@@ -115,7 +136,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Image</th>
+                                    {{-- <th>Image</th> --}}
                                     <th>Nom du produit</th>
                                     <th>Quantité</th>
                                     <th>Prix unitaire</th>
@@ -126,11 +147,11 @@
                                 @foreach ($vente->produits as $key => $item)
                                     <tr id="row_{{ $item['id'] }}">
                                         <td>{{ ++$key }}</td>
-                                        <td>
+                                        {{-- <td>
                                             <img class="rounded avatar-sm"
                                                 src="{{ $item->getFirstMediaUrl('ProduitImage') }}" width="50px"
                                                 alt="{{ $item['nom'] }}">
-                                        </td>
+                                        </td> --}}
                                         <td>{{ $item['nom'] }}</td>
                                         <!-- Recuperer le libelle de la variante en fonction de son id -->
 
@@ -420,11 +441,30 @@
 
                     // cacher la div de client
                     $('#client').hide(500);
+
+                    // on met les champs client en required false
+                    $('#nomClient').prop('required', false);
+                    $('#prenomClient').prop('required', false);
+                    $('#telephoneClient').prop('required', false);
+
+                    // on vide les champs client
+                    $('#nomClient').val('');
+                    $('#prenomClient').val('');
+                    $('#telephoneClient').val('');
+
+
                 } else if (montantRecu < montantTotalVente) {
                     $('#statutPaiement').text('Impayé').css('color', 'red');
 
                     // afficher la div de client
                     $('#client').show(500);
+
+                    // on met les champs client en required true
+                    $('#nomClient').prop('required', true);
+                    $('#prenomClient').prop('required', true);
+                    $('#telephoneClient').prop('required', true);
+
+                    
                 }
             }
 
