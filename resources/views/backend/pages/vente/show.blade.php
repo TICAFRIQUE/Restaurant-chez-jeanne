@@ -81,7 +81,7 @@
                             @endif
 
                             <p> <strong>Statut paiement :</strong> <span
-                                    class="badge bg-{{ $vente->statut_paiement == 'payé' ? 'success' : 'danger' }}">{{ $vente->statut_paiement }}</span>
+                                    class="badge bg-{{ $vente->statut_paiement == 'paye' ? 'success' : 'danger' }}">{{ $vente->statut_paiement }}</span>
                             </p>
                         </div>
                         <div class="col-md-4">
@@ -119,13 +119,14 @@
                                 class="ri-printer-line align-bottom me-1"></i> Imprimer le reçu</button>
 
                         @can('creer-vente')
-                            <button class="btn btn-success me-2" data-bs-toggle="modal"
-                                data-bs-target="#reglementModal{{ $vente->id }}"> 💷 Règlément</button>
+                            @if ($vente->statut_paiement != 'paye')
+                                <button class="btn btn-success me-2" data-bs-toggle="modal"
+                                    data-bs-target="#reglementModal{{ $vente->id }}"> 💷 Règlément</button>
+                            @endif
                             @include('backend.pages.vente.reglement')
                             <a href="{{ route('vente.create') }}" type="button" class="btn btn-primary"><i
                                     class="ri-add-circle-line align-bottom me-1"></i> Nouvelle vente</a>
                         @endcan
-
                     </div>
                 </div>
 
@@ -422,59 +423,105 @@
             // par default cacher la div de client 
             $('#client').hide();
 
-            // calcul du montant rendu
-            function updateChangeAmount() {
+            // calcul des montants
+            function calculDesMontant() {
                 let montantRecu = parseFloat($('#montantRecu').val() || 0); // montant reçu
-                let montantTotalVente = parseFloat($('#montantTotalVente').val() || 0); // montant total de la vente
+                let montantARegler = parseFloat($('#montantARegler').val() || 0); // montant à régler
 
                 // montant rendu
-                let montantRendu = montantRecu - montantTotalVente;;
+                let montantRendu = montantRecu - montantARegler;
                 $('#montantRendu').val(montantRendu < 0 ? 0 : montantRendu);
 
                 // montant restant
-                let montantRestant = montantTotalVente - montantRecu;
+                let montantRestant = montantARegler - montantRecu;
                 $('#montantRestant').val(montantRestant > 0 ? montantRestant : 0);
 
-                // gestion des status
-                if (montantRecu >= montantTotalVente) {
-                    $('#statutPaiement').text('Payé').css('color', 'green');
+                // gestion des statuts
+                if (montantRecu >= montantARegler) {
+                    $('#statutPaiement').text('Vente Payé').css('color', 'green');
 
                     // cacher la div de client
                     $('#client').hide(500);
 
-                    // on met les champs client en required false
+                    // rendre les champs client non requis
                     $('#nomClient').prop('required', false);
                     $('#prenomClient').prop('required', false);
                     $('#telephoneClient').prop('required', false);
 
-                    // on vide les champs client
+                    // vider les champs
                     $('#nomClient').val('');
                     $('#prenomClient').val('');
                     $('#telephoneClient').val('');
-
-
-                } else if (montantRecu < montantTotalVente) {
-                    $('#statutPaiement').text('Impayé').css('color', 'red');
+                    $('#clientId').empty();
+                } else {
+                    $('#statutPaiement').text('Vente Impayé').css('color', 'red');
 
                     // afficher la div de client
                     $('#client').show(500);
 
-                    // on met les champs client en required true
+                    // rendre les champs client requis
+                    $('#nomClient').prop('required', true);
+                    $('#prenomClient').prop('required', true);
+                    $('#telephoneClient').prop('required', true);
+                }
+            }
+
+
+            // appel de la fonction au chargement de la page
+            calculDesMontant();
+
+            // appel de la fonction lorsqu'on modifie le montant reçu
+            $('#montantRecu').on('input', function() {
+                calculDesMontant();
+            });
+
+
+            // Gestion du mode paiement
+            $('#modePaiement').on('change', function() {
+                $modePaiement = $(this).val();
+
+                // si le mode de paiement est impaye alors on met a 0 le montant reçu et on le met en read only
+                if ($modePaiement == 'impaye') {
+                    $('#montantRecu').val(0);
+                    $('#montantRecu').prop('readonly', true);
+                    // ajouter un fond gris en background
+                    $('#montantRecu').css('background-color', '#f1f4f7');
+                } else {
+                    $('#montantRecu').prop('readonly', false);
+                    // supprimer le fond gris en background
+                    $('#montantRecu').css('background-color', 'white');
+
+                }
+
+            })
+
+
+
+            // Verifier si un client a ete selectionner
+            $('#clientId').on('change', function() {
+                // si un client est selectionner on met required false au champs de saisir du nouveau client
+                if ($(this).val() != '') {
+                    $('#nomClient').prop('required', false);
+                    $('#prenomClient').prop('required', false);
+                    $('#telephoneClient').prop('required', false);
+
+                    // cacher les champs de saisir du nouveau client
+                    $('.newClient').addClass('d-none');
+                   
+                    // vider les champs de saisir du nouveau client
+                    $('#nomClient').val('');
+                    $('#prenomClient').val('');
+                    $('#telephoneClient').val();
+                } else {
                     $('#nomClient').prop('required', true);
                     $('#prenomClient').prop('required', true);
                     $('#telephoneClient').prop('required', true);
 
+                    // afficher les champs de saisir du nouveau client
+                    $('.newClient').removeClass('d-none');
                     
                 }
-            }
-
-            // appel de la fonction au chargement de la page
-            updateChangeAmount();
-
-            // appel de la fonction lorsqu'on modifie le montant reçu
-            $('#montantRecu').on('input', function() {
-                updateChangeAmount();
-            });
+            })
         })
     </script>
 @endsection

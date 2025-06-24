@@ -488,12 +488,16 @@ class VenteController extends Controller
                 'montant_remise' => $montantRemise,
                 'type_remise' => $typeRemise,
                 'valeur_remise' => $valeurRemise,
-                'mode_paiement' => $modePaiement,
-                'montant_recu' => $montantRecu,
-                'montant_rendu' => $montantRendu,
+
+
                 'numero_table' => $numeroDeTable,
                 'nombre_couverts' => $nombreDeCouverts,
                 'statut' => 'confirmée',
+
+                // informations de paiement
+                'mode_paiement' => $modePaiement,
+                'montant_recu' => $montantRecu,
+                'montant_rendu' => $montantRendu,
 
                 'montant_restant' => $montantApresRemise - $montantRecu,
                 'statut_paiement' => $montantRecu >= $montantApresRemise ? 'paye' : 'impaye',

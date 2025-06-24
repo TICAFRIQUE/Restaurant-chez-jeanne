@@ -31,7 +31,7 @@ class Vente extends Model
         'statut_cloture', // boolean true ou false
         'type_vente', // vente normale , commande , 
         'commande_id',
-        
+
         'statut_paiement', // paye ou impaye
         'montant_restant', // montant restant de la vente
         'statut_reglement' // reglement effectué ou non [0: non, 1: oui]
@@ -54,12 +54,12 @@ class Vente extends Model
     }
 
 
-    public function user()
+    public function user() // caissier
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function client()
+    public function client() // client
     {
         return $this->belongsTo(User::class, 'client_id');
     }
@@ -85,5 +85,18 @@ class Vente extends Model
     public function billetteries()
     {
         return $this->hasMany(Billetterie::class);
+    }
+
+
+    // relations reglements
+    public function reglements()
+    {
+        return $this->hasMany(Reglement::class);
+    }
+
+    //relations reglements user
+    public function reglements_user()
+    {
+        return $this->hasMany(Reglement::class, 'user_id');
     }
 }

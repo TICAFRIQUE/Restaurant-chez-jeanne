@@ -11,6 +11,7 @@ use App\Http\Controllers\PaieController;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Http\Controllers\PosteController;
 use App\Http\Controllers\EmployeController;
+use App\Http\Controllers\ReglementController;
 use App\Http\Controllers\site\SiteController;
 use App\Http\Controllers\site\PanierController;
 use App\Http\Controllers\site\AuthUserController;
@@ -354,6 +355,14 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
         ##supprimer une vente
         route::get('delete/{id}', 'delete')->name('vente.delete')->middleware('can:supprimer-vente'); // supprimer vente
+    });
+
+    // Réglement
+    Route::prefix('reglement')->controller(ReglementController::class)->group(function () {
+        route::get('', 'index')->name('reglement.index');
+        route::post('store', 'store')->name('reglement.store');
+        route::get('show/{id}', 'show')->name('reglement.show');
+        route::get('delete/{id}', 'delete')->name('reglement.delete');
     });
 
     // Commande
