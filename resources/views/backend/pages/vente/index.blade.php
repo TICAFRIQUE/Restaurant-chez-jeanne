@@ -21,6 +21,76 @@
     @endcomponent
 
 
+    <style>
+        /* css pour les cartes */
+        .card-custom {
+            border: none;
+            color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #007bff, #00c6ff);
+        }
+
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #28a745, #85e085);
+        }
+
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #ffc107, #ffde59);
+        }
+
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, #fa5c6c, #f06548);
+        }
+
+            .bg-gradient-danger2 {
+            background: linear-gradient(135deg, #a886ec, #655ce7);
+        }
+
+
+        .card-title {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+
+        /*css pour les boutons d'action*/
+        .btn-group-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-lg {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-lg i {
+            font-size: 1.2rem;
+        }
+
+        .btn-lg:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+
+
 
     <div class="row">
 
@@ -100,15 +170,6 @@
                 </div>
         @endif
 
-
-
-
-
-
-
-
-
-
         <div class="card">
             <div class="card-header d-flex justify-content-between">
 
@@ -145,11 +206,19 @@
                 </h5>
                 <!-- ========== End filter result libellé ========== -->
 
+            </div>
 
-                @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
+            <!-- ========== Start button action ========== -->
+            <div class="card-header mb-3 d-flex justify-content-center">
+                {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
+                    <h5 class="card-title
+                {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
+                    <h5 class="card-title
+                {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
                     <!-- ========== Start cloture caisse button ========== -->
                     @if ($data_vente->sum('montant_total') > 0)
-                        <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg ">Clôturer la caisse
+                        <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg "> 👍Clôturer la
+                            caisse
                             <i class="ri ri-bill"></i></a>
                     @else
                         <button class="btn btn-danger btn-lg" disabled>Clôturer la caisse <i
@@ -177,16 +246,55 @@
                         </button>
                     @endif
                     <!-- ========== End nouvelle vente button ========== -->
+                @endif --}}
+
+
+                @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
+                    <div class="btn-group-actions">
+
+                        {{-- Clôture caisse --}}
+                        @if ($data_vente->sum('montant_total') > 0 && $venteAucunReglement == 0)
+                            <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
+                                👍 Clôturer la caisse <i class="ri ri-bill"></i>
+                            </a>
+                        @else
+                            <button class="btn btn-danger btn-lg" disabled>
+                                Clôturer la caisse <i class="ri ri-lock-line"></i>
+                            </button>
+                        @endif
+
+                        {{-- Rapport caisse --}}
+                        @if ($venteCaisseCloture > 0)
+                            <a href="{{ route('vente.rapport-caisse') }}" class="btn btn-success btn-lg">
+                                📊 Voir le rapport de caisse <i class="ri ri-file-list-3-line"></i>
+                            </a>
+                        @endif
+
+                        {{-- Nouvelle vente --}}
+                        @if ($sessionDate != null)
+                            <a href="{{ route('vente.create') }}" class="btn btn-primary btn-lg">
+                                🛒 Nouvelle vente
+                            </a>
+                        @else
+                            <button type="button" class="btn btn-info btn-lg btnChoiceDate">
+                                🛒 Nouvelle vente
+                            </button>
+                        @endif
+
+                    </div>
                 @endif
-
-
-
-
             </div>
+            <!-- ========== End button action ========== -->
 
-            @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
+
+
+
+
+            <!-- ========== Start statistique caisse ========== -->
+            <div class="card-body">
+                {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Caisse actuelle</h5>
@@ -196,30 +304,98 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body d-flex justify-content-around bg-success">
+                                <h5 class="card-title text-white">Total des ventes du jour : <br> <strong
+                                        class="fs-3">{{ number_format($data_vente->sum('montant_total'), 0, ',', ' ') }}
+                                        FCFA</strong> </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
                         <div class="card">
                             <div class="card-body d-flex justify-content-around">
-                                <h5 class="card-title">Total des ventes du jour : <br> <strong
-                                        class="text-primary fs-3">{{ number_format($data_vente->sum('montant_total'), 0, ',', ' ') }}
-                                        FCFA</strong> </h5>
-                                <p class="card-text h3 text-success">
+                                <h5 class="card-title">Vente en attente : <br> <strong
+                                        class="text-primary fs-3">5</strong> </h5>
+                            </div>
+                        </div>
+                    </div>
 
 
-                                    {{-- @if ($data_vente->sum('montant_total') > 0)
-                                        <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger ">Procéder a
-                                            la Clóturer
-                                            la caisse</a>
-                                    @else
-                                        <button class="btn btn-danger" disabled>Procéder a la Clóturer la
-                                            caisse</button>
-                                    @endif --}}
-                                </p>
+                     <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body d-flex justify-content-around">
+                                <h5 class="card-title">Vente sans réglement : <br> <strong
+                                        class="text-danger fs-3">5</strong> </h5>
                             </div>
                         </div>
                     </div>
                 </div>
-            @endif
-            @include('backend.components.alertMessage')
+            @endif --}}
+
+
+                @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
+                    <div class="row mb-3 g-3">
+                        <div class="col-md-2">
+                            <div class="card card-custom bg-gradient-primary">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Caisse actuelle</h5>
+                                    <p class="card-value">
+                                        {{ auth()->user()->caisse->libelle ?? 'Non définie' }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card card-custom bg-gradient-success">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Ventes du jour</h5>
+                                    <p class="card-value">
+                                        {{ number_format($data_vente->sum('montant_total'), 0, ',', ' ') }} FCFA
+                                    </p>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                         <div class="col-md-3">
+                            <div class="card card-custom bg-gradient-danger2">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Impayés</h5>
+                                    <p class="card-value ">
+                                        {{ number_format($data_vente->where('statut_paiement', 'impaye')->sum('montant_restant'), 0, ',', ' ') }} FCFA
+                                    </p>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="card card-custom bg-gradient-warning">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Ventes en attente</h5>
+                                    <p class="card-value text-dark">5</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <div class="card card-custom bg-gradient-danger">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Ventes non réglé</h5>
+                                    <p class="card-value"> {{ $venteAucunReglement }} </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            <!-- ========== End statistique caisse ========== -->
+
+
 
 
 
@@ -230,35 +406,31 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Statut de vente</th>
                                 <th>N° de vente</th>
-                                {{-- <th>Type de vente</th> --}}
                                 <th>N° de Table</th>
                                 <th>Session vente</th>
                                 <th>Montant</th>
                                 <th>Vendu le</th>
                                 <th>Vendu par</th>
                                 <th>Caisse</th>
-                                <th>Statut</th>
+                                <th>Statut paiement vente</th>
+                                <th>Statut réglement</th>
+
                                 @if (auth()->user()->can('modifier-vente') || auth()->user()->can('supprimer-vente'))
                                     <th>Action</th>
                                 @endif
-
-
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($data_vente as $key => $item)
                                 <tr id="row_{{ $item['id'] }}">
+                                   
                                     <td> {{ $loop->iteration }} </td>
+                                     <td> <span class="badge bg-{{ $item['statut'] == 'en attente' ? 'warning' : 'success' }}">{{ $item['statut'] }}</span> </td>
                                     <td> <a class="fw-bold"
                                             href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a> </td>
-                                    {{-- <td> {{ $item['type_vente'] }}
-
-                                        @if ($item['type_vente'] == 'commande')
-                                            <br> <a href="{{ route('commande.show', $item['commande_id']) }}"
-                                                class="text-primary fw-bold">#{!! $item['commande']['code'] !!}</a>
-                                        @endif
-                                    </td> --}}
+                                 
                                     <td> {{ $item['numero_table'] ?? 'non défini' }}</td>
                                     <td> {{ \Carbon\Carbon::parse($item['date_vente'])->format('d-m-Y') }}
                                         {{ $item['created_at']->format('à H:i') }} </td>
@@ -266,9 +438,18 @@
                                     <td> {{ $item['created_at']->format('d-m-Y à H:i') }} </td>
                                     <td> {{ $item['user']['first_name'] }} {{ $item['user']['last_name'] }} </td>
                                     <td> {{ $item['caisse']['libelle'] ?? '' }} </td>
-                                    <td> <span class="badge bg-{{ $item['statut_paiement'] == 'paye' ? 'success' : 'danger' }}">
-                                        {{ $item['statut_paiement'] == 'paye' ? 'Payé' : ($item['statut_paiement'] == 'impaye' ? 'Impayé' : '')  }}
-                                        </span> 
+
+                                    <td> <span
+                                            class="badge bg-{{ $item['statut_paiement'] == 'paye' ? 'success' : 'danger' }}">
+                                            {{ $item['statut_paiement'] == 'paye' ? 'Payé' : ($item['statut_paiement'] == 'impaye' ? 'Impayé' : '') }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            class="badge bg-{{ $item['statut_reglement'] == 1 ? 'success' : 'danger' }}">
+                                            {{ $item['statut_reglement'] == 0 ? 'non effectué' : ($item['statut_reglement'] == 1 ? 'effectué' : '') }}
+                                        </span>
                                     </td>
 
                                     @if (auth()->user()->can('modifier-vente') || auth()->user()->can('supprimer-vente'))
@@ -290,7 +471,6 @@
                                             </div>
                                         </td>
                                     @endif
-
                                 </tr>
                             @empty
                                 <tr>

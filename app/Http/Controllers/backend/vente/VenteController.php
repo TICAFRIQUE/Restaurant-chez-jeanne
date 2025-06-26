@@ -174,6 +174,7 @@ class VenteController extends Controller
             //Recuperer la session de la date vente manuelle et verifier si la caisse actuelle a effectuer des vente clotureé  a sa date de vente
             $sessionDate = null;
             $venteCaisseCloture = null;
+            $venteAucunReglement = null;
             if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
 
                 //Recuperer la session de la date vente manuelle
@@ -187,11 +188,20 @@ class VenteController extends Controller
                     ->where('statut_cloture', true)
                     ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
                     ->count();
+
+
+
+                // recuperer les vente de la caisse actuelle qui nont aucun reglement
+                $venteAucunReglement = Vente::where('caisse_id', auth()->user()->caisse_id)
+                    ->where('user_id', auth()->user()->id)
+                    ->where('statut_reglement', false)
+                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente)
+                    ->count();
             }
 
 
 
-            return view('backend.pages.vente.index', compact('data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture'));
+            return view('backend.pages.vente.index', compact('data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement'));
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes : ' . $e->getMessage());
             return back();
@@ -768,12 +778,33 @@ class VenteController extends Controller
             if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
                 $totalVente = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
+                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
                     ->where('statut_cloture', false)->sum('montant_total');
+
+
+                $totalVenteImpayer = Vente::where('caisse_id', auth()->user()->caisse_id)
+                    ->where('user_id', auth()->user()->id)
+                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                    ->where('statut_cloture', false)
+                    ->where('statut_paiement', 'impaye')
+                    ->sum('montant_restant');
+
+
+                $totalVenteCaisse = $totalVente - $totalVenteImpayer;
             }
 
             // dd($type_monnaies , $billets, $pieces, $totalVente);
 
-            return view('backend.pages.vente.billeterie.create', compact('modes', 'type_monnaies', 'billets', 'pieces', 'totalVente', 'type_mobile_money'));
+            return view('backend.pages.vente.billeterie.create', compact(
+                'modes',
+                'type_monnaies',
+                'billets',
+                'pieces',
+                'totalVente',
+                'type_mobile_money',
+                'totalVenteImpayer',
+                'totalVenteCaisse'
+            ));
         } catch (\Throwable $th) {
 
             return $th->getMessage();
@@ -786,6 +817,7 @@ class VenteController extends Controller
             $user = Auth::user();
             $caisse = $user->caisse;
 
+
             // enregistrer la billetterie
             foreach ($request->input('variantes', []) as $variante) {
                 Billetterie::create([
@@ -795,6 +827,7 @@ class VenteController extends Controller
                     'valeur' => $variante['valeur'] ?? null,
                     'type_mobile_money' => $variante['type_mobile_money'] ?? null,
                     'montant' => $variante['montant'] ?? null,
+                    // 'montant_impaye' => $montantTotalImpaye ?? 0,
                     'total' => $variante['total'],
                     'caisse_id' => $caisse->id,
                     'user_id' => $user->id,
@@ -802,7 +835,7 @@ class VenteController extends Controller
                 ]);
             }
 
-            // si il il n'y a pas d'erreur lors de l'enregistrement de billetterie appel a fonction clotureCaisse
+            // si  il n'y a pas d'erreur lors de l'enregistrement de billetterie appel a fonction clotureCaisse
             return $this->clotureCaisse($request);
         } catch (\Throwable $th) {
             return $th->getMessage();
@@ -964,27 +997,43 @@ class VenteController extends Controller
 
             // Tableau pour stocker les résultats
             $resultats = [
-                'mode_0' => 0,
-                'mode_1' => []
+                'mode_espece' => 0, // Total pour le mode 0 (Espèce)
+                'mode_digital' => [], // Total pour le mode 1 (Mobile money) par type
+                'mode_impaye' => 0, // Total pour le mode 0 (Espèce)
+
+
             ];
 
             // Regrouper et additionner les totaux
             foreach ($billetterie as $item) {
                 if ($item->mode == 0) {
-                    $resultats['mode_0'] += $item->total;
+                    $resultats['mode_espece'] += $item->total;
                 } elseif ($item->mode == 1) {
                     $type = $item->type_mobile_money ?? 0;
-                    if (!isset($resultats['mode_1'][$type])) {
-                        $resultats['mode_1'][$type] = 0;
+                    if (!isset($resultats['mode_digital'][$type])) {
+                        $resultats['mode_digital'][$type] = 0;
                     }
-                    $resultats['mode_1'][$type] += $item->total;
+                    $resultats['mode_digital'][$type] += $item->total;
                 }
             }
+
+            //calculer le montant total impayé des ventes de la caisse
+            $montantTotalImpaye = Vente::where('caisse_id', auth()->user()->caisse_id)
+                ->where('user_id', auth()->user()->id)
+                ->where('statut_cloture', true)
+                ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                ->sum('montant_restant');
+
+            // Ajouter le montant impayé au résultat
+            $resultats['mode_impaye'] = $montantTotalImpaye;
+
 
             // Libellés
             $modes = [
                 0 => 'Espèce',
                 1 => 'Mobile money',
+                2 => 'Impayées',
+
             ];
 
             $type_mobile_money = [
@@ -996,8 +1045,12 @@ class VenteController extends Controller
                 5 => 'Visa',
             ];
 
+
+            // recuperer les impayes de ventes
+
+
             /** End Afficher les billetteries */
-            // dd($billetterie->toArray());
+            // dd($resultats);
 
             $caisses = Caisse::all();
             $famille = Categorie::whereNull('parent_id')->whereIn('type', ['bar', 'menu'])->orderBy('name', 'DESC')->get();

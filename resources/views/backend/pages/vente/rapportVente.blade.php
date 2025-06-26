@@ -270,10 +270,6 @@
                                                 <td>{{ number_format($produit['montant_total'], 0, ',', ' ') }} FCFA</td>
                                             @endif
 
-
-
-
-
                                         </tr>
                                     @empty
                                         <tr>
@@ -306,32 +302,44 @@
 
                         <div class="row">
                             <!-- Mode 0 : Espèce -->
-                            <div class="col-md-6 mb-4">
+                            <div class="col-md-4 mb-4">
                                 <div class="card shadow-sm border-left-success">
                                     <div class="card-body">
                                         <h5 class="card-title text-success">{{ $modes[0] }}</h5>
                                         <p class="card-text fs-5 fw-bold">
-                                            {{ number_format($resultats['mode_0'], 0, ',', ' ') }} FCFA
+                                            {{ number_format($resultats['mode_espece'], 0, ',', ' ') }} FCFA
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Mode 1 : Mobile Money -->
-                            <div class="col-md-6 mb-4">
+                            <div class="col-md-4 mb-4">
                                 <div class="card shadow-sm border-left-info">
                                     <div class="card-body">
                                         <h5 class="card-title text-info">{{ $modes[1] }}</h5>
                                         <ul class="list-group list-group-flush">
-                                            @foreach ($resultats['mode_1'] as $type => $montant)
+                                            @foreach ($resultats['mode_digital'] as $type => $montant)
                                                 <li
-                                                    class="list-group-item d-flex justify-content-between align-items-center">
+                                                    class="list-group-item d-flex justify-content-around align-items-center">
                                                     {{ $type_mobile_money[$type] ?? 'Inconnu' }}
-                                                    <span class="fw-bold">{{ number_format($montant, 0, ',', ' ') }}
+                                                    <span class="fw-bold">{{ number_format($montant, 0, ',', ' ') ?? 0 }}
                                                         FCFA</span>
                                                 </li>
                                             @endforeach
                                         </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mode 2 : Impayé -->
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm border-left-danger">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-danger">{{ $modes[2] }}</h5>
+                                        <p class="card-text fs-5 fw-bold">
+                                            {{ number_format($resultats['mode_impaye'], 0, ',', ' ') ?? 0 }} FCFA
+                                        </p>
                                     </div>
                                 </div>
                             </div>

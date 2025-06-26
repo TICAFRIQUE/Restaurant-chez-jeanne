@@ -248,7 +248,7 @@
 
 
                 <div class="ms-1 header-item d-none d-sm-flex">
-                    <a href="{{route('accueil')}}"  target="_blank"
+                    <a href="{{ route('accueil') }}" target="_blank"
                         class="btn btn-icon btn-topbar material-shadow-none btn-ghost-secondary rounded-circle ">
                         <i class='bx bx-globe fs-22'></i>
                     </a>
@@ -378,7 +378,7 @@
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
                             <img class="rounded-circle header-profile-user"
-                                src="@if (Auth::user()->avatar != '') {{ URL::asset('images/' . Auth::user()->avatar) }}@else{{ URL::asset('build/images/users/avatar-1.jpg') }} @endif"
+                                src="@if (Auth::user()?->avatar) {{ URL::asset('images/' . Auth::user()->avatar) }}@else{{ URL::asset('build/images/users/icone_user.png') }} @endif"
                                 alt="Header Avatar">
                             <span class="text-start ms-xl-2">
                                 <span
@@ -405,7 +405,7 @@
                                 class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span
                                 class="align-middle">Parametre</span></a> --}}
 
-                        @if (Auth::user())
+                        @auth
                             <a class="dropdown-item " href="javascript:void();"
                                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i
                                     class="bx bx-power-off font-size-16 align-middle me-1"></i> <span
@@ -414,7 +414,7 @@
                                 style="display: none;">
                                 @csrf
                             </form>
-                        @endif
+                        @endauth
                     </div>
                 </div>
                 <!-- ========== End profil ========== -->

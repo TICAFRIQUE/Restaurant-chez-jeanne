@@ -9,7 +9,8 @@
     <!-- Danger Alert 2 -->
     <div class="alert alert-danger alert-dismissible bg-danger text-white alert-label-icon fade show material-shadow"
         role="alert">
-        <i class="ri-error-warning-line label-icon"></i><strong>Attention !</strong> - <span class="fw-medium">{{ $Msg }}</span>
+        <i class="ri-error-warning-line label-icon"></i><strong>Attention !</strong> - <span
+            class="fw-medium">{{ $Msg }}</span>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
@@ -19,19 +20,19 @@
 <!-- Success Alert -->
 
 @if ($Msg = Session::get('success'))
-    <div class="alert alert-success alert-top-border alert-dismissible fade show" role="alert">
+    {{-- <div class="alert alert-success alert-top-border alert-dismissible fade show" role="alert">
         <i class="ri-notification-off-line me-3 align-middle fs-16 text-success"></i><strong> {{ $Msg }}
         </strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-  
-<!-- Success Alert 2 -->
-    <div class="alert alert-success alert-dismissible bg-success text-white alert-label-icon fade show material-shadow"
+    </div> --}}
+
+    <!-- Success Alert 2 -->
+    <div class="alert alert-success alert-dismissible bg-success text-white alert-label-icon fade show material-shadow pb-3"
         role="alert">
-        <i class="ri-check-double-line label-icon"></i><strong>Super !</strong> - <span class="fw-medium">{{ $Msg }}</span>
+        <i class="ri-check-double-line label-icon"></i><strong>Super !</strong> - <span
+            class="fw-medium">{{ $Msg }}</span>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-
 @endif
 
 

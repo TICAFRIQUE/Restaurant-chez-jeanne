@@ -83,6 +83,14 @@
                             <p> <strong>Statut paiement :</strong> <span
                                     class="badge bg-{{ $vente->statut_paiement == 'paye' ? 'success' : 'danger' }}">{{ $vente->statut_paiement }}</span>
                             </p>
+
+                            @if ($vente->client)
+                                <p><strong>Client :</strong>
+                                    {{ $vente->client->first_name }} {{ $vente->client->last_name }}
+                                </p>
+                            @endif
+
+
                         </div>
                         <div class="col-md-4">
                             @if ($vente->valeur_remise > 0)
@@ -452,7 +460,7 @@
                     $('#nomClient').val('');
                     $('#prenomClient').val('');
                     $('#telephoneClient').val('');
-                    $('#clientId').empty();
+                    $('.clientId').empty();
                 } else {
                     $('#statutPaiement').text('Vente Impayé').css('color', 'red');
 
@@ -498,7 +506,7 @@
 
 
             // Verifier si un client a ete selectionner
-            $('#clientId').on('change', function() {
+            $('.clientId').on('change', function() {
                 // si un client est selectionner on met required false au champs de saisir du nouveau client
                 if ($(this).val() != '') {
                     $('#nomClient').prop('required', false);
@@ -507,7 +515,7 @@
 
                     // cacher les champs de saisir du nouveau client
                     $('.newClient').addClass('d-none');
-                   
+
                     // vider les champs de saisir du nouveau client
                     $('#nomClient').val('');
                     $('#prenomClient').val('');
@@ -519,7 +527,7 @@
 
                     // afficher les champs de saisir du nouveau client
                     $('.newClient').removeClass('d-none');
-                    
+
                 }
             })
         })

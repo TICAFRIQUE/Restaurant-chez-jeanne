@@ -24,6 +24,7 @@ class Billetterie extends Model
         'caisse_id',
         'user_id',
         'date_save',
+        'montant_impaye', // Montant impayé de la vente
     ];
 
 

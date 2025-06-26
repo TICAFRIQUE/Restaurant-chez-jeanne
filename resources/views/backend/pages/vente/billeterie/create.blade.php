@@ -31,8 +31,12 @@
                                         </div> --}}
                                         <div class="alert alert-primary fs-5">
                                             <strong>Important !</strong> Veuillez effectuer la billetterie pour vérifier si
-                                            le montant physique en caisse correspond à votre montant de vente qui est de
-                                            <strong>{{ number_format($totalVente, 0, ',', ' ') }} FCFA</strong>.
+                                            le montant physique en caisse correspond à votre montant de vente du systeme
+                                           <ul>
+                                            <li> Total de la vente: <strong>{{ number_format($totalVente, 0, ',', ' ') }} FCFA</strong>.</li>
+                                            <li> Total Impayées: <strong>{{ number_format($totalVenteImpayer, 0, ',', ' ') }} FCFA</strong>.</li>
+                                            <li> Total en caisse: <strong>{{ number_format($totalVenteCaisse, 0, ',', ' ') }} FCFA</strong>.</li>
+                                           </ul>
                                         </div>
 
                                         {{-- <a href="{{ route('vente.rapport-caisse') }}" class="btn btn-primary">Rapport de

@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ReglementController extends Controller
 {
@@ -125,12 +126,18 @@ class ReglementController extends Controller
             $reglement = Reglement::create($data);
 
             // 👤 4. Gérer le client si nécessaire
-            $client = null;
+            $vente = Vente::find($request->vente_id);
 
-            if ($reglement->montant_restant > 0) {
+            $client = $vente->client_id; // par défaut, on garde le client existant
+
+            // Si la vente n'a pas encore de client ET qu'il reste un montant à payer
+            if ($reglement->montant_restant > 0 && is_null($vente->client_id)) {
+
                 if ($request->filled('client_id')) {
+                    // Utiliser un client existant
                     $client = $request->client_id;
                 } else {
+                    // Créer un nouveau client s'il n'existe pas déjà par téléphone
                     $newClient = User::firstOrCreate(
                         ['phone' => $request->phone],
                         [
@@ -140,10 +147,15 @@ class ReglementController extends Controller
                         ]
                     );
 
-                    $newClient->assignRole('client');
+                    // Assigner le rôle client si ce n'est pas déjà fait
+                    if (!$newClient->hasRole('client')) {
+                        $newClient->assignRole('client');
+                    }
+
                     $client = $newClient->id;
                 }
             }
+
 
             // 🛒 5. Mise à jour de la vente
             $vente = Vente::findOrFail($request->vente_id);
@@ -156,14 +168,18 @@ class ReglementController extends Controller
                 'mode_paiement' => $data['montant_restant'] == 0 ? $data['mode_paiement'] : 'impaye',
                 'statut_paiement' => $data['montant_restant'] == 0 ? 'paye' : 'impaye',
                 'statut_reglement' => 1,
+                'statut' =>'confirmée', // Statut de la vente,
             ]);
 
             DB::commit(); // ✅ Si tout va bien, on valide la transaction
-
+            // ✅ Retour succès avec message
+            Alert::success('Règlement effectué avec succès')->flash();
             return back()->with('success', 'Règlement effectué avec succès');
         } catch (\Throwable $th) {
             DB::rollBack(); // ❌ Une erreur → on annule tout
             Log::error('Erreur règlement : ' . $th->getMessage());
+
+            
 
             return back()->with('error', 'Une erreur est survenue : ' . $th->getMessage());
         }

@@ -154,80 +154,97 @@
 
 
 
+                                <h4 class="fw-bold my-3 text-center ">Informations sur le client</h4>
 
-                                <div class="row" id="client">
-                                    <h4 class="fw-bold my-3 text-center ">Informations sur le client</h4>
+                                @if ($vente->client)
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Nom du client</label>
+                                                <input type="text" name="client_name"
+                                                    value="{{ $vente->client->first_name }} {{ $vente->client->last_name }}"
+                                                    class="form-control" id="clientName" readonly>
+                                            </div>
+                                        </div>
 
-
-                                    <!-- ========== Start selectionner un client si il existe ========== -->
-
-                                    <div class="col-md-12 mb-4">
-                                        <div class="mb-3">
-                                            <label for="username" class="form-label">Choisir un client existant</label>
-                                            <select class="form-select" name="client_id" id="clientId" data-choices
-                                                data-choices-sorting-true data-choices-removeItem>
-                                                <option value="" selected>Selectionner...</option>
-                                                @foreach ($client as $item)
-                                                    <option value="{{ $item->id }}">
-                                                        {{ $item->last_name }} {{ $item->first_name }}</option>
-                                                @endforeach
-                                            </select>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Téléphone du client</label>
+                                                <input type="text" name="client_phone"
+                                                    value="{{ $vente->client->phone }}" class="form-control"
+                                                    id="clientPhone" readonly>
+                                            </div>
                                         </div>
                                     </div>
+                                @else
+                                    <p class="text-danger text-center">Aucun client associé à cette vente.</p>
+
+                                    <div class="row" id="client">
 
 
+                                        <!-- ========== Start selectionner un client si il existe ========== -->
 
-                                    {{-- <div class="col-md-3">
-                                        <div class="mb-3">
+                                        <div class="col-md-12 mb-4">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Choisir un client
+                                                    existant</label>
+                                                <select class="form-control clientId" name="client_id" data-choices
+                                                    data-choices-sorting-true data-choices-removeItem>
+                                                    <option value="">Selectionner...</option>
+                                                    @foreach ($client as $item)
+                                                        <option value="{{ $item->id }}">
+                                                            {{ $item->last_name }} {{ $item->first_name }}</option>
+                                                    @endforeach
+                                                </select>
 
-                                            <button class="btn btn-primary mt-4 w-100" type="button"
-                                                id="ajouterClient"><i class="ri-add-line"></i>
-                                                Nouveau client</button>
 
+                                            </div>
                                         </div>
-                                    </div> --}}
 
-                                    <!-- ========== End selectionner un client si il existe ========== -->
+                                        <!-- ========== End selectionner un client si il existe ========== -->
 
-                                    <div class="col-md-12 d-flex justify-content-between mb-2 newClient">
-                                        <hr class="text-primary w-50 fw-bold">
-                                        <h4 class="fw-bold text-center my-3 text-danger">OU créer un nouveau client</h4>
-                                        <hr class="text-primary w-50 fw-bold">
+                                        <div class="col-md-12 d-flex justify-content-between mb-2 newClient">
+                                            <hr class="text-primary w-50 fw-bold">
+                                            <h4 class="fw-bold text-center my-3 text-danger">OU créer un nouveau client
+                                            </h4>
+                                            <hr class="text-primary w-50 fw-bold">
+                                        </div>
+
+
+
+
+                                        <!-- ========== Start Créer un nouveau client ========== -->
+
+                                        <div class="col-md-4 newClient">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Nom</label>
+                                                <input type="text" name="last_name" class="form-control "
+                                                    id="nomClient">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 newClient">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Prenoms</label>
+                                                <input type="text" name="first_name" class="form-control"
+                                                    id="prenomClient">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4 newClient">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Telephone</label>
+                                                <input type="number" name="phone" class="form-control "
+                                                    id="telephoneClient">
+                                            </div>
+                                        </div>
+
+
+                                        <!-- ========== End Créer un nouveau client ========== -->
+
                                     </div>
 
-
-
-
-                                    <!-- ========== Start Créer un nouveau client ========== -->
-
-                                    <div class="col-md-4 newClient">
-                                        <div class="mb-3">
-                                            <label for="username" class="form-label">Nom</label>
-                                            <input type="text" name="last_name" class="form-control "
-                                                id="nomClient">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4 newClient">
-                                        <div class="mb-3">
-                                            <label for="username" class="form-label">Prenoms</label>
-                                            <input type="text" name="first_name" class="form-control "
-                                                id="prenomClient">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4 newClient">
-                                        <div class="mb-3">
-                                            <label for="username" class="form-label">Telephone</label>
-                                            <input type="number" name="phone" class="form-control "
-                                                id="telephoneClient">
-                                        </div>
-                                    </div>
-
-
-                                    <!-- ========== End Créer un nouveau client ========== -->
-
-                                </div>
+                                @endif
                                 <!-- ========== End Client si impayé ========== -->
                                 <div class="mt-3">
                                     <button class="btn btn-success w-100" type="submit">Valider</button>
