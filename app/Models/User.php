@@ -53,7 +53,7 @@ class User extends Authenticatable
 
     public function ventes()
     {
-        return $this->hasMany(Vente::class);
+        return $this->hasMany(Vente::class , 'client_id');
     }
 
     public function factures()

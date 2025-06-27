@@ -68,6 +68,13 @@ class VenteController extends Controller
         try {
 
             $caisses = Caisse::all();
+            // client
+
+            $clients = User::whereHas('roles', function ($query) {
+                $query->where('name', 'client');
+            })->get();
+
+
 
             // ##Filtres de recherche
             // $query = Vente::with('produits')
@@ -118,6 +125,9 @@ class VenteController extends Controller
             $dateFin = $request->input('date_fin');
             $caisse = $request->input('caisse');
             $periode = $request->input('periode');
+            $statut_paiement = $request->input('statut_paiement');
+            $client = $request->input('client');
+
 
 
             // Formatage des dates
@@ -156,12 +166,23 @@ class VenteController extends Controller
                 }
             }
 
+            // Application du filtre de statut de paiement
+            if ($request->filled('statut_paiement')) {
+                $query->where('statut_paiement', $request->statut_paiement);
+            }
+
+            // Application du filtre de client
+            if ($request->filled('client')) {
+                $query->where('client_id', $request->client);
+            }
+
             //si l'utilisateur a le rôle 'caisse' ou 'supercaisse' on affiche les ventes de la caisse actuelle
-            if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
+            if ($request->user()->hasRole(['caisse'])) {
                 $query->where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', false)
                     ->whereDate('date_vente', auth()->user()->caisse->session_date_vente); // ✅ Compare seulement la date
+                    
             }
 
 
@@ -201,7 +222,7 @@ class VenteController extends Controller
 
 
 
-            return view('backend.pages.vente.index', compact('data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement'));
+            return view('backend.pages.vente.index', compact('data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'clients'));
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes : ' . $e->getMessage());
             return back();

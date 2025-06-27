@@ -46,7 +46,7 @@
             background: linear-gradient(135deg, #fa5c6c, #f06548);
         }
 
-            .bg-gradient-danger2 {
+        .bg-gradient-danger2 {
             background: linear-gradient(135deg, #a886ec, #655ce7);
         }
 
@@ -95,7 +95,7 @@
     <div class="row">
 
         <!-- ========== Start filtre ========== -->
-        @if (!auth()->user()->hasRole(['caisse', 'supercaisse']))
+        {{-- @if (!auth()->user()->hasRole(['caisse', 'supercaisse']))
             <form action="{{ route('vente.index') }}" method="GET">
                 <div class="row mb-3">
 
@@ -114,16 +114,18 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label for="date_debut" class="form-label">Date de début</label>
                         <input type="date" value="{{ request('date_debut') }}" class="form-control" id="date_debut"
                             name="date_debut">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <label for="date_fin" class="form-label">Date de fin</label>
                         <input type="date" value="{{ request('date_fin') }}" class="form-control" id="date_fin"
                             name="date_fin">
                     </div>
+
+
                     <div class="col-md-2">
                         <label for="caisse" class="form-label">Caisse</label>
                         <select class="form-select" id="caisse" name="caisse">
@@ -136,12 +138,120 @@
                         </select>
                     </div>
 
+                    <div class="col-md-2">
+                        <label for="caisse" class="form-label">Clients</label>
+                        <select class="form-select" id="client" name="client">
+
+                            <option value= " ">Tout les clients</option>
+                            @foreach ($clients as $client)
+                                <option value="{{ $client->id }}"
+                                    {{ request('client') == $client->id ? 'selected' : '' }}>{{ $client->first_name }}
+                                    {{ $client->last_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label for="caisse" class="form-label">Statut</label>
+                        <select class="form-select" id="statutPaiement" name="statut_paiement">
+
+                            <option value= "">Tout les statuts</option>
+                            <option value="paye" {{ request('statut_paiement') == 'paye' ? 'selected' : '' }}>Payé
+                            </option>
+                            <option value="impaye" {{ request('statut_paiement') == 'impaye' ? 'selected' : '' }}>
+                                Impayé</option>
+                        </select>
+                    </div>
+
                     <div class="col-md-2 mt-4">
                         <button type="submit" class="btn btn-primary w-100">Filtrer</button>
                     </div>
                 </div>
             </form>
-        @endif
+        @endif --}}
+
+
+        @php
+            $selectedPeriode = request('periode');
+            $selectedDateDebut = request('date_debut');
+            $selectedDateFin = request('date_fin');
+            $selectedCaisse = request('caisse');
+            $selectedClient = request('client');
+            $selectedStatut = request('statut_paiement');
+        @endphp
+
+        <form action="{{ route('vente.index') }}" method="GET">
+            <div class="row mb-3 d-flex justify-content-center">
+
+                {{-- Filtres réservés aux rôles autres que caisse/supercaisse --}}
+                @unless (auth()->user()->hasRole(['caisse', 'supercaisse']))
+                    <div class="col-md-4">
+                        <label for="periode" class="form-label">Période</label>
+                        <select class="form-select" id="periode" name="periode">
+                            <option value="">Toutes les périodes</option>
+                            @foreach (['jour' => 'Jour', 'semaine' => 'Semaine', 'mois' => 'Mois', 'annee' => 'Année'] as $key => $label)
+                                <option value="{{ $key }}" {{ $selectedPeriode === $key ? 'selected' : '' }}>
+                                    {{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="date_debut" class="form-label">Date de début</label>
+                        <input type="date" id="date_debut" name="date_debut" class="form-control"
+                            value="{{ $selectedDateDebut }}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="date_fin" class="form-label">Date de fin</label>
+                        <input type="date" id="date_fin" name="date_fin" class="form-control"
+                            value="{{ $selectedDateFin }}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="caisse" class="form-label">Caisse</label>
+                        <select class="form-select" id="caisse" name="caisse">
+                            <option value="">Toutes les caisses</option>
+                            @foreach ($caisses as $caisse)
+                                <option value="{{ $caisse->id }}" {{ $selectedCaisse == $caisse->id ? 'selected' : '' }}>
+                                    {{ $caisse->libelle }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endunless
+
+                {{-- Filtres visibles pour tous --}}
+                <div class="col-md-4">
+                    <label for="client" class="form-label">Clients</label>
+                    <select class="form-select" id="client" name="client">
+                        <option value="">Tous les clients</option>
+                        @foreach ($clients as $client)
+                            <option value="{{ $client->id }}" {{ $selectedClient == $client->id ? 'selected' : '' }}>
+                                {{ $client->first_name }} {{ $client->last_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="statutPaiement" class="form-label">Statut</label>
+                    <select class="form-select" id="statutPaiement" name="statut_paiement">
+                        <option value="">Tous les statuts</option>
+                        <option value="paye" {{ $selectedStatut === 'paye' ? 'selected' : '' }}>Payé</option>
+                        <option value="impaye" {{ $selectedStatut === 'impaye' ? 'selected' : '' }}>Impayé</option>
+                    </select>
+                </div>
+
+                {{-- Boutons d'action --}}
+                <div class="col-md-2 d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                    <a href="{{ route('vente.index') }}" class="btn btn-outline-secondary w-100">Réinitialiser</a>
+                </div>
+
+            </div>
+        </form>
+
         <!-- ========== End filtre ========== -->
 
 
@@ -171,15 +281,16 @@
         @endif
 
         <div class="card">
+            <!-- ========== Start filter result libellé ========== -->
             <div class="card-header d-flex justify-content-between">
+                {{-- <h5 class="card-title mb-0 filter" style="text-align: center">Liste des ventes
+                    @if (request('date_debut') || request('date_fin') || request('caisse') || request('periode') || request('statut_paiement'))
 
 
-                <!-- ========== Start filter result libellé ========== -->
-                <h5 class="card-title mb-0 filter" style="text-align: center">Liste des ventes
-                    @if (request('date_debut') || request('date_fin') || request('caisse') || request('periode'))
-
-
-
+                        @if (request()->has('statut_paiement') && request('statut_paiement') != null)
+                            -
+                            <strong>{{ request('statut_paiement') }}</strong>
+                        @endif
                         @if (request()->has('periode') && request('periode') != null)
                             -
                             <strong>{{ request('periode') }}</strong>
@@ -203,10 +314,62 @@
                         du mois en cours - {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}
                     @endif
 
+                </h5> --}}
+
+                @php
+                    use Carbon\Carbon;
+
+                    $dateDebut = request('date_debut') ? Carbon::parse(request('date_debut'))->format('d/m/Y') : null;
+                    $dateFin = request('date_fin') ? Carbon::parse(request('date_fin'))->format('d/m/Y') : null;
+                    $caisseLabel = request('caisse')
+                        ? optional(App\Models\Caisse::find(request('caisse')))->libelle
+                        : null;
+                        $client = request('client') ? optional(App\Models\User::find(request('client')))->first_name  : null;
+                @endphp
+
+                <h5 class="card-title mb-0" style="text-align: center;">
+                    Liste des ventes
+                    @if (request()->filled('statut_paiement') ||
+                            request()->filled('periode') ||
+                            request()->filled('date_debut') ||
+                            request()->filled('date_fin') ||
+                            request()->filled('caisse') ||
+                            request()->filled('client'))
+                        @if (request()->filled('statut_paiement'))
+                            - {{ request('statut_paiement') }}
+                        @endif
+
+                        @if (request()->filled('periode'))
+                            - {{ request('periode') }}
+                        @endif
+
+                        @if ($dateDebut || $dateFin)
+                            - du
+                            @if ($dateDebut)
+                                {{ $dateDebut }}
+                            @endif
+                            @if ($dateFin)
+                                au {{ $dateFin }}
+                            @endif
+                        @endif
+
+                        @if ($caisseLabel)
+                            - {{ ucfirst($caisseLabel) }}
+                        @endif
+
+                          @if ($client)
+                           de {{ ucfirst($client) }}
+                        @endif
+                    @else
+                        - du mois en cours - {{ Carbon::now()->translatedFormat('F Y') }}
+                    @endif
                 </h5>
-                <!-- ========== End filter result libellé ========== -->
+
+
 
             </div>
+            <!-- ========== End filter result libellé ========== -->
+
 
             <!-- ========== Start button action ========== -->
             <div class="card-header mb-3 d-flex justify-content-center">
@@ -356,19 +519,20 @@
                                     <p class="card-value">
                                         {{ number_format($data_vente->sum('montant_total'), 0, ',', ' ') }} FCFA
                                     </p>
-                                    
+
                                 </div>
                             </div>
                         </div>
 
-                         <div class="col-md-3">
+                        <div class="col-md-3">
                             <div class="card card-custom bg-gradient-danger2">
                                 <div class="card-body text-center">
                                     <h5 class="card-title">Impayés</h5>
                                     <p class="card-value ">
-                                        {{ number_format($data_vente->where('statut_paiement', 'impaye')->sum('montant_restant'), 0, ',', ' ') }} FCFA
+                                        {{ number_format($data_vente->where('statut_paiement', 'impaye')->sum('montant_restant'), 0, ',', ' ') }}
+                                        FCFA
                                     </p>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -425,12 +589,14 @@
                         <tbody>
                             @forelse ($data_vente as $key => $item)
                                 <tr id="row_{{ $item['id'] }}">
-                                   
+
                                     <td> {{ $loop->iteration }} </td>
-                                     <td> <span class="badge bg-{{ $item['statut'] == 'en attente' ? 'warning' : 'success' }}">{{ $item['statut'] }}</span> </td>
+                                    <td> <span
+                                            class="badge bg-{{ $item['statut'] == 'en attente' ? 'warning' : 'success' }}">{{ $item['statut'] }}</span>
+                                    </td>
                                     <td> <a class="fw-bold"
                                             href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a> </td>
-                                 
+
                                     <td> {{ $item['numero_table'] ?? 'non défini' }}</td>
                                     <td> {{ \Carbon\Carbon::parse($item['date_vente'])->format('d-m-Y') }}
                                         {{ $item['created_at']->format('à H:i') }} </td>

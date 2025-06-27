@@ -1,7 +1,7 @@
 @extends('backend.layouts.master')
 @section('title')
     {{-- @lang('translation.datatables') --}}
-   Client
+    Client
 @endsection
 @section('css')
     <!--datatable css-->
@@ -40,6 +40,7 @@
                                     <th>Nom</th>
                                     <th>Prenoms</th>
                                     <th>Telephone</th>
+                                    <th>Ventes impayées</th>
                                     <th>Date creation</th>
                                     <th>Actions</th>
                                 </tr>
@@ -51,6 +52,23 @@
                                         <td>{{ $item['last_name'] }}</td>
                                         <td>{{ $item['first_name'] }}</td>
                                         <td>{{ $item['phone'] }}</td>
+
+                                        <td>
+                                            {{-- <a href="{{ route('vente.index', ['client' => $item['id']]) }}"
+                                                class="btn btn-primary btn-sm">
+                                                Total : {{ $item->ventes->count() }}
+                                            </a>
+
+                                            <a href="{{ route('vente.index', ['client' => $item['id'], 'statut_paiement' => 'paye']) }}"
+                                                class="btn btn-success btn-sm">
+                                                Payé : {{ $item->ventes->where('statut_paiement', 'paye')->count() }}
+                                            </a> --}}
+
+                                            <a href=" {{ route('vente.index', ['client' => $item['id'], 'statut_paiement' => 'impaye']) }}"
+                                                class="btn {{$item->ventes_impaye == 0 ? 'btn-success' : 'btn-danger'}} btn-sm">
+                                                {{ $item->ventes->where('statut_paiement', 'impaye')->count() }}
+                                            </a>
+                                        </td>
                                         <td> {{ $item['created_at'] }} </td>
                                         <td>
                                             <div class="dropdown d-inline-block">
@@ -63,6 +81,10 @@
                                                                 class="ri-lock-fill align-bottom me-2 text-muted"></i>
                                                             Change password</a>
                                                     </li> --}}
+                                                    <li><a href="{{ route('vente.index', ['client' => $item['id']]) }}"  class="dropdown-item edit-item-btn"><i
+                                                                class="ri-history-fill align-bottom me-2 text-muted"></i>
+                                                            Historique des ventes</a></li>
+                                                    <li>
                                                     <li><a type="button" class="dropdown-item edit-item-btn"
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#myModalEdit{{ $item['id'] }}"><i
@@ -83,14 +105,14 @@
                                 @endforeach
 
 
-                            </table>
-                        </div>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
-        <!--end row-->
-        @include('backend.pages.auth-client.create')
+    </div>
+    <!--end row-->
+    @include('backend.pages.auth-client.create')
 @endsection
 @section('script')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -110,9 +132,9 @@
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
 
     <script>
-         $(document).ready(function(){
-        var route = "client"
-        delete_row(route);
-       })
+        $(document).ready(function() {
+            var route = "client"
+            delete_row(route);
+        })
     </script>
 @endsection

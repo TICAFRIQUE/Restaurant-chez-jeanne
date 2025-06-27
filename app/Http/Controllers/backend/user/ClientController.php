@@ -12,9 +12,27 @@ class ClientController extends Controller
     public function index()
     {
         try {
-            $clients = User::whereHas('roles', function ($query) {
-                $query->where('name', 'client');
-            })->get();
+
+            // Récupération des utilisateurs ayant le rôle 'client'
+            $query = User::withCount('ventes as ventes_total')
+                ->withCount([
+                    'ventes as ventes_paye'
+                    => function ($query) {
+                        $query->where('statut_paiement', '=', 'paye');
+                    },
+                    'ventes as ventes_impaye'
+                    => function ($query) {
+                        $query->where('statut_paiement', '=', 'impaye');
+                    }
+                ])
+                ->whereHas('roles', function ($query) {
+                    $query->where('name', 'client');
+                });
+
+            $clients = $query->get();
+
+            // dd($clients->toArray());
+
             return view('backend.pages.auth-client.index', compact('clients'));
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());

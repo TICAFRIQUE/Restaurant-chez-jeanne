@@ -223,11 +223,15 @@
                         </table>
                     </div>
                 </div>
-
-
             </div>
 
-            <!-- ========== Start facture generé ========== -->
+
+
+
+
+
+
+            <!-- ========== Start facture generée ========== -->
             <div class="ticket-container"
                 style="font-family: 'Courier New', monospace; font-size: 14px; width: 300px; margin: 0 auto;">
                 <div class="ticket-header" style="text-align: center; margin-bottom: 10px;">
@@ -354,24 +358,26 @@
 
                 <hr style="border-top: 1px dashed black; margin: 5px 0;">
 
-                <table style="width: 100%; font-size: 18px; font-weight:bold;">
-                    <tr>
-                        <td><strong>Règlement le :</strong></td>
-                        <td style="text-align: right;">{{ $vente->created_at->format('d/m/Y à H:i') }}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Reçu :</strong></td>
-                        <td style="text-align: right;">
-                            {{ $vente->montant_recu ? number_format($vente->montant_recu, 0, ',', ' ') : '0' }} FCFA
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Rendu:</strong></td>
-                        <td style="text-align: right;">
-                            {{ $vente->montant_rendu ? number_format($vente->montant_rendu, 0, ',', ' ') : '0' }} FCFA
-                        </td>
-                    </tr>
-                </table>
+                @if ($vente->statut_reglement == 1)
+                    <table style="width: 100%; font-size: 18px; font-weight:bold;">
+                        <tr>
+                            <td><strong>Règlement le :</strong></td>
+                            <td style="text-align: right;">{{ $vente->created_at->format('d/m/Y à H:i') }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reçu :</strong></td>
+                            <td style="text-align: right;">
+                                {{ $vente->montant_recu ? number_format($vente->montant_recu, 0, ',', ' ') : '0' }} FCFA
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rendu:</strong></td>
+                            <td style="text-align: right;">
+                                {{ $vente->montant_rendu ? number_format($vente->montant_rendu, 0, ',', ' ') : '0' }} FCFA
+                            </td>
+                        </tr>
+                    </table>
+                @endif
 
 
                 <hr style="border-top: 1px dashed black; margin: 5px 0;">
