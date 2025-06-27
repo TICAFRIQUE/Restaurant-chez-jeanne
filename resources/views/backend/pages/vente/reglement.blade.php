@@ -152,8 +152,6 @@
 
                                 <!-- ========== Start Client si impayé ========== -->
 
-
-
                                 <h4 class="fw-bold my-3 text-center ">Informations sur le client</h4>
 
                                 @if ($vente->client)
@@ -188,13 +186,21 @@
                                             <div class="mb-3">
                                                 <label for="username" class="form-label">Choisir un client
                                                     existant</label>
-                                                <select class="form-control clientId" name="client_id" data-choices
+                                                <select id="username" class="form-select clientId" name="client_id" data-choices
                                                     data-choices-sorting-true data-choices-removeItem>
                                                     <option value="">Selectionner...</option>
                                                     @foreach ($client as $item)
+                                                        <!-- ========== compter les commande impayé du client ========== -->
+                                                        @php
+                                                            $impayeCount = $item->ventes()
+                                                                ->where('statut_paiement', 'impaye')
+                                                                ->count();
+                                                        @endphp
+
                                                         <option value="{{ $item->id }}">
-                                                            {{ $item->last_name }} {{ $item->first_name }}</option>
+                                                            {{ $item->first_name }} {{ $item->last_name }}  <span class="text-danger fw-bold d-{{ $impayeCount > 0 ? 'block' : 'none' }}">({{ $impayeCount }} vente impayée)</span></option>
                                                     @endforeach
+                                                   
                                                 </select>
 
 

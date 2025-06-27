@@ -177,7 +177,7 @@ class VenteController extends Controller
             }
 
             //si l'utilisateur a le rôle 'caisse' ou 'supercaisse' on affiche les ventes de la caisse actuelle
-            if ($request->user()->hasRole(['caisse'])) {
+            if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
                 $query->where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', false)

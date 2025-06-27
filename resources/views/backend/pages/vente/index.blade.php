@@ -219,35 +219,39 @@
                             @endforeach
                         </select>
                     </div>
+
+                    {{-- Filtres visibles pour tous --}}
+                    <div class="col-md-4">
+                        <label for="client" class="form-label">Clients</label>
+                        <select class="form-select" id="client" name="client">
+                            <option value="">Tous les clients</option>
+                            @foreach ($clients as $client)
+                                <option value="{{ $client->id }}" {{ $selectedClient == $client->id ? 'selected' : '' }}>
+                                    {{ $client->first_name }} {{ $client->last_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="statutPaiement" class="form-label">Statut</label>
+                        <select class="form-select" id="statutPaiement" name="statut_paiement">
+                            <option value="">Tous les statuts</option>
+                            <option value="paye" {{ $selectedStatut === 'paye' ? 'selected' : '' }}>Payé</option>
+                            <option value="impaye" {{ $selectedStatut === 'impaye' ? 'selected' : '' }}>Impayé</option>
+                        </select>
+                    </div>
+
+                    {{-- Boutons d'action --}}
+                    <div class="col-md-2 d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                        <a href="{{ route('vente.index') }}" class="btn btn-outline-secondary w-100">Réinitialiser</a>
+                    </div>
                 @endunless
 
-                {{-- Filtres visibles pour tous --}}
-                <div class="col-md-4">
-                    <label for="client" class="form-label">Clients</label>
-                    <select class="form-select" id="client" name="client">
-                        <option value="">Tous les clients</option>
-                        @foreach ($clients as $client)
-                            <option value="{{ $client->id }}" {{ $selectedClient == $client->id ? 'selected' : '' }}>
-                                {{ $client->first_name }} {{ $client->last_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
 
-                <div class="col-md-4">
-                    <label for="statutPaiement" class="form-label">Statut</label>
-                    <select class="form-select" id="statutPaiement" name="statut_paiement">
-                        <option value="">Tous les statuts</option>
-                        <option value="paye" {{ $selectedStatut === 'paye' ? 'selected' : '' }}>Payé</option>
-                        <option value="impaye" {{ $selectedStatut === 'impaye' ? 'selected' : '' }}>Impayé</option>
-                    </select>
-                </div>
 
-                {{-- Boutons d'action --}}
-                <div class="col-md-2 d-flex gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
-                    <a href="{{ route('vente.index') }}" class="btn btn-outline-secondary w-100">Réinitialiser</a>
-                </div>
+
 
             </div>
         </form>
@@ -324,7 +328,7 @@
                     $caisseLabel = request('caisse')
                         ? optional(App\Models\Caisse::find(request('caisse')))->libelle
                         : null;
-                        $client = request('client') ? optional(App\Models\User::find(request('client')))->first_name  : null;
+                    $client = request('client') ? optional(App\Models\User::find(request('client')))->first_name : null;
                 @endphp
 
                 <h5 class="card-title mb-0" style="text-align: center;">
@@ -357,8 +361,8 @@
                             - {{ ucfirst($caisseLabel) }}
                         @endif
 
-                          @if ($client)
-                           de {{ ucfirst($client) }}
+                        @if ($client)
+                            de {{ ucfirst($client) }}
                         @endif
                     @else
                         - du mois en cours - {{ Carbon::now()->translatedFormat('F Y') }}
