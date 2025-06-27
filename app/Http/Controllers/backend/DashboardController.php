@@ -81,7 +81,7 @@ class DashboardController extends Controller
 
         /// Montant total des ventes mois en cours 
         $montantTotalVentesMois = Vente::whereMonth('date_vente', Carbon::now()->month)
-            ->sum('montant_total');
+            ->sum('montant_avant_remise');
 
         // Montant total des ventes annee en cours
         $montantTotalDepensesMois = Depense::whereMonth('date_depense', Carbon::now()->month)

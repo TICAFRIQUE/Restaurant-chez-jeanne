@@ -70,6 +70,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => Admin::class,
         'check.session' => \App\Http\Middleware\CheckSession::class,
+        'check.inventaire' => \App\Http\Middleware\CheckInventaireMensuel::class,
 
 
         // Autres middlewares
