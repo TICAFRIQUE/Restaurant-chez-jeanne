@@ -182,7 +182,8 @@
 
                                 <li class="nav-item active">
                                     <a href="{{ route('etat-stock.suiviStock') }}"
-                                        class="nav-link {{ Route::is('suivi-stock.*') ? 'active' : '' }}">Suivi du stock</a>
+                                        class="nav-link {{ Route::is('suivi-stock.*') ? 'active' : '' }}">Suivi du
+                                        stock</a>
                                 </li>
 
 
@@ -239,187 +240,197 @@
                                 </li>
 
 
-                                <li class="nav-item active">
-                                    <a href="{{ route('vente.index') }}"
-                                        class="nav-link {{ Route::is('vente.*') ? 'active' : '' }}">Ventes</a>
-                                </li>
+                                <!-- ========== Start si le role est caisse ou supercaisse on redirige les vente direct sur vente non reglé par defaut ========== -->
 
-                                {{-- <li class="nav-item active">
-                                    <a href="{{ route('vente.index') }}"
-                                        class="nav-link {{ Route::is('vente.*') ? 'active' : '' }}">Liste des Ventes</a>
-                                </li> --}}
+                                @if (Auth::user()->hasRole(['caisse', 'supercaisse']))
+                                    <li class="nav-item active">
+                                        <a href="{{ route('vente.index', ['statut_reglement' => '0']) }}"
+                                            class="nav-link {{ Route::is('vente.*') ? 'active' : '' }}">Ventes</a>
+                                    </li>
+                                @else
+                                    <li class="nav-item active">
+                                        <a href="{{ route('vente.index') }}"
+                                            class="nav-link {{ Route::is('vente.*') ? 'active' : '' }}">Ventes</a>
+                                    </li>
+                                @endif
 
-                                <li class="nav-item active">
-                                    <a href="{{ route('commande.index', ['filter' => 'en attente']) }}"
-                                        class="nav-link {{ Route::is('commande.*') ? 'active' : '' }}">Commandes</a>
-                                </li>
-                            </ul>
-                        </div>
                     </li>
-                @endcan
+
+                    <!-- ========== End si le role est caisse ou supercaisse on redirige les vente direct sur vente non reglé par defaut ========== -->
 
 
-                @can('voir-menu')
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="#sideBarMenu" data-bs-toggle="collapse" role="button"
-                            aria-controls="sideBarMenu">
-                            <i class="ri ri-file-list-line"></i> <span>PLATS & MENU</span>
-                        </a>
-                        <div class="collapse menu-dropdown {{ Route::is('menu.*') || Route::is('plat.*') || Route::is('plat-menu.*') || Route::is('categorie-menu.*') ? 'show' : '' }}"
-                            id="sideBarMenu">
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item active">
-                                    <a href="{{ route('categorie-menu.index') }}"
-                                        class="nav-link {{ Route::is('categorie-menu') ? 'active' : '' }}">
-                                        Categories</a>
-                                </li>
 
-                                <li class="nav-item active">
-                                    <a href="{{ route('plat.index') }}"
-                                        class="nav-link {{ Route::is('plat.*') ? 'active' : '' }}">Plats Quotidiens</a>
-                                </li>
 
-                                <li class="nav-item active">
-                                    <a href="{{ route('plat-menu.index') }}"
-                                        class="nav-link {{ Route::is('plat-menu.*') ? 'active' : '' }}">Plats Menu </a>
-                                </li>
-
-                                <li class="nav-item active">
-                                    <a href="{{ route('menu.index') }}"
-                                        class="nav-link {{ Route::is('menu.*') ? 'active' : '' }}">Menu du jour</a>
-                                </li>
-                            </ul>
-                        </div>
+                    <li class="nav-item active">
+                        <a href="{{ route('commande.index', ['filter' => 'en attente']) }}"
+                            class="nav-link {{ Route::is('commande.*') ? 'active' : '' }}">Commandes</a>
                     </li>
-                @endcan
+                </ul>
+            </div>
+            </li>
+        @endcan
 
-                @can('voir-rapport')
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="#sideBarRapport" data-bs-toggle="collapse" role="button"
-                            aria-controls="sideBarRapport">
-                            <i class="ri ri-file-list-line"></i> <span>RAPPORTS</span>
-                        </a>
-                        <div class="collapse menu-dropdown {{ Route::is('rapport.*') ? 'show' : '' }}"
-                            id="sideBarRapport">
-                            <ul class="nav nav-sm flex-column">
 
-                                <li class="nav-item active">
-                                    <a href="{{ route('rapport.historique') }}"
-                                        class="nav-link {{ Route::is('rapport.historique') ? 'active' : '' }}">Historiques
-                                       </a>
-                                </li>
+        @can('voir-menu')
+            <li class="nav-item">
+                <a class="nav-link menu-link" href="#sideBarMenu" data-bs-toggle="collapse" role="button"
+                    aria-controls="sideBarMenu">
+                    <i class="ri ri-file-list-line"></i> <span>PLATS & MENU</span>
+                </a>
+                <div class="collapse menu-dropdown {{ Route::is('menu.*') || Route::is('plat.*') || Route::is('plat-menu.*') || Route::is('categorie-menu.*') ? 'show' : '' }}"
+                    id="sideBarMenu">
+                    <ul class="nav nav-sm flex-column">
+                        <li class="nav-item active">
+                            <a href="{{ route('categorie-menu.index') }}"
+                                class="nav-link {{ Route::is('categorie-menu') ? 'active' : '' }}">
+                                Categories</a>
+                        </li>
 
-                                {{-- <li class="nav-item active">
+                        <li class="nav-item active">
+                            <a href="{{ route('plat.index') }}"
+                                class="nav-link {{ Route::is('plat.*') ? 'active' : '' }}">Plats Quotidiens</a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a href="{{ route('plat-menu.index') }}"
+                                class="nav-link {{ Route::is('plat-menu.*') ? 'active' : '' }}">Plats Menu </a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a href="{{ route('menu.index') }}"
+                                class="nav-link {{ Route::is('menu.*') ? 'active' : '' }}">Menu du jour</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        @endcan
+
+        @can('voir-rapport')
+            <li class="nav-item">
+                <a class="nav-link menu-link" href="#sideBarRapport" data-bs-toggle="collapse" role="button"
+                    aria-controls="sideBarRapport">
+                    <i class="ri ri-file-list-line"></i> <span>RAPPORTS</span>
+                </a>
+                <div class="collapse menu-dropdown {{ Route::is('rapport.*') ? 'show' : '' }}" id="sideBarRapport">
+                    <ul class="nav nav-sm flex-column">
+
+                        <li class="nav-item active">
+                            <a href="{{ route('rapport.historique') }}"
+                                class="nav-link {{ Route::is('rapport.historique') ? 'active' : '' }}">Historiques
+                            </a>
+                        </li>
+
+                        {{-- <li class="nav-item active">
                                     <a href="{{ route('rapport.produit') }}"
                                         class="nav-link {{ Route::is('rapport.produit') ? 'active' : '' }}">Chiffre
                                         d'affaire par
                                         produit</a>
                                 </li> --}}
-                                <li class="nav-item active">
-                                    <a href="{{ route('rapport.vente') }}"
-                                        class="nav-link {{ Route::is('rapport.vente') ? 'active' : '' }}">
-                                        Ventes</a>
-                                </li>
-                                <li class="nav-item active">
-                                    <a href="{{ route('rapport.exploitation') }}"
-                                        class="nav-link {{ Route::is('rapport.exploitation') ? 'active' : '' }}">Exploitation</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                @endcan
+                        <li class="nav-item active">
+                            <a href="{{ route('rapport.vente') }}"
+                                class="nav-link {{ Route::is('rapport.vente') ? 'active' : '' }}">
+                                Ventes</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a href="{{ route('rapport.exploitation') }}"
+                                class="nav-link {{ Route::is('rapport.exploitation') ? 'active' : '' }}">Exploitation</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        @endcan
 
-                @can('voir-site')
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="#sidebarSite" data-bs-toggle="collapse" role="button"
-                            aria-controls="sidebarSite">
-                            <i class="ri ri-global-fill"></i> <span>SITE</span>
-                        </a>
-                        <div class="collapse menu-dropdown {{ Route::is('slide.*') ? 'show' : '' }}" id="sidebarSite">
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item active">
-                                    <a href="{{ route('slide.index') }}"
-                                        class="nav-link {{ Route::is('slide.*') ? 'active' : '' }}">Slides</a>
-                                </li>
-
-
-                            </ul>
-                        </div>
-                    </li>
-                @endcan
-
-                @can('voir-ressource humaine')
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="#sidebarRh" data-bs-toggle="collapse" role="button"
-                            aria-controls="sidebarRh">
-                            <i class="ri ri-home-office-fill"></i> <span>RESSOURCES HUMAINES</span>
-                        </a>
-                        <div class="collapse menu-dropdown {{ Route::is('poste.*') || Route::is('employe.*') || Route::is('paie.*') ? 'show' : '' }}"
-                            id="sidebarRh">
-                            <ul class="nav nav-sm flex-column">
-
-                                <li class="nav-item active">
-                                    <a href="{{ route('poste.index') }}"
-                                        class="nav-link {{ Route::is('poste.*') ? 'active' : '' }}">Postes</a>
-                                </li>
-
-                                <li class="nav-item active">
-                                    <a href="{{ route('employe.index') }}"
-                                        class="nav-link {{ Route::is('employe.*') ? 'active' : '' }}">Employés</a>
-                                </li>
-
-                                <li class="nav-item active">
-                                    <a href="{{ route('paie.index') }}"
-                                        class="nav-link {{ Route::is('paie.*') ? 'active' : '' }}">Paie</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                @endcan
+        @can('voir-site')
+            <li class="nav-item">
+                <a class="nav-link menu-link" href="#sidebarSite" data-bs-toggle="collapse" role="button"
+                    aria-controls="sidebarSite">
+                    <i class="ri ri-global-fill"></i> <span>SITE</span>
+                </a>
+                <div class="collapse menu-dropdown {{ Route::is('slide.*') ? 'show' : '' }}" id="sidebarSite">
+                    <ul class="nav nav-sm flex-column">
+                        <li class="nav-item active">
+                            <a href="{{ route('slide.index') }}"
+                                class="nav-link {{ Route::is('slide.*') ? 'active' : '' }}">Slides</a>
+                        </li>
 
 
-                @if (Auth::user()->role == 'superadmin' || Auth::user()->role == 'developpeur' || Auth::user()->can('voir-parametre'))
-                    <li class="nav-item">
-                        <a class="nav-link menu-link" href="#sidebarAuth" data-bs-toggle="collapse" role="button"
-                            aria-controls="sidebarAuth">
-                            <i class=" ri-settings-2-fill"></i> <span>PARAMETRE</span>
-                        </a>
-                        <div class="collapse menu-dropdown {{ Route::is('setting.*') || Route::is('module.*') || Route::is('role.*') || Route::is('permission.*') || Route::is('admin-register.*') ? 'show' : '' }}"
-                            id="sidebarAuth">
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item active">
-                                    <a href="{{ route('setting.index') }}"
-                                        class="nav-link {{ Route::is('setting.*') ? 'active' : '' }}">Informations</a>
-                                </li>
+                    </ul>
+                </div>
+            </li>
+        @endcan
 
-                                <li class="nav-item active">
-                                    <a href="{{ route('admin-register.index') }}"
-                                        class="nav-link {{ Route::is('admin-register.*') ? 'active' : '' }}">Utilisateurs</a>
-                                </li>
+        @can('voir-ressource humaine')
+            <li class="nav-item">
+                <a class="nav-link menu-link" href="#sidebarRh" data-bs-toggle="collapse" role="button"
+                    aria-controls="sidebarRh">
+                    <i class="ri ri-home-office-fill"></i> <span>RESSOURCES HUMAINES</span>
+                </a>
+                <div class="collapse menu-dropdown {{ Route::is('poste.*') || Route::is('employe.*') || Route::is('paie.*') ? 'show' : '' }}"
+                    id="sidebarRh">
+                    <ul class="nav nav-sm flex-column">
 
-                                <li class="nav-item">
-                                    <a href="{{ route('module.index') }}"
-                                        class="nav-link {{ Route::is('module.*') ? 'active' : '' }}">Modules</a>
-                                </li>
-                                {{-- <li class="nav-item">
+                        <li class="nav-item active">
+                            <a href="{{ route('poste.index') }}"
+                                class="nav-link {{ Route::is('poste.*') ? 'active' : '' }}">Postes</a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a href="{{ route('employe.index') }}"
+                                class="nav-link {{ Route::is('employe.*') ? 'active' : '' }}">Employés</a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a href="{{ route('paie.index') }}"
+                                class="nav-link {{ Route::is('paie.*') ? 'active' : '' }}">Paie</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        @endcan
+
+
+        @if (Auth::user()->role == 'superadmin' || Auth::user()->role == 'developpeur' || Auth::user()->can('voir-parametre'))
+            <li class="nav-item">
+                <a class="nav-link menu-link" href="#sidebarAuth" data-bs-toggle="collapse" role="button"
+                    aria-controls="sidebarAuth">
+                    <i class=" ri-settings-2-fill"></i> <span>PARAMETRE</span>
+                </a>
+                <div class="collapse menu-dropdown {{ Route::is('setting.*') || Route::is('module.*') || Route::is('role.*') || Route::is('permission.*') || Route::is('admin-register.*') ? 'show' : '' }}"
+                    id="sidebarAuth">
+                    <ul class="nav nav-sm flex-column">
+                        <li class="nav-item active">
+                            <a href="{{ route('setting.index') }}"
+                                class="nav-link {{ Route::is('setting.*') ? 'active' : '' }}">Informations</a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a href="{{ route('admin-register.index') }}"
+                                class="nav-link {{ Route::is('admin-register.*') ? 'active' : '' }}">Utilisateurs</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('module.index') }}"
+                                class="nav-link {{ Route::is('module.*') ? 'active' : '' }}">Modules</a>
+                        </li>
+                        {{-- <li class="nav-item">
                                     <a href="{{ route('role.index') }}"
                                         class="nav-link {{ Route::is('role.*') ? 'active' : '' }}">Roles</a>
                                 </li> --}}
-                                <li class="nav-item">
-                                    <a href="{{ route('permission.index') }}"
-                                        class="nav-link {{ Route::is('permission.*') ? 'active' : '' }}">Permissions/
-                                        Roles</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                @endif
+                        <li class="nav-item">
+                            <a href="{{ route('permission.index') }}"
+                                class="nav-link {{ Route::is('permission.*') ? 'active' : '' }}">Permissions/
+                                Roles</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        @endif
 
-            </ul>
-        </div>
-        <!-- Sidebar -->
+        </ul>
     </div>
-    <div class="sidebar-background"></div>
+    <!-- Sidebar -->
+</div>
+<div class="sidebar-background"></div>
 </div>
 <!-- Left Sidebar End -->
 <!-- Vertical Overlay-->

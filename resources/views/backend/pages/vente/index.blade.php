@@ -259,9 +259,36 @@
         <!-- ========== End filtre ========== -->
 
 
-
-
+        <!-- ========== Start date session ========== -->
         @if (Auth::user()->hasRole(['caisse', 'supercaisse']))
+            <div class="col-lg-12">
+                <div class="alert alert-info alert-dismissible fade show d-flex justify-content-center align-items-center"
+                    role="alert">
+                    <div class="me-3">
+                        <h5 class="card-title mb-0">
+                            Date de vente actuelle :
+                            <span id="heureActuelle">
+                                {{ $sessionDate ? \Carbon\Carbon::parse($sessionDate)->format('d-m-Y') : 'non définie' }}
+                            </span>
+                        </h5>
+                        <p class="fw-bold text-center text-dark ">Caisse actuelle :
+                            {{ auth()->user()->caisse->libelle ?? 'non définie' }}</p>
+                    </div>
+
+                    @if ($data_vente->sum('montant_total') == 0)
+                        <button type="button" class="btn btn-info ms-3" data-bs-toggle="modal"
+                            data-bs-target="#dateSessionVenteModal">
+                            {{ $sessionDate ? 'Modifier la date de la session vente' : 'Choisir une date pour la session vente' }}
+                        </button>
+                    @endif
+
+                    <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+            </div>
+        @endif
+
+
+        {{-- @if (Auth::user()->hasRole(['caisse', 'supercaisse']))
             <div class="col-lg-12">
                 <div class="alert alert-info alert-dismissible fade show d-flex justify-content-center align-items-center"
                     role="alert">
@@ -282,7 +309,12 @@
 
                     <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-        @endif
+        @endif --}}
+
+        <!-- ========== End date session ========== -->
+
+
+
 
         <div class="card">
             <!-- ========== Start filter result libellé ========== -->
@@ -338,9 +370,17 @@
                             request()->filled('date_debut') ||
                             request()->filled('date_fin') ||
                             request()->filled('caisse') ||
-                            request()->filled('client'))
+                            request()->filled('client') ||
+                            request()->filled('statut_vente') ||
+                            request()->filled('statut_reglement'))
                         @if (request()->filled('statut_paiement'))
-                            - {{ request('statut_paiement') }}
+                            - {{ request('statut_paiement') == 'paye' ? 'Payées' : 'Impayées' }}
+                        @endif
+                        @if (request()->filled('statut_vente'))
+                            - {{ request('statut_vente') }}
+                        @endif
+                        @if (request()->filled('statut_reglement'))
+                            - {{ request('statut_reglement') == 0 ? 'Non réglée' : 'Réglée' }}
                         @endif
 
                         @if (request()->filled('periode'))
@@ -368,6 +408,7 @@
                         - du mois en cours - {{ Carbon::now()->translatedFormat('F Y') }}
                     @endif
                 </h5>
+
 
 
 
@@ -504,62 +545,95 @@
 
 
                 @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
-                    <div class="row mb-3 g-3">
-                        <div class="col-md-2">
-                            <div class="card card-custom bg-gradient-primary">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Caisse actuelle</h5>
-                                    <p class="card-value">
-                                        {{ auth()->user()->caisse->libelle ?? 'Non définie' }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                    @php
+                        //recuperer les ventes de la caisse connectée
 
+                        $query = App\Models\Vente::query();
+                        $query
+                            ->where('caisse_id', auth()->user()->caisse_id)
+                            ->where('user_id', auth()->user()->id)
+                            ->where('statut_cloture', false)
+                            ->whereDate('date_vente', auth()->user()->caisse->session_date_vente); // ✅ Compare seulement la date
+
+                        $caisseVente = $query->get();
+                    @endphp
+
+
+                    <div class="row mb-3  d-flex flex-wrap justify-content-center">
+
+                        {{-- Carte 1 : Total des ventes --}}
+                          {{-- <div class="col-md-2">
+                          <a href="{{ route('vente.index') }}" class="text-decoration-none">
+                                <div class="card card-custom bg-gradient-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Total ventes</h5>
+                                        <p class="card-value">
+                                            {{ $caisseVente->sum('montant_total') > 0 ? number_format($caisseVente->sum('montant_total'), 0, ',', ' ') : '0' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div> --}}
+
+                        {{-- Carte 2 : Ventes du jour --}}
                         <div class="col-md-3">
-                            <div class="card card-custom bg-gradient-success">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Ventes du jour</h5>
-                                    <p class="card-value">
-                                        {{ number_format($data_vente->sum('montant_total'), 0, ',', ' ') }} FCFA
-                                    </p>
-
+                            <a href="{{ route('vente.index') }}" class="text-decoration-none">
+                                <div class="card card-custom bg-gradient-success text-white">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Toutes les Ventes <span class="text-white">({{ $caisseVente->count() }})</span></h5>
+                                        <p class="card-value">
+                                            {{ $caisseVente->sum('montant_total') > 0 ? number_format($caisseVente->sum('montant_total'), 0, ',', ' ') : '0' }} FCFA
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
+                        {{-- Carte 3 : Impayés --}}
                         <div class="col-md-3">
-                            <div class="card card-custom bg-gradient-danger2">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Impayés</h5>
-                                    <p class="card-value ">
-                                        {{ number_format($data_vente->where('statut_paiement', 'impaye')->sum('montant_restant'), 0, ',', ' ') }}
-                                        FCFA
-                                    </p>
-
+                            <a href="{{ route('vente.index', ['statut_paiement' => 'impaye']) }}"
+                                class="text-decoration-none">
+                                <div class="card card-custom bg-gradient-danger2 text-white">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Ventes impayés 
+                                         <span class="text-white ">   ({{ $caisseVente->where('statut_paiement', 'impaye')->count() }})</span></h5>
+                                        <p class="card-value">
+                                            {{ number_format($caisseVente->where('statut_paiement', 'impaye')->sum('montant_restant'), 0, ',', ' ') }}
+                                            FCFA
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
 
-                        <div class="col-md-2">
-                            <div class="card card-custom bg-gradient-warning">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Ventes en attente</h5>
-                                    <p class="card-value text-dark">5</p>
+                        {{-- Carte 4 : Ventes en attente --}}
+                        {{-- <div class="col-md-2">
+                            <a href="{{ route('vente.index', ['statut_vente' => 'en attente']) }}"
+                                class="text-decoration-none">
+                                <div class="card card-custom bg-gradient-warning text-dark">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Ventes en attente</h5>
+                                        <p class="card-value">5</p>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
+                        </div> --}}
+
+                        {{-- Carte 5 : Ventes non réglées --}}
+                        <div class="col-md-3">
+                            <a href="{{ route('vente.index', ['statut_reglement' => 0]) }}" class="text-decoration-none">
+                                <div class="card card-custom bg-gradient-danger text-white">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Ventes non réglées <span class="text-white">({{ $venteAucunReglement }})</span></h5>
+                                        <p class="card-value">{{ number_format($data_vente->where('statut_reglement', 0)->sum('montant_total'), 0, ',', ' ') }} FCFA</p>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
 
-                        <div class="col-md-2">
-                            <div class="card card-custom bg-gradient-danger">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Ventes non réglé</h5>
-                                    <p class="card-value"> {{ $venteAucunReglement }} </p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 @endif
+
             </div>
             <!-- ========== End statistique caisse ========== -->
 
@@ -644,7 +718,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">Aucune vente trouvée</td>
+                                    <td colspan="6" class="text-center m-auto">Aucune vente trouvée dans cette session</td>
                                 </tr>
                             @endforelse
                         </tbody>

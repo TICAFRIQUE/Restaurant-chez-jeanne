@@ -125,8 +125,15 @@ class VenteController extends Controller
             $dateFin = $request->input('date_fin');
             $caisse = $request->input('caisse');
             $periode = $request->input('periode');
-            $statut_paiement = $request->input('statut_paiement');
+            $statut_paiement = $request->input('statut_paiement'); // paye ou impaye
             $client = $request->input('client');
+
+            // uniquement a la caisse
+            $statut_reglement = $request->input('statut_reglement'); // 0 : non réglée, 1 : réglée
+            $statut_vente = $request->input('statut_vente'); // confirmée, annulée, en attente
+
+
+
 
 
 
@@ -171,21 +178,32 @@ class VenteController extends Controller
                 $query->where('statut_paiement', $request->statut_paiement);
             }
 
+            // Application du filtre de statut de vente
+            if ($request->filled('statut_vente')) {
+                $query->where('statut', $request->statut_vente);
+            }
+            // Application du filtre de statut de règlement
+            if ($request->filled('statut_reglement')) {
+                $query->where('statut_reglement', $request->statut_reglement);
+            }
+
             // Application du filtre de client
             if ($request->filled('client')) {
                 $query->where('client_id', $request->client);
             }
 
-            //si l'utilisateur a le rôle 'caisse' ou 'supercaisse' on affiche les ventes de la caisse actuelle
+
+
+            /**si l'utilisateur a le rôle 'caisse' ou 'supercaisse' on affiche les ventes de la caisse actuelle */
             if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
                 $query->where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', false)
                     ->whereDate('date_vente', auth()->user()->caisse->session_date_vente); // ✅ Compare seulement la date
-                    
+
             }
 
-
+            // retourne les données de vente filtrées
             $data_vente = $query->get();
 
 
