@@ -14,13 +14,13 @@ class ClientController extends Controller
         try {
 
             // Récupération des utilisateurs ayant le rôle 'client'
-            $query = User::withCount('ventes as ventes_total')
+            $query = User::withCount('ventesClient as ventes_total')
                 ->withCount([
-                    'ventes as ventes_paye'
+                    'ventesClient as ventes_paye'
                     => function ($query) {
                         $query->where('statut_paiement', '=', 'paye');
                     },
-                    'ventes as ventes_impaye'
+                    'ventesClient as ventes_impaye'
                     => function ($query) {
                         $query->where('statut_paiement', '=', 'impaye');
                     }

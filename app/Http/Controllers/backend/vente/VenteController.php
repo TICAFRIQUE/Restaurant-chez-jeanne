@@ -106,19 +106,17 @@ class VenteController extends Controller
 
 
 
-
-
-
             $query = Vente::with('produits')
                 ->whereStatut('confirmée')
                 ->orderBy('created_at', 'desc');
 
 
-            // Vérifier si aucune période ou date spécifique n'a été fournie
-            if (!$request->filled('periode') && !$request->filled('date_debut') && !$request->filled('date_fin')) {
-                $query->whereMonth('date_vente', Carbon::now()->month)
-                    ->whereYear('date_vente', Carbon::now()->year);
-            }
+            // Vérifier si aucune période ou date spécifique n'a été fournie on par défaut on affiche les ventes du mois en cours
+            // if (!$request->filled('periode') && !$request->filled('date_debut') && !$request->filled('date_fin')) {
+            //     $query->whereMonth('date_vente', Carbon::now()->month)
+            //         ->whereYear('date_vente', Carbon::now()->year);
+            // }
+
 
             // sinon on applique le filtre des date et caisse
             $dateDebut = $request->input('date_debut');
@@ -131,9 +129,6 @@ class VenteController extends Controller
             // uniquement a la caisse
             $statut_reglement = $request->input('statut_reglement'); // 0 : non réglée, 1 : réglée
             $statut_vente = $request->input('statut_vente'); // confirmée, annulée, en attente
-
-
-
 
 
 
@@ -214,6 +209,7 @@ class VenteController extends Controller
             $sessionDate = null;
             $venteCaisseCloture = null;
             $venteAucunReglement = null;
+            $totalVentesCaisse = null;
             if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
 
                 //Recuperer la session de la date vente manuelle
@@ -221,13 +217,12 @@ class VenteController extends Controller
                 $sessionDate = $sessionDate->session_date_vente;
 
 
-                // verifier si la caisse actuelle a effectuer des vente clotureé  a sa date de vente
+                // verifier si la caisse actuelle a des ventes à cloturer
                 $venteCaisseCloture = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', true)
                     ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
                     ->count();
-
 
 
                 // recuperer les vente de la caisse actuelle qui nont aucun reglement
@@ -236,11 +231,20 @@ class VenteController extends Controller
                     ->where('statut_reglement', false)
                     ->whereDate('date_vente', auth()->user()->caisse->session_date_vente)
                     ->count();
+
+                // recuperer le montant total des ventes de la caisse actuelle
+                $totalVentesCaisse = Vente::where('caisse_id', auth()->user()->caisse_id)
+                    ->where('user_id', auth()->user()->id)
+                    ->where('statut_cloture', false)
+                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente)
+                    ->sum('montant_total');
+
+                    // dd($totalVentesCaisse);
             }
 
 
 
-            return view('backend.pages.vente.index', compact('data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'clients'));
+            return view('backend.pages.vente.index', compact('data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients'));
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes : ' . $e->getMessage());
             return back();

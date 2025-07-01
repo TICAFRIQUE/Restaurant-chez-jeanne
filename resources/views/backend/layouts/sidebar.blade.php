@@ -249,7 +249,7 @@
                                     </li>
                                 @else
                                     <li class="nav-item active">
-                                        <a href="{{ route('vente.index') }}"
+                                        <a href="{{ route('vente.index' , ['periode' => 'mois']) }}"
                                             class="nav-link {{ Route::is('vente.*') ? 'active' : '' }}">Ventes</a>
                                     </li>
                                 @endif

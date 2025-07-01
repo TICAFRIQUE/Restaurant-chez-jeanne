@@ -51,7 +51,13 @@ class User extends Authenticatable
     }
     
 
-    public function ventes()
+    public function ventes () // caissier
+    {
+        return $this->hasMany(Vente::class);
+    }
+
+
+      public function ventesClient()
     {
         return $this->hasMany(Vente::class , 'client_id');
     }

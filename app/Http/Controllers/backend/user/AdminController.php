@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\backend\user;
 
 use App\Models\User;
+use App\Models\Vente;
 use App\Models\Caisse;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use App\Models\HistoriqueCaisse;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
-use App\Models\HistoriqueCaisse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -58,57 +59,76 @@ class AdminController extends Controller
     //logout admin
     public function logout(Request $request)
     {
-        $user = Auth::user();
+        try {
+            // Vérifier si l'utilisateur  connecté et a le rôle 'caisse' ou 'supercaisse' si oui on applique les conditions de déconnexion
+            if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
+                $user = Auth::user();
 
-        //on verifie si l'utilisateur a une caisse non cloturer si oui la cloturer avant de se deconnecter
-        $ventes = $user->ventes->where('user_id', $user->id)->where('caisse_id', $user->caisse_id)->where('statut_cloture', false)->first();
-        if ($ventes) {
-            Alert::success('Vous devez cloturer la caisse avant de vous deconnecter', 'warning Message');
-
-            return Redirect()->route('vente.index');
-        }
-
-
-
-
-        // Si l'utilisateur a une caisse active, la désactiver
-        if ($user->caisse_id) {
-
-            // Mettre a Null la session de vente et desactiver la caisse
-            Caisse::whereId($user->caisse_id)->update([
-                'statut' => 'desactive',
-                'session_date_vente' => null
-            ]);
-            // $caisse = Caisse::find($user->caisse_id);
-            // $caisse->statut = 'desactive';
-            // $caisse->session_date_vente = null;
-            // $caisse->save();
-            // mettre caisse_id a null
-            User::whereId($user->id)->update([
-                'caisse_id' => null,
-            ]);
-
-            //mise a jour dans historiquecaisse pour fermeture de caisse
-            HistoriqueCaisse::where('user_id', $user->id)
+                // on verifie si l'utilisateur a une vente non reglée si oui la regler avant de se deconnecter
+                $ventes_non_reglee = Vente::where('user_id', $user->id)
                 ->where('caisse_id', $user->caisse_id)
-                ->whereNull('date_fermeture')
-                ->update([
-                    'date_fermeture' => now(),
-                ]);
+                ->where('statut_reglement', false)
+                ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                ->count();
+                if ($ventes_non_reglee > 0) {
+                    Alert::warning('Vous devez regler les ventes non reglées avant de vous deconnecter', 'Attention!');
+
+                    return Redirect()->route('vente.index');
+                }
+
+
+              
+
+
+                //on verifie si l'utilisateur a une vente non cloturer si oui la cloturer avant de se deconnecter
+                $ventes = Vente::where('user_id', $user->id)
+                ->where('caisse_id', $user->caisse_id)
+                ->where('statut_cloture', false)
+                ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                ->count();
+                if ($ventes > 0) {
+                    Alert::warning('Vous devez cloturer la caisse avant de vous deconnecter', 'Attention!');
+
+                    return Redirect()->route('vente.index');
+                }
+
+
+
+                // Si l'utilisateur a une caisse active, la désactiver
+                if ($user->caisse_id) {
+
+                    // Mettre a Null la session de vente et desactiver la caisse
+                    Caisse::whereId($user->caisse_id)->update([
+                        'statut' => 'desactive',
+                        'session_date_vente' => null
+                    ]);
+
+                    User::whereId($user->id)->update([
+                        'caisse_id' => null,
+                    ]);
+
+                    //mise a jour dans historiquecaisse pour fermeture de caisse
+                    HistoriqueCaisse::where('user_id', $user->id)
+                        ->where('caisse_id', $user->caisse_id)
+                        ->whereNull('date_fermeture')
+                        ->update([
+                            'date_fermeture' => now(),
+                        ]);
+                }
+            }
+
+
+            Auth::logout(); // Déconnexion de l'utilisateur
+
+            Alert::success('Vous etes deconnecté', 'Success Message');
+            return Redirect()->route('admin.login');
+        } catch (\Throwable $th) {
+            Alert::error('Erreur', 'Une erreur est survenue lors de la déconnexion : ' . $th->getMessage());
+            return back();
         }
-
-
-        Auth::logout();
-        // Supprimer toutes les sessions de connexion
-
-        // $request->session()->invalidate();
-        // $request->session()->regenerateToken();
-
-
-        // Session::forget('user_auth');
-        Alert::success('Vous etes deconnecté', 'Success Message');
-        return Redirect()->route('admin.login');
     }
+
+
 
 
 

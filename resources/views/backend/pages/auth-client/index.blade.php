@@ -66,7 +66,7 @@
 
                                             <a href=" {{ route('vente.index', ['client' => $item['id'], 'statut_paiement' => 'impaye']) }}"
                                                 class="btn {{$item->ventes_impaye == 0 ? 'btn-success' : 'btn-danger'}} btn-sm">
-                                                {{ $item->ventes->where('statut_paiement', 'impaye')->count() }}
+                                                {{ $item->ventes_impaye }}
                                             </a>
                                         </td>
                                         <td> {{ $item['created_at'] }} </td>

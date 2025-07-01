@@ -28,6 +28,7 @@
             color: #fff;
             border-radius: 1rem;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
         }
 
         .bg-gradient-primary {
@@ -57,9 +58,29 @@
         }
 
         .card-value {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: bold;
         }
+
+        /**mettre des animations sur les cartes */
+        .carte-vente-anim {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .carte-vente-anim:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .carte.active .card {
+            background: #ffffff !important;
+            /* jaune clair ou autre */
+            color: #0751ba !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+
 
 
         /*css pour les boutons d'action*/
@@ -71,8 +92,8 @@
         }
 
         .btn-lg {
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.9rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
@@ -249,10 +270,6 @@
                     </div>
                 @endunless
 
-
-
-
-
             </div>
         </form>
 
@@ -271,11 +288,11 @@
                                 {{ $sessionDate ? \Carbon\Carbon::parse($sessionDate)->format('d-m-Y') : 'non définie' }}
                             </span>
                         </h5>
-                        <p class="fw-bold text-center text-dark ">Caisse actuelle :
-                            {{ auth()->user()->caisse->libelle ?? 'non définie' }}</p>
+
                     </div>
 
-                    @if ($data_vente->sum('montant_total') == 0)
+                    @if ($totalVentesCaisse == 0)
+                        {{-- Si aucune vente n'a été effectuée, on propose de choisir une date --}}
                         <button type="button" class="btn btn-info ms-3" data-bs-toggle="modal"
                             data-bs-target="#dateSessionVenteModal">
                             {{ $sessionDate ? 'Modifier la date de la session vente' : 'Choisir une date pour la session vente' }}
@@ -376,16 +393,32 @@
                         @if (request()->filled('statut_paiement'))
                             - {{ request('statut_paiement') == 'paye' ? 'Payées' : 'Impayées' }}
                         @endif
+
                         @if (request()->filled('statut_vente'))
                             - {{ request('statut_vente') }}
                         @endif
+
                         @if (request()->filled('statut_reglement'))
                             - {{ request('statut_reglement') == 0 ? 'Non réglée' : 'Réglée' }}
                         @endif
 
                         @if (request()->filled('periode'))
-                            - {{ request('periode') }}
+                            -
+                            @if (request('periode') === 'mois')
+                                du mois en cours - {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}
+                            @elseif (request('periode') === 'jour')
+                                du jour - {{ \Carbon\Carbon::now()->translatedFormat('d/m/Y') }}
+                            @elseif (request('periode') === 'semaine')
+                                de la semaine en cours -
+                                {{ \Carbon\Carbon::now()->startOfWeek()->translatedFormat('d/m/Y') }} au
+                                {{ \Carbon\Carbon::now()->endOfWeek()->translatedFormat('d/m/Y') }}
+                            @elseif (request('periode') === 'annee')
+                                de l'année en cours - {{ \Carbon\Carbon::now()->translatedFormat('Y') }}
+                            @else
+                                - {{ request('periode') }}
+                            @endif
                         @endif
+
 
                         @if ($dateDebut || $dateFin)
                             - du
@@ -405,12 +438,11 @@
                             de {{ ucfirst($client) }}
                         @endif
                     @else
-                        - du mois en cours - {{ Carbon::now()->translatedFormat('F Y') }}
+                        de toutes les periodes
                     @endif
                 </h5>
-
-
-
+                <p class="fw-bold text-center text-dark ">Caisse actuelle :
+                    {{ auth()->user()->caisse->libelle ?? 'non définie' }}</p>
 
             </div>
             <!-- ========== End filter result libellé ========== -->
@@ -461,7 +493,7 @@
                     <div class="btn-group-actions">
 
                         {{-- Clôture caisse --}}
-                        @if ($data_vente->sum('montant_total') > 0 && $venteAucunReglement == 0)
+                        @if ($venteAucunReglement == 0 && $totalVentesCaisse > 0)
                             <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
                                 👍 Clôturer la caisse <i class="ri ri-bill"></i>
                             </a>
@@ -562,9 +594,9 @@
                     <div class="row mb-3  d-flex flex-wrap justify-content-center">
 
                         {{-- Carte 1 : Total des ventes --}}
-                          {{-- <div class="col-md-2">
+                        {{-- <div class="col-md-2">
                           <a href="{{ route('vente.index') }}" class="text-decoration-none">
-                                <div class="card card-custom bg-gradient-primary text-white">
+                                <div class="card card-custom bg-gradient-primary text-white carte-vente-anim">
                                     <div class="card-body text-center">
                                         <h5 class="card-title">Total ventes</h5>
                                         <p class="card-value">
@@ -577,12 +609,17 @@
 
                         {{-- Carte 2 : Ventes du jour --}}
                         <div class="col-md-3">
-                            <a href="{{ route('vente.index') }}" class="text-decoration-none">
-                                <div class="card card-custom bg-gradient-success text-white">
+                            <a href="{{ route('vente.index') }}"
+                                class="text-decoration-none carte {{ Route::is('vente.index') && empty(request()->query()) ? 'active' : '' }}
+">
+                                {{-- <div class="card card-custom bg-gradient-primary text-white carte-vente-anim"> --}}
+                                <div class="card card-custom bg-gradient-success text-white carte-vente-anim">
                                     <div class="card-body text-center">
-                                        <h5 class="card-title">Toutes les Ventes <span class="text-white">({{ $caisseVente->count() }})</span></h5>
+                                        <h5 class="card-title">Toutes les Ventes <span
+                                                class="text-white">({{ $caisseVente->count() }})</span></h5>
                                         <p class="card-value">
-                                            {{ $caisseVente->sum('montant_total') > 0 ? number_format($caisseVente->sum('montant_total'), 0, ',', ' ') : '0' }} FCFA
+                                            {{ $caisseVente->sum('montant_total') > 0 ? number_format($caisseVente->sum('montant_total'), 0, ',', ' ') : '0' }}
+                                            FCFA
                                         </p>
                                     </div>
                                 </div>
@@ -592,11 +629,14 @@
                         {{-- Carte 3 : Impayés --}}
                         <div class="col-md-3">
                             <a href="{{ route('vente.index', ['statut_paiement' => 'impaye']) }}"
-                                class="text-decoration-none">
-                                <div class="card card-custom bg-gradient-danger2 text-white">
+                                class="text-decoration-none carte {{ request('statut_paiement') == 'impaye' ? 'active' : '' }}">
+                                {{-- <div class="card card-custom bg-gradient-danger text-white carte-vente-anim"> --}}
+                                <div class="card card-custom bg-gradient-danger2 text-white carte-vente-anim">
                                     <div class="card-body text-center">
-                                        <h5 class="card-title">Ventes impayés 
-                                         <span class="text-white ">   ({{ $caisseVente->where('statut_paiement', 'impaye')->count() }})</span></h5>
+                                        <h5 class="card-title">Ventes impayés
+                                            <span class="text-white ">
+                                                ({{ $caisseVente->where('statut_paiement', 'impaye')->count() }})</span>
+                                        </h5>
                                         <p class="card-value">
                                             {{ number_format($caisseVente->where('statut_paiement', 'impaye')->sum('montant_restant'), 0, ',', ' ') }}
                                             FCFA
@@ -610,7 +650,7 @@
                         {{-- <div class="col-md-2">
                             <a href="{{ route('vente.index', ['statut_vente' => 'en attente']) }}"
                                 class="text-decoration-none">
-                                <div class="card card-custom bg-gradient-warning text-dark">
+                                <div class="card card-custom bg-gradient-warning text-dark carte-vente-anim">
                                     <div class="card-body text-center">
                                         <h5 class="card-title">Ventes en attente</h5>
                                         <p class="card-value">5</p>
@@ -621,11 +661,16 @@
 
                         {{-- Carte 5 : Ventes non réglées --}}
                         <div class="col-md-3">
-                            <a href="{{ route('vente.index', ['statut_reglement' => 0]) }}" class="text-decoration-none">
-                                <div class="card card-custom bg-gradient-danger text-white">
+                            <a href="{{ route('vente.index', ['statut_reglement' => 0]) }}"
+                                class="text-decoration-none carte {{ request('statut_reglement') == '0' ? 'active' : '' }}">
+                                {{-- <div class="card card-custom bg-gradient-danger text-white carte-vente-anim"> --}}
+                                <div class="card card-custom bg-gradient-danger text-white carte-vente-anim">
                                     <div class="card-body text-center">
-                                        <h5 class="card-title">Ventes non réglées <span class="text-white">({{ $venteAucunReglement }})</span></h5>
-                                        <p class="card-value">{{ number_format($data_vente->where('statut_reglement', 0)->sum('montant_total'), 0, ',', ' ') }} FCFA</p>
+                                        <h5 class="card-title">Ventes non réglées <span
+                                                class="text-white">({{ $venteAucunReglement }})</span></h5>
+                                        <p class="card-value">
+                                            {{ number_format($data_vente->where('statut_reglement', 0)->sum('montant_total'), 0, ',', ' ') }}
+                                            FCFA</p>
                                     </div>
                                 </div>
                             </a>
@@ -642,7 +687,7 @@
 
 
 
-            <div class="card-body">
+            <div class="card-body tableVente">
                 <div class="table-responsive">
                     <table id="buttons-datatables" class="display table table-bordered" style="width:100%">
                         <thead>
@@ -718,7 +763,8 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center m-auto">Aucune vente trouvée dans cette session</td>
+                                    <td colspan="6" class="text-center m-auto">Aucune vente trouvée dans cette session
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -753,6 +799,8 @@
 
     <script>
         $(document).ready(function() {
+
+            // fonction pour choisir une date de session de vente
             $('.btnChoiceDate').click(function() {
                 Swal.fire({
                     title: 'Veuillez choisir une date de session de vente avant d\'effectuer une vente',
@@ -766,6 +814,25 @@
                 })
             })
 
+            // scroller a liste des ventes lrsqu'on clique sur les cartes de statistiques
+            function scrollListVente() {
+                // Vérifiez si la table existe
+                if ($('.tableVente').length) {
+                    // Faites défiler jusqu'à la table des ventes
+                    $('html, body').animate({
+                        scrollTop: $('#buttons-datatables').offset().top
+                    }, 1000); // Durée de l'animation en millisecondes
+                }
+            }
+
+            scrollListVente(); // Appel de la fonction pour faire défiler vers la liste des ventes
+
+            // mettre un active sur la carte selectionnée
+            // $('.carte').on('click', function(e) {
+            //     e.preventDefault();
+            //     $('.carte').removeClass('active');
+            //     $(this).addClass('active');
+            // });
 
             // Vérifiez si la DataTable est déjà initialisée
             if ($.fn.DataTable.isDataTable('#buttons-datatables')) {
