@@ -647,17 +647,17 @@
                         </div>
 
                         {{-- Carte 4 : Ventes en attente --}}
-                        {{-- <div class="col-md-2">
-                            <a href="{{ route('vente.index', ['statut_vente' => 'en attente']) }}"
-                                class="text-decoration-none">
+                        <div class="col-md-2">
+                            <a href="#" class="text-decoration-none" data-bs-toggle="modal"
+                                data-bs-target="#venteEnAttente">
                                 <div class="card card-custom bg-gradient-warning text-dark carte-vente-anim">
                                     <div class="card-body text-center">
                                         <h5 class="card-title">Ventes en attente</h5>
-                                        <p class="card-value">5</p>
+                                        <p class="card-value" id="ventesAttente"></p>
                                     </div>
                                 </div>
                             </a>
-                        </div> --}}
+                        </div>
 
                         {{-- Carte 5 : Ventes non réglées --}}
                         <div class="col-md-3">
@@ -777,6 +777,8 @@
     <!--end row-->
 
     @include('backend.pages.vente.dateSessionVente')
+    @include('backend.pages.vente.partials.venteEnAttente.listeVenteAttente')
+
 @endsection
 @section('script')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -827,12 +829,77 @@
 
             scrollListVente(); // Appel de la fonction pour faire défiler vers la liste des ventes
 
-            // mettre un active sur la carte selectionnée
-            // $('.carte').on('click', function(e) {
-            //     e.preventDefault();
-            //     $('.carte').removeClass('active');
-            //     $(this).addClass('active');
-            // });
+
+
+            /*  Afficher la liste des ventes en attente */
+
+            function afficherVentesEnAttenteLocales() {
+                const ventes = JSON.parse(localStorage.getItem('ventes_en_attente')) || [];
+
+                let html = '<h5>Ventes en attente :</h5><ul class="list-group">';
+
+                ventes.forEach((vente, index) => {
+                    html += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Vente #${index + 1} - ${new Date(vente.data.date).toLocaleString()}
+                            <span class="fw-bold"> TABLE N° ${vente.data.tableNumber}</span>
+                            <div>
+                                <button class="btn btn-sm btn-success reprendre-vente-locale" data-id="${vente.id}">Reprendre</button>
+                                <button class="btn btn-sm btn-danger supprimer-vente-locale" data-id="${vente.id}">Supprimer</button>
+                            </div>
+                        </li>`;
+                });
+
+                html += '</ul>';
+
+                $('#ventes-locale-list').html(html);
+
+                // compter le nombre de ventes en attente
+                const nombreVentes = ventes.length;
+                $('#ventesAttente').text(nombreVentes);
+            }
+
+            // Appel initial pour afficher les ventes en attente
+            afficherVentesEnAttenteLocales();
+
+
+
+            // ###########################Fonction pour reprendre une vente en attente
+            $(document).on('click', '.reprendre-vente-locale', function() {
+                const id = $(this).data('id');
+                const ventes = JSON.parse(localStorage.getItem('ventes_en_attente')) || [];
+
+                const vente = ventes.find(v => v.id === id);
+                if (!vente) {
+                    Swal.fire('Erreur', 'Vente introuvable.', 'error');
+                    return;
+                }
+
+                localStorage.setItem('vente_en_cours', JSON.stringify(vente));
+
+                // Supprimer cette vente de la liste
+                const nouvellesVentes = ventes.filter(v => v.id !== id);
+                localStorage.setItem('ventes_en_attente', JSON.stringify(nouvellesVentes));
+
+                window.location.href = '{{ route('vente.create') }}';
+            });
+
+            // ###########################Fonction pour supprimer une vente en attente
+            $(document).on('click', '.supprimer-vente-locale', function() {
+                const id = $(this).data('id');
+                let ventes = JSON.parse(localStorage.getItem('ventes_en_attente')) || [];
+
+                ventes = ventes.filter(v => v.id !== id);
+                localStorage.setItem('ventes_en_attente', JSON.stringify(ventes));
+
+                afficherVentesEnAttenteLocales();
+
+                Swal.fire('Supprimé', 'La vente a été retirée de la liste.', 'success');
+            });
+
+
+
+
 
             // Vérifiez si la DataTable est déjà initialisée
             if ($.fn.DataTable.isDataTable('#buttons-datatables')) {

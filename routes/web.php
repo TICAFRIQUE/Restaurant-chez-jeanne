@@ -338,6 +338,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     // vente
     Route::prefix('vente')->controller(VenteController::class)->group(function () {
+        route::get('vente-en-attente', 'venteEnAttente')->name('vente.attente')->middleware('can:voir-vente'); // liste des vente en attente en localStorage js
         route::get('', 'index')->name('vente.index')->middleware('can:voir-vente');
         route::get('show/{id}', 'show')->name('vente.show')->middleware('can:voir-vente'); // detail vente
         route::get('create', 'create')->name('vente.create')->middleware(['can:creer-vente' , 'check.inventaire']); // vue de la page de creation vente

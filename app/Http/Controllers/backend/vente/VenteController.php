@@ -239,7 +239,7 @@ class VenteController extends Controller
                     ->whereDate('date_vente', auth()->user()->caisse->session_date_vente)
                     ->sum('montant_total');
 
-                    // dd($totalVentesCaisse);
+                // dd($totalVentesCaisse);
             }
 
 
@@ -247,6 +247,22 @@ class VenteController extends Controller
             return view('backend.pages.vente.index', compact('data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients'));
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes : ' . $e->getMessage());
+            return back();
+        }
+    }
+
+
+    /*
+    * Afficher la liste des ventes en attente
+    */
+
+    public function venteEnAttente()
+    {
+        try {
+           
+            return view('backend.pages.vente.partials.venteEnAttente.listeVenteAttente');
+        } catch (\Exception $e) {
+            Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes en attente : ' . $e->getMessage());
             return back();
         }
     }
@@ -498,7 +514,6 @@ class VenteController extends Controller
             $cart = $request->input('cart');
             // dd($cart);
             $cartMenu = $request->input('cartMenu');
-
             $montantAvantRemise = $request->input('montantAvantRemise');
             $montantApresRemise = $request->input('montantApresRemise');
             $montantRemise = $request->input('montantRemise');
@@ -595,7 +610,7 @@ class VenteController extends Controller
                             $bouteille_vendu = 0;
                         }
 
-                        // Mettre à jour le stock du produit
+                        // retirer la quantité de bouteilles vendues du stock du produit
                         $produit->stock -= $bouteille_vendu;
                         $produit->save();
 
@@ -645,6 +660,9 @@ class VenteController extends Controller
             return back();
         }
     }
+
+
+
 
     public function show($id)
     {

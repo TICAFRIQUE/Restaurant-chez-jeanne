@@ -1,3 +1,4 @@
+// popover
 const popoverTriggerList = [].slice.call(
     document.querySelectorAll('[data-bs-toggle="popover"]')
 );
@@ -399,3 +400,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
