@@ -82,6 +82,12 @@
         }
 
 
+        .carte.active .count {
+            color: #0751ba !important;
+
+        }
+
+
 
         /*css pour les boutons d'action*/
         .btn-group-actions {
@@ -573,7 +579,7 @@
                         </div>
                     </div>
                 </div>
-            @endif --}}
+                    @endif --}}
 
 
                 @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
@@ -610,13 +616,13 @@
                         {{-- Carte 2 : Ventes du jour --}}
                         <div class="col-md-3">
                             <a href="{{ route('vente.index') }}"
-                                class="text-decoration-none carte {{ Route::is('vente.index') && empty(request()->query()) ? 'active' : '' }}
-">
+                                class="text-decoration-none carte {{ Route::is('vente.index') && empty(request()->query()) ? 'active' : '' }}">
+
                                 {{-- <div class="card card-custom bg-gradient-primary text-white carte-vente-anim"> --}}
                                 <div class="card card-custom bg-gradient-success text-white carte-vente-anim">
                                     <div class="card-body text-center">
-                                        <h5 class="card-title">Toutes les Ventes <span
-                                                class="text-white">({{ $caisseVente->count() }})</span></h5>
+                                        <h6 class="card-title">Toutes les Ventes <span
+                                                class="text-white count">({{ $caisseVente->count() }})</span></h6>
                                         <p class="card-value">
                                             {{ $caisseVente->sum('montant_total') > 0 ? number_format($caisseVente->sum('montant_total'), 0, ',', ' ') : '0' }}
                                             FCFA
@@ -633,10 +639,10 @@
                                 {{-- <div class="card card-custom bg-gradient-danger text-white carte-vente-anim"> --}}
                                 <div class="card card-custom bg-gradient-danger2 text-white carte-vente-anim">
                                     <div class="card-body text-center">
-                                        <h5 class="card-title">Ventes impayés
-                                            <span class="text-white ">
+                                        <h6 class="card-title">Ventes impayés
+                                            <span class="text-white count">
                                                 ({{ $caisseVente->where('statut_paiement', 'impaye')->count() }})</span>
-                                        </h5>
+                                        </h6>
                                         <p class="card-value">
                                             {{ number_format($caisseVente->where('statut_paiement', 'impaye')->sum('montant_restant'), 0, ',', ' ') }}
                                             FCFA
@@ -646,31 +652,33 @@
                             </a>
                         </div>
 
-                        {{-- Carte 4 : Ventes en attente --}}
-                        <div class="col-md-2">
-                            <a href="#" class="text-decoration-none" data-bs-toggle="modal"
-                                data-bs-target="#venteEnAttente">
-                                <div class="card card-custom bg-gradient-warning text-dark carte-vente-anim">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">Ventes en attente</h5>
-                                        <p class="card-value" id="ventesAttente"></p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
 
-                        {{-- Carte 5 : Ventes non réglées --}}
+
+                        {{-- Carte 4 : Ventes non réglées --}}
                         <div class="col-md-3">
                             <a href="{{ route('vente.index', ['statut_reglement' => 0]) }}"
                                 class="text-decoration-none carte {{ request('statut_reglement') == '0' ? 'active' : '' }}">
                                 {{-- <div class="card card-custom bg-gradient-danger text-white carte-vente-anim"> --}}
                                 <div class="card card-custom bg-gradient-danger text-white carte-vente-anim">
                                     <div class="card-body text-center">
-                                        <h5 class="card-title">Ventes non réglées <span
-                                                class="text-white">({{ $venteAucunReglement }})</span></h5>
+                                        <h6 class="card-title">Ventes non réglées <span
+                                                class="text-white count">({{ $venteAucunReglement }})</span></h6>
                                         <p class="card-value">
                                             {{ number_format($data_vente->where('statut_reglement', 0)->sum('montant_total'), 0, ',', ' ') }}
                                             FCFA</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                        {{-- Carte 5 : Ventes en attente --}}
+                        <div class="col-md-2">
+                            <a href="#" class="text-decoration-none" data-bs-toggle="modal"
+                                data-bs-target="#venteEnAttente">
+                                <div class="card card-custom bg-gradient-warning text-dark carte-vente-anim">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">Ventes en attentes</h5>
+                                        <p class="card-value" id="ventesAttente"></p>
                                     </div>
                                 </div>
                             </a>
@@ -693,7 +701,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Statut de vente</th>
+                                {{-- <th>Statut de vente</th> --}}
                                 <th>N° de vente</th>
                                 <th>N° de Table</th>
                                 <th>Session vente</th>
@@ -713,10 +721,10 @@
                             @forelse ($data_vente as $key => $item)
                                 <tr id="row_{{ $item['id'] }}">
 
-                                    <td> {{ $loop->iteration }} </td>
-                                    <td> <span
+                                    <td> {{ $loop->iteration }} <i class="ri ri-checkbox-blank-circle-fill text-success"></i> </td>
+                                    {{-- <td> <span
                                             class="badge bg-{{ $item['statut'] == 'en attente' ? 'warning' : 'success' }}">{{ $item['statut'] }}</span>
-                                    </td>
+                                    </td> --}}
                                     <td> <a class="fw-bold"
                                             href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a> </td>
 
@@ -823,7 +831,7 @@
                     // Faites défiler jusqu'à la table des ventes
                     $('html, body').animate({
                         scrollTop: $('#buttons-datatables').offset().top
-                    }, 1000); // Durée de l'animation en millisecondes
+                    }, 500); // Durée de l'animation en millisecondes
                 }
             }
 

@@ -26,11 +26,114 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
+
+                <!-- ========== Start Filtre ========== -->
+                <div class="m-4">
+                    @php
+                        $selectedPeriode = request('periode');
+                        $selectedDateDebut = request('date_debut');
+                        $selectedDateFin = request('date_fin');
+                        $selectedCaisse = request('caisse');
+                        $selectedClient = request('client');
+                        $selectedStatut = request('statut_paiement');
+                    @endphp
+                    <form action="{{ route('client.index') }}" method="GET">
+                        <div class="row mb-3 d-flex justify-content-center">
+
+                            {{-- Filtres réservés aux rôles autres que caisse/supercaisse --}}
+                            {{-- @unless (auth()->user()->hasRole(['caisse', 'supercaisse'])) --}}
+                            {{-- <div class="col-md-3">
+                                <label for="periode" class="form-label">Période</label>
+                                <select class="form-select" id="periode" name="periode">
+                                    <option value="">Toutes les périodes</option>
+                                    @foreach (['jour' => 'Jour', 'semaine' => 'Semaine', 'mois' => 'Mois', 'annee' => 'Année'] as $key => $label)
+                                        <option value="{{ $key }}"
+                                            {{ $selectedPeriode === $key ? 'selected' : '' }}>
+                                            {{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div> --}}
+
+                            <div class="col-md-3">
+                                <label for="date_debut" class="form-label">Date de début</label>
+                                <input type="date" id="date_debut" name="date_debut" class="form-control"
+                                    value="{{ $selectedDateDebut }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="date_fin" class="form-label">Date de fin</label>
+                                <input type="date" id="date_fin" name="date_fin" class="form-control"
+                                    value="{{ $selectedDateFin }}">
+                            </div>
+
+
+
+                            {{-- Filtres visibles pour tous --}}
+                            {{-- <div class="col-md-4">
+                        <label for="client" class="form-label">Clients</label>
+                        <select class="form-select" id="client" name="client">
+                            <option value="">Tous les clients</option>
+                            @foreach ($clients as $client)
+                                <option value="{{ $client->id }}" {{ $selectedClient == $client->id ? 'selected' : '' }}>
+                                    {{ $client->first_name }} {{ $client->last_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div> --}}
+
+                            <div class="col-md-3">
+                                <label for="statutPaiement" class="form-label">Statut</label>
+                                <select class="form-select" id="statutPaiement" name="statut_paiement">
+                                    <option value="">Tous les statuts</option>
+                                    <option value="paye" {{ $selectedStatut === 'paye' ? 'selected' : '' }}>Payé</option>
+                                    <option value="impaye" {{ $selectedStatut === 'impaye' ? 'selected' : '' }}>Impayé
+                                    </option>
+                                </select>
+                            </div>
+
+                            {{-- Boutons d'action --}}
+                            <div class="col-md-3 d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                                <a href="{{ route('client.index') }}"
+                                    class="btn btn-outline-secondary w-100">Réinitialiser</a>
+                            </div>
+                            {{-- @endunless --}}
+
+                        </div>
+                    </form>
+                </div>
+                <!-- ========== End Filtre ========== -->
+
+
                 <div class="card-header d-flex justify-content-between">
-                    <h5 class="card-title mb-0">Liste des clients</h5>
+                    <h5 class="card-title mb-0">Liste des clients
+
+
+                        @if (request('periode') || request('date_debut') || request('date_fin') || request('client') || request('statut_paiement'))
+                            <span class="badge bg-info">Filtré
+                                {{-- @if (request('periode'))
+                                    - Période: {{ request('periode') }}
+                                @endif --}}
+                                @if (request('date_debut'))
+                                    - Date de début: {{ request('date_debut') }}
+                                @endif
+                                @if (request('date_fin'))
+                                    - Date de fin: {{ request('date_fin') }}
+                                @endif
+                                {{-- @if (request('client'))
+                                    - Client: {{ $clients->find(request('client'))->first_name ?? 'Tous' }}
+                                @endif --}}
+                                @if (request('statut_paiement'))
+                                    - Statut: {{ request('statut_paiement') }}
+                                @endif
+                            </span>
+                        @endif
+                    </h5>
                     <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#myModal">Créer
                         un client</button>
                 </div>
+
+
                 <div class="card-body">
                     <div class="table-responsive">
                         <table id="buttons-datatables" class="display table table-bordered" style="width:100%">
@@ -40,7 +143,7 @@
                                     <th>Nom</th>
                                     <th>Prenoms</th>
                                     <th>Telephone</th>
-                                    <th>Ventes impayées</th>
+                                    <th>Ventes</th>
                                     <th>Date creation</th>
                                     <th>Actions</th>
                                 </tr>
@@ -54,20 +157,11 @@
                                         <td>{{ $item['phone'] }}</td>
 
                                         <td>
-                                            {{-- <a href="{{ route('vente.index', ['client' => $item['id']]) }}"
-                                                class="btn btn-primary btn-sm">
-                                                Total : {{ $item->ventes->count() }}
-                                            </a>
-
-                                            <a href="{{ route('vente.index', ['client' => $item['id'], 'statut_paiement' => 'paye']) }}"
-                                                class="btn btn-success btn-sm">
-                                                Payé : {{ $item->ventes->where('statut_paiement', 'paye')->count() }}
-                                            </a> --}}
-
-                                            <a href=" {{ route('vente.index', ['client' => $item['id'], 'statut_paiement' => 'impaye']) }}"
-                                                class="btn {{$item->ventes_impaye == 0 ? 'btn-success' : 'btn-danger'}} btn-sm">
-                                                {{ $item->ventes_impaye }}
-                                            </a>
+                                           {{ $item['ventes_total'] ?? $item['ventesClient']->count() }}
+                                            {{-- <span class="badge bg-info">{{ $item['ventes_paye'] }}</span> --}}
+                                            {{-- <span class="badge bg-danger">{{ $item['ventes_impaye'] }}</span> --}}
+                                            {{-- <span class="badge bg-warning">{{ $item['ventesClient']->count() }}</span> --}}
+                                            {{-- <span class="badge bg-success">{{ $item['ventesClient']->count() }}</span> --}}
                                         </td>
                                         <td> {{ $item['created_at'] }} </td>
                                         <td>
@@ -81,9 +175,10 @@
                                                                 class="ri-lock-fill align-bottom me-2 text-muted"></i>
                                                             Change password</a>
                                                     </li> --}}
-                                                    <li><a href="{{ route('vente.index', ['client' => $item['id']]) }}"  class="dropdown-item edit-item-btn"><i
+                                                    <li><a href="{{ route('vente.client', ['client' => $item['id'], 'statut_paiement' => 'impaye']) }}"
+                                                            class="dropdown-item edit-item-btn"><i
                                                                 class="ri-history-fill align-bottom me-2 text-muted"></i>
-                                                            Historique des ventes</a></li>
+                                                            Vente impayées</a></li>
                                                     <li>
                                                     <li><a type="button" class="dropdown-item edit-item-btn"
                                                             data-bs-toggle="modal"

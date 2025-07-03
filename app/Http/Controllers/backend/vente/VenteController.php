@@ -251,6 +251,40 @@ class VenteController extends Controller
         }
     }
 
+    /**Historique de vente du client */
+    public function historiqueVenteClient(Request $request)
+    {
+        try {
+            // Récupérer l'ID du client depuis la requête
+            $clientId = $request->input('client');
+            $statutPaiement = $request->input('statut_paiement'); // paye ou impaye
+
+            $client = User::findOrFail($clientId); // Récupérer le client par son ID
+
+            $query = Vente::with('produits')
+                ->whereStatut('confirmée')
+                ->orderBy('created_at', 'desc');
+
+            // Application du filtre de client
+            if ($request->filled('client')) {
+                $query->where('client_id', $clientId);
+            }
+            // Application du filtre de statut de paiement
+            if ($request->filled('statut_paiement')) {
+                $query->where('statut_paiement', $statutPaiement);
+            }
+
+            $ventes = $query->get();
+
+            // dd($ventes->toArray());
+
+            return view('backend.pages.vente.partials.vente-client.historique-vente', compact('client', 'ventes'));
+        } catch (\Throwable $th) {
+            Alert::error('Erreur', $th->getMessage());
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
 
     /*
     * Afficher la liste des ventes en attente
@@ -259,7 +293,7 @@ class VenteController extends Controller
     public function venteEnAttente()
     {
         try {
-           
+
             return view('backend.pages.vente.partials.venteEnAttente.listeVenteAttente');
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes en attente : ' . $e->getMessage());

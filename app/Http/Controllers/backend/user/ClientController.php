@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\backend\user;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -9,25 +10,68 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
 
             // Récupération des utilisateurs ayant le rôle 'client'
-            $query = User::withCount('ventesClient as ventes_total')
-                ->withCount([
-                    'ventesClient as ventes_paye'
-                    => function ($query) {
-                        $query->where('statut_paiement', '=', 'paye');
-                    },
-                    'ventesClient as ventes_impaye'
-                    => function ($query) {
-                        $query->where('statut_paiement', '=', 'impaye');
-                    }
-                ])
-                ->whereHas('roles', function ($query) {
-                    $query->where('name', 'client');
+            // $query = User::withCount('ventesClient as ventes_total')
+            //     ->withCount([
+            //         'ventesClient as ventes_paye'
+            //         => function ($query) {
+            //             $query->where('statut_paiement', '=', 'paye');
+            //         },
+            //         'ventesClient as ventes_impaye'
+            //         => function ($query) {
+            //             $query->where('statut_paiement', '=', 'impaye');
+            //         }
+            //     ])
+            //     ->whereHas('roles', function ($query) {
+            //         $query->where('name', 'client');
+            //     })->with('ventesClient');
+
+            $query = User::whereHas('roles', function ($query) {
+                $query->where('name', 'client');
+            })->with('ventesClient');
+
+            // request des filtres
+            $dateDebut = $request->input('date_debut');
+            $dateFin = $request->input('date_fin');
+            $statutPaiement = $request->input('statut_paiement'); // paye ou impaye
+
+
+
+            // Formatage des dates
+            $dateDebut = $request->filled('date_debut') ? Carbon::parse($dateDebut)->format('Y-m-d') : null;
+            $dateFin = $request->filled('date_fin') ? Carbon::parse($dateFin)->format('Y-m-d') : null;
+
+            // Application des filtres de date
+            if ($dateDebut && $dateFin) {
+                $query->whereHas('ventesClient', function ($query) use ($dateDebut, $dateFin) {
+                    $query->whereBetween('date_vente', [$dateDebut, $dateFin]);
                 });
+            } elseif ($dateDebut) {
+                $query->whereHas('ventesClient', function ($query) use ($dateDebut) {
+                    $query->where('date_vente', '>=', $dateDebut);
+                });
+            } elseif ($dateFin) {
+                $query->whereHas('ventesClient', function ($query) use ($dateFin) {
+                    $query->where('date_vente', '<=', $dateFin);
+                });
+            }
+            // Application du filtre de statut de paiement
+            if ($statutPaiement) {
+                $query->whereHas('ventesClient', function ($query) use ($statutPaiement) {
+                    $query->where('statut_paiement', $statutPaiement);
+                })
+                    ->withCount([
+                        'ventesClient as ventes_total' => function ($query) use ($statutPaiement) {
+                            $query->where('statut_paiement', $statutPaiement);
+                        }
+                    ])
+                    ;
+            }
+
 
             $clients = $query->get();
 

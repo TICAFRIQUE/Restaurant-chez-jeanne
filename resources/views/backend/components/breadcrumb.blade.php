@@ -3,10 +3,9 @@
     <div class="col-12">
         <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-galaxy-transparent">
             <h4 class="mb-sm-0 font-size-18">
-                @if ($previousUrl = url()->previous())
-                    <a href="#" class="btn btn-primary" id="goBack"> <i class="ri ri-arrow-left-fill"></i>
-                        Retour</a>
-                @endif
+                <a href="#" class="btn btn-primary" id="goBack">
+                    <i class="ri ri-arrow-left-fill"></i> Retour
+                </a>
                 {{ $title }}
             </h4>
 
@@ -21,16 +20,26 @@
         </div>
     </div>
 </div>
+
+<!-- Script intégré pour retour + rechargement -->
 <script>
-    // go to back
-    // document.getElementById('goBack').addEventListener('click', function() {
-    //     window.history.back();
-    //     setTimeout(function() {
-    //         location.reload();
-    //     }, 500);
-    // });
-    document.getElementById('goBack').addEventListener('click', function() {
-        window.location.href = document.referrer;
+    document.getElementById('goBack').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const ref = document.referrer;
+
+        if (ref && ref !== window.location.href) {
+            window.location.href = ref; // Recharge la page précédente
+        } else {
+            window.history.back(); // Fallback si pas de referrer
+        }
+    });
+
+    // Forcer le rechargement quand on revient avec le bouton navigateur
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.reload();
+        }
     });
 </script>
 <!-- end page title -->

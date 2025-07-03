@@ -340,8 +340,10 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('vente')->controller(VenteController::class)->group(function () {
         route::get('vente-en-attente', 'venteEnAttente')->name('vente.attente')->middleware('can:voir-vente'); // liste des vente en attente en localStorage js
         route::get('', 'index')->name('vente.index')->middleware('can:voir-vente');
+        route::get('historique-vente-client', 'historiqueVenteClient')->name('vente.client')->middleware('can:voir-vente'); // Historique des ventes client
+
         route::get('show/{id}', 'show')->name('vente.show')->middleware('can:voir-vente'); // detail vente
-        route::get('create', 'create')->name('vente.create')->middleware(['can:creer-vente' , 'check.inventaire']); // vue de la page de creation vente
+        route::get('create', 'create')->name('vente.create')->middleware(['can:creer-vente', 'check.inventaire']); // vue de la page de creation vente
         route::post('store', 'store')->name('vente.store')->middleware('can:creer-vente'); // ajouter vente
         route::get('cloture-caisse', 'clotureCaisse')->name('vente.cloture-caisse')->middleware('can:voir-vente'); // cloture caisse
         route::get('billeterie-caisse', 'billeterieCaisse')->name('vente.billeterie-caisse')->middleware('can:voir-vente'); // billeterie caisse
