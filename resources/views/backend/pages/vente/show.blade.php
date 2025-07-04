@@ -507,6 +507,11 @@
 
                     // afficher la div de client
                     $('#client').show(500);
+
+                    // rendre les champs client requis
+                    $('#nomClient').prop('required', true);
+                    $('#prenomClient').prop('required', true);
+                    $('#telephoneClient').prop('required', true);
                 } else {
                     $('#montantRecu').prop('readonly', false);
                     // supprimer le fond gris en background
