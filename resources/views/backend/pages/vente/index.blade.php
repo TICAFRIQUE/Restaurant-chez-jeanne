@@ -690,11 +690,6 @@
             </div>
             <!-- ========== End statistique caisse ========== -->
 
-
-
-
-
-
             <div class="card-body tableVente">
                 <div class="table-responsive">
                     <table id="buttons-datatables" class="display table table-bordered" style="width:100%">

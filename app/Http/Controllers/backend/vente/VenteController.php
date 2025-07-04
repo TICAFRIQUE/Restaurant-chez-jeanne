@@ -597,7 +597,7 @@ class VenteController extends Controller
                 'statut' => 'confirmée',
 
                 // informations de paiement
-                'mode_paiement' => $modePaiement,
+                'mode_paiement' => $modePaiement ?? 'espece',
                 'montant_recu' => $montantRecu,
                 'montant_rendu' => $montantRendu,
 
