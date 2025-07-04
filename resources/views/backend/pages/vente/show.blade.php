@@ -498,9 +498,15 @@
                 // si le mode de paiement est impaye alors on met a 0 le montant reçu et on le met en read only
                 if ($modePaiement == 'impaye') {
                     $('#montantRecu').val(0);
+                    $('#montantRendu').val(0);
+                    $('#montantRestant').val($('#montantARegler').val());
+                    $('#statutPaiement').text('Vente Impayé').css('color', 'red');
                     $('#montantRecu').prop('readonly', true);
                     // ajouter un fond gris en background
                     $('#montantRecu').css('background-color', '#f1f4f7');
+
+                    // afficher la div de client
+                    $('#client').show(500);
                 } else {
                     $('#montantRecu').prop('readonly', false);
                     // supprimer le fond gris en background
