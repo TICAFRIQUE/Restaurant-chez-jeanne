@@ -110,8 +110,8 @@
             <div class="card divPrint">
                 <div class="card-header">
                     <h5 class="card-title mb-0 " style="text-align: center";>
-                       {{-- Rapport des ventes --}}
-                      Vente
+                        {{-- Rapport des ventes --}}
+                        Vente
                         @if (request('caisse_id'))
                             <strong> {{ $caisses->find(request('caisse_id'))->libelle }}</strong>
                         @endif
@@ -169,7 +169,7 @@
                         });
                     @endphp
                     @foreach ($produitsVendus as $famille => $produits)
-                        <h3>
+                        <h3 class="fw-semibold">
                             @if ($famille == 'menu')
                                 Cuisine interne
                             @elseif($famille == 'bar')
@@ -178,13 +178,17 @@
                                 {{ $famille }}
                             @endif
                         </h3>
+                        <span>Nombre d'articles : <b>{{ $produits->sum('quantite_vendue') }}</b></span><br>
+                        <span>Montant total :
+                           <b> {{ number_format($produits->sum('montant_total'), 0, ',', ' ') }} FCFA</b>
+                        </span>
                         <div class="table-responsive mb-4">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
+                                        {{-- <th>Code</th> --}}
                                         <th>Designation</th>
-                                        <th>Catégorie</th>
+                                        {{-- <th>Catégorie</th> --}}
                                         @if ($famille == 'bar')
                                             <th>Quantité vendue</th>
                                             <th>Montant total</th>
@@ -199,9 +203,9 @@
                                 <tbody>
                                     @forelse ($produits as $produit)
                                         <tr>
-                                            <td>{{ $produit['code'] }}</td>
+                                            {{-- <td>{{ $produit['code'] }}</td> --}}
                                             <td>{{ $produit['designation'] }}</td>
-                                            <td>{{ $produit['categorie'] }}</td>
+                                            {{-- <td>{{ $produit['categorie'] }}</td> --}}
 
                                             <!-- ========== Start si famille est bar on affiche les details quantité et variante ========== -->
                                             {{-- @if ($famille == 'bar')
@@ -268,11 +272,10 @@
                                         </tr>
                                     @endforelse
                                 </tbody>
-                                <tfoot>
+                                {{-- <tfoot>
                                     <tr>
                                         <th colspan="7">
                                             <div class="text-end">
-                                                {{-- <div>Total pour {{ $famille }}</div> --}}
                                                 <div>Nombre d'articles : {{ $produits->sum('quantite_vendue') }}</div>
                                                 <div>Montant total :
                                                     {{ number_format($produits->sum('montant_total'), 0, ',', ' ') }} FCFA
@@ -280,7 +283,7 @@
                                             </div>
                                         </th>
                                     </tr>
-                                </tfoot>
+                                </tfoot> --}}
 
                             </table>
                         </div>
@@ -294,12 +297,12 @@
                         </p>
                     </div> --}}
 
-                     <!-- Total général -->
-                        <div class="alert alert-dark mt-4 text-center fs-5">
-                            <b>💰 Montant total de vente :</b>
-                            <span class="fw-bold fs-4 text-primary">{{ number_format($montantTotalVente, 0, ',', ' ') }}
-                                FCFA</span>
-                        </div>
+                    <!-- Total général -->
+                    <div class="alert alert-dark mt-4 text-center fs-5">
+                        <b>💰 Montant total de vente :</b>
+                        <span class="fw-bold fs-4 text-primary">{{ number_format($montantTotalVente, 0, ',', ' ') }}
+                            FCFA</span>
+                    </div>
                 </div>
             </div>
 
@@ -420,7 +423,7 @@
 
 
 
-           
+
         });
     </script>
 @endsection

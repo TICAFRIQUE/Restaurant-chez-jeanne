@@ -253,7 +253,7 @@
                                 @endif
                                 <!-- ========== End Client si impayé ========== -->
                                 <div class="mt-3">
-                                    <button class="btn btn-success w-100" type="submit">Valider</button>
+                                    <button class="btn btn-success w-100 saveReglement" type="submit">Valider</button>
                                 </div>
                             </form>
                         </div><!-- /.modal-content -->

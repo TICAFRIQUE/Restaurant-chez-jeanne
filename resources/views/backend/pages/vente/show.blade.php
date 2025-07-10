@@ -548,6 +548,54 @@
 
                 }
             })
+
+
+            // Gestion de l'envoi du formulaire de règlement
+            // $('.saveReglement').on('click', function(e) {
+            //     e.preventDefault();
+
+            //     let submitButton = $(this);
+
+            //     submitButton.prop('disabled', true).html(`
+        //         <span class="d-flex align-items-center">
+        //             <span class="spinner-border flex-shrink-0" role="status">
+        //                 <span class="visually-hidden">Loading...</span>
+        //             </span>
+        //             <span class="flex-grow-1 ms-2">Enregistrement en cours...</span>
+        //         </span>
+        //     `);
+
+
+            //     var form = $(this).closest('form');
+            //     form.submit();
+            // })
+
+
+            $('.saveReglement').on('click', function(e) {
+                e.preventDefault();
+
+                let submitButton = $(this);
+                let form = submitButton.closest('form')[0]; // DOM element natif
+
+                // Vérifie si le formulaire est valide
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated'); // Pour Bootstrap 5
+                    return; // Empêche l'envoi si le formulaire est invalide
+                }
+
+                // Spinner
+                submitButton.prop('disabled', true).html(`
+                    <span class="d-flex align-items-center">
+                        <span class="spinner-border flex-shrink-0" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </span>
+                        <span class="flex-grow-1 ms-2">Enregistrement en cours...</span>
+                    </span>
+                `);
+
+                form.submit(); // Envoi classique une fois validé
+            });
+
         })
     </script>
 @endsection

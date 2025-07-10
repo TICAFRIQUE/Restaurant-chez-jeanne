@@ -288,7 +288,7 @@
                                     <table class="table table-borderless table-centered align-middle table-nowrap mb-0">
                                         <thead class="text-muted table-light">
                                             <tr>
-                                                <th scope="col">Code</th>
+                                                {{-- <th scope="col">Code</th> --}}
                                                 <th scope="col">Produit</th>
                                                 <th scope="col">Categorie</th>
                                                 <th scope="col">Nombre de ventes</th>
@@ -298,17 +298,17 @@
                                         <tbody>
                                             @foreach ($produitsLesPlusVendus as $item)
                                                 <tr>
-                                                    <td>
+                                                    {{-- <td>
                                                         <a href="#"
                                                             class="fw-medium link-primary">#{{ $item->code }} </a>
-                                                    </td>
+                                                    </td> --}}
                                                     <td>
                                                         <div class="d-flex align-items-center">
                                                             <div class="flex-shrink-0 me-2">
                                                                 {{ $item->nom }}
-                                                                <img src="{{ URL::asset($item->getFirstMediaUrl('ProduitImage')) }}"
+                                                                {{-- <img src="{{ URL::asset($item->getFirstMediaUrl('ProduitImage')) }}"
                                                                     alt=" {{ $item->nom }} "
-                                                                    class="avatar-xs rounded-circle material-shadow" />
+                                                                    class="avatar-xs rounded-circle material-shadow" /> --}}
                                                             </div>
                                                         </div>
                                                     </td>

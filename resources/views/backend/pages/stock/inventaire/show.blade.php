@@ -70,8 +70,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    {{-- <th>Image</th> --}}
-                                    <th>Code</th>
+                                    <th class="{{Auth::user()->hasRole('developpeur') ? '' : 'd-none'}}">Code</th>
                                     <th>Nom</th>
                                     <th>stock dernier inventaire</th>
                                     <th>Achat après dernier inventaire</th>
@@ -82,19 +81,14 @@
                                     <th>Écart</th>
                                     <th>Etat du stock</th>
                                     <th>Observation</th>
-                                    <th>Stock alerte</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($inventaire->produits as $key => $item)
                                     <tr id="row_{{ $item['id'] }}">
                                         <td>{{ ++$key }}</td>
-                                        <td> {{ $item['code'] }} </td>
-                                        {{-- <td>
-                                            <img class="rounded avatar-sm"
-                                                src="{{ $item->hasMedia('ProduitImage') ? $item->getFirstMediaUrl('ProduitImage') : asset('assets/img/logo/logo_Chez-jeanne.jpg') }}"
-                                                width="10px" height="10px" alt="">
-                                        </td> --}}
+                                        <td class="{{Auth::user()->hasRole('developpeur') ? '' : 'd-none'}}"> {{ $item['code'] }} </td>
+                                      
                                         <td>{{ $item['nom'] }} <b>{{ $item['valeur_unite'] ?? '' }}</b>
                                             {{ $item['unite']['abreviation'] ?? '' }} </td>
                                         <td>{{ $item['pivot']['stock_dernier_inventaire'] ?? '' }}</td>
@@ -111,7 +105,6 @@
                                         <td>{{ $item['pivot']['ecart'] }}</td>
                                         <td>{{ $item['pivot']['etat'] }}</td>
                                         <td>{{ $item['pivot']['observation'] }}</td>
-                                        <td>{{ $item['stock_alerte'] }} {{ $item['uniteSortie']['libelle'] ?? '' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
