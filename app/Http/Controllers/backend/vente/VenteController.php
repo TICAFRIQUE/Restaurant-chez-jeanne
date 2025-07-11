@@ -9,6 +9,7 @@ use App\Models\Vente;
 use App\Models\Caisse;
 use App\Models\Produit;
 use App\Models\Categorie;
+use App\Models\Reglement;
 use App\Models\Billetterie;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -66,6 +67,7 @@ class VenteController extends Controller
     public function index(Request $request)
     {
         try {
+
 
             $caisses = Caisse::all();
             // client
@@ -244,7 +246,18 @@ class VenteController extends Controller
 
 
 
-            return view('backend.pages.vente.index', compact('data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients'));
+            // les reglements des impayés des ventre autrement que la session de la caisse actuelle
+            $reglementImpayes = Reglement::whereHas('vente', function ($q) {
+                $q->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente);
+            })
+                ->whereDate('created_at', auth()->user()->caisse->session_date_vente)
+                ->get();
+
+
+
+            // dd($reglementImpayes->toArray());
+
+            return view('backend.pages.vente.index', compact('reglementImpayes', 'data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients'));
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes : ' . $e->getMessage());
             return back();
@@ -706,7 +719,14 @@ class VenteController extends Controller
             $client = User::whereHas('roles', function ($query) {
                 $query->where('name', 'client');
             })->get();
-            return view('backend.pages.vente.show', compact('vente', 'client'));
+
+
+            //Recuperer la session de la date vente manuelle
+            $sessionDate = null;
+            $sessionDate = Caisse::find(Auth::user()->caisse_id);
+            $sessionDate = $sessionDate->session_date_vente;
+
+            return view('backend.pages.vente.show', compact('vente', 'client', 'sessionDate'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return redirect()->route('vente.index')->with('error', "La vente demandée n'existe plus.");
         } catch (\Exception $e) {
@@ -885,7 +905,15 @@ class VenteController extends Controller
                     ->sum('montant_restant');
 
 
-                $totalVenteCaisse = $totalVente - $totalVenteImpayer;
+                // les reglements des impayés des ventre autrement que la session de la caisse actuelle
+                $reglementImpayes = Reglement::whereHas('vente', function ($q) {
+                    $q->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente);
+                })
+                    ->whereDate('created_at', auth()->user()->caisse->session_date_vente)
+                    ->sum('montant_reglement');
+
+
+                $totalVenteCaisse = ($totalVente + $reglementImpayes) - $totalVenteImpayer;
             }
 
             // dd($type_monnaies , $billets, $pieces, $totalVente);
@@ -898,6 +926,7 @@ class VenteController extends Controller
                 'totalVente',
                 'type_mobile_money',
                 'totalVenteImpayer',
+                'reglementImpayes', // les reglements des impayés des ventre autrement que la session de la caisse actuelle
                 'totalVenteCaisse'
             ));
         } catch (\Throwable $th) {
@@ -1151,7 +1180,16 @@ class VenteController extends Controller
             $famille = Categorie::whereNull('parent_id')->whereIn('type', ['bar', 'menu'])->orderBy('name', 'DESC')->get();
 
 
-            return view('backend.pages.vente.rapportVente', compact('platsVendus', 'produitsVendus', 'caisses', 'categorieFamille', 'famille', 'modes', 'type_mobile_money', 'resultats'));
+            // les reglements des impayés des ventre autrement que la session de la caisse actuelle
+            $reglementImpayes = Reglement::whereHas('vente', function ($q) {
+                $q->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente);
+            })
+                ->whereDate('created_at', auth()->user()->caisse->session_date_vente)
+                ->sum('montant_reglement');
+
+
+
+            return view('backend.pages.vente.rapportVente', compact('reglementImpayes' ,'platsVendus', 'produitsVendus', 'caisses', 'categorieFamille', 'famille', 'modes', 'type_mobile_money', 'resultats' , ));
         } catch (\Exception $e) {
             return back()->with('error', 'Une erreur s\'est produite : ' . $e->getMessage());
         }

@@ -347,9 +347,40 @@
 
                         <!-- Total général -->
                         <div class="alert alert-dark mt-4 text-center fs-5">
-                            <b>💰 Montant total de vente :</b>
-                            <span class="fw-bold fs-4 text-primary">{{ number_format($montantTotalVente, 0, ',', ' ') }}
-                                FCFA</span>
+
+                            @if ($reglementImpayes > 0)
+                                <p>
+                                    <b>Vente du jour :</b>
+                                    <span
+                                        class="fw-bold fs-4 text-primary">{{ number_format($montantTotalVente, 0, ',', ' ') }}
+                                        FCFA</span>
+                                    <br>
+
+                                    <b>Ventes impayées réglées :</b>
+                                    <span
+                                        class="fw-bold fs-4 text-danger">{{ number_format($reglementImpayes, 0, ',', ' ') }}
+                                        FCFA</span>
+
+                                </p>
+
+                                <p class=" fs-3">
+                                    @php
+                                        $totalCaisse = $montantTotalVente + $reglementImpayes;
+                                    @endphp
+                                    <b>💰TOTAL :</b>
+                                    <span class="fw-bold text-primary">{{ number_format($totalCaisse, 0, ',', ' ') }}
+                                        FCFA</span>
+                                </p>
+
+                                @else
+                                <p class=" fs-3">
+                                     <b>💰TOTAL :</b>
+                                    <span class="fw-bold text-primary">{{ number_format($montantTotalVente, 0, ',', ' ') }}
+                                        FCFA</span>
+                                </p>
+                                   
+                            @endif
+
                         </div>
                     </div>
                     <!-- ========== End Resultat & billetterie ========== -->

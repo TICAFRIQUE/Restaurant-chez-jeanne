@@ -234,9 +234,14 @@
                             id="sideBarVente">
                             <ul class="nav nav-sm flex-column">
 
-                                <li class="nav-item active">
+                                {{-- <li class="nav-item active">
                                     <a href="{{ route('client.index') }}"
                                         class="nav-link {{ Route::is('client.*') ? 'active' : '' }}">Clients</a>
+                                </li> --}}
+
+                                <li class="nav-item active">
+                                    <a href="{{ route('client.vente-impaye') }}"
+                                        class="nav-link {{ Route::is('client.*') ? 'active' : '' }}">Clients ventes impayés </a>
                                 </li>
 
 
@@ -249,7 +254,7 @@
                                     </li>
                                 @else
                                     <li class="nav-item active">
-                                        <a href="{{ route('vente.index' , ['periode' => 'mois']) }}"
+                                        <a href="{{ route('vente.index', ['periode' => 'mois']) }}"
                                             class="nav-link {{ Route::is('vente.*') ? 'active' : '' }}">Ventes</a>
                                     </li>
                                 @endif

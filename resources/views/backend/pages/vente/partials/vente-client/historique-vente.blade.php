@@ -14,7 +14,7 @@
 @section('content')
     @component('backend.components.breadcrumb')
         @slot('li_1')
-            Liste des clients
+            Liste des vente impayées clients
         @endslot
         @slot('title')
             Clients
@@ -27,7 +27,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0 filter text-center">Historique des ventes de {{ $client->first_name }}
+                    <h5 class="card-title mb-0 filter text-center">Historique des ventes impayées de {{ $client->first_name }}
                         {{ $client->last_name }}</h5>
 
                 </div>

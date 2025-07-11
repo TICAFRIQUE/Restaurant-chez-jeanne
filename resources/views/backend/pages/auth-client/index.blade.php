@@ -143,7 +143,7 @@
                                     <th>Nom</th>
                                     <th>Prenoms</th>
                                     <th>Telephone</th>
-                                    <th>Ventes</th>
+                                    <th>Montant Impayés</th>
                                     <th>Date creation</th>
                                     <th>Actions</th>
                                 </tr>
@@ -157,7 +157,7 @@
                                         <td>{{ $item['phone'] }}</td>
 
                                         <td>
-                                           {{ $item['ventes_total'] ?? $item['ventesClient']->count() }}
+                                           {{ number_format($item['ventesClient']->sum('montant_total'), 0, ',', ' ') }} FCFA
                                             {{-- <span class="badge bg-info">{{ $item['ventes_paye'] }}</span> --}}
                                             {{-- <span class="badge bg-danger">{{ $item['ventes_impaye'] }}</span> --}}
                                             {{-- <span class="badge bg-warning">{{ $item['ventesClient']->count() }}</span> --}}

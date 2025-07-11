@@ -35,6 +35,7 @@
                                            <ul>
                                             <li> Total de la vente: <strong>{{ number_format($totalVente, 0, ',', ' ') }} FCFA</strong>.</li>
                                             <li> Total Impayées: <strong>{{ number_format($totalVenteImpayer, 0, ',', ' ') }} FCFA</strong>.</li>
+                                            <li class="text-danger"> Total des impayées réglées: <strong>{{ number_format($reglementImpayes, 0, ',', ' ') }} FCFA</strong>.</li>
                                             <li> Total en caisse: <strong>{{ number_format($totalVenteCaisse, 0, ',', ' ') }} FCFA</strong>.</li>
                                            </ul>
                                         </div>

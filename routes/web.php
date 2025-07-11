@@ -95,6 +95,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
     //register client
     Route::prefix('client')->controller(ClientController::class)->group(function () {
+        route::get('vente-impaye', 'clientVenteImpaye')->name('client.vente-impaye'); // liste des client des ventes impayées
         route::get('', 'index')->name('client.index'); // liste des client
         route::post('store', 'store')->name('client.store'); // ajouter client
         route::post('update/{id}', 'update')->name('client.update'); // modifier client

@@ -449,6 +449,9 @@
                 </h5>
                 <p class="fw-bold text-center text-dark ">Caisse actuelle :
                     {{ auth()->user()->caisse->libelle ?? 'non définie' }}</p>
+                    <p class="fw-bold">
+                    Ventes impayées réglées :<span class="text-danger"> {{ number_format($reglementImpayes->sum('montant_reglement'), 0, ',', ' ')}}  FCFA</span>
+                    </p>
 
             </div>
             <!-- ========== End filter result libellé ========== -->

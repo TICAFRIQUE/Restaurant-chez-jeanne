@@ -84,6 +84,86 @@ class ClientController extends Controller
     }
 
 
+    public function clientVenteImpaye(Request $request)
+    {
+        try {
+
+            // Récupération des utilisateurs ayant le rôle 'client'
+            // $query = User::withCount('ventesClient as ventes_total')
+            //     ->withCount([
+            //         'ventesClient as ventes_paye'
+            //         => function ($query) {
+            //             $query->where('statut_paiement', '=', 'paye');
+            //         },
+            //         'ventesClient as ventes_impaye'
+            //         => function ($query) {
+            //             $query->where('statut_paiement', '=', 'impaye');
+            //         }
+            //     ])
+            //     ->whereHas('roles', function ($query) {
+            //         $query->where('name', 'client');
+            //     })->with('ventesClient');
+
+            $query = User::whereHas('roles', function ($query) {
+                $query->where('name', 'client');
+            })
+                ->whereHas('ventesClient', function ($query) {
+                    $query->where('statut_paiement', 'impaye');
+                })
+                ->with('ventesClient' , function ($query) {
+                    $query->where('statut_paiement', 'impaye');
+                });
+
+            // request des filtres
+            $dateDebut = $request->input('date_debut');
+            $dateFin = $request->input('date_fin');
+            $statutPaiement = $request->input('statut_paiement'); // paye ou impaye
+
+
+
+            // Formatage des dates
+            $dateDebut = $request->filled('date_debut') ? Carbon::parse($dateDebut)->format('Y-m-d') : null;
+            $dateFin = $request->filled('date_fin') ? Carbon::parse($dateFin)->format('Y-m-d') : null;
+
+            // Application des filtres de date
+            if ($dateDebut && $dateFin) {
+                $query->whereHas('ventesClient', function ($query) use ($dateDebut, $dateFin) {
+                    $query->whereBetween('date_vente', [$dateDebut, $dateFin]);
+                });
+            } elseif ($dateDebut) {
+                $query->whereHas('ventesClient', function ($query) use ($dateDebut) {
+                    $query->where('date_vente', '>=', $dateDebut);
+                });
+            } elseif ($dateFin) {
+                $query->whereHas('ventesClient', function ($query) use ($dateFin) {
+                    $query->where('date_vente', '<=', $dateFin);
+                });
+            }
+            // Application du filtre de statut de paiement
+            if ($statutPaiement) {
+                $query->whereHas('ventesClient', function ($query) use ($statutPaiement) {
+                    $query->where('statut_paiement', $statutPaiement);
+                })
+                    ->withCount([
+                        'ventesClient as ventes_total' => function ($query) use ($statutPaiement) {
+                            $query->where('statut_paiement', $statutPaiement);
+                        }
+                    ])
+                ;
+            }
+
+
+            $clients = $query->get();
+
+            // dd($clients->toArray());
+
+            return view('backend.pages.auth-client.vente_impaye', compact('clients'));
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', $th->getMessage());
+        }
+    }
+
+
     public function store(Request $request)
     {
         try {
