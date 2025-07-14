@@ -926,7 +926,7 @@ class VenteController extends Controller
                 $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
                     ->whereDate('created_at', auth()->user()->caisse->session_date_vente)
                     ->where('user_id', auth()->user()->id)
-                    ->get();
+                    ->sum('montant_reglement');
 
 
                 $totalVenteCaisse = ($totalVente + $reglementImpayes) - $totalVenteImpayer;
