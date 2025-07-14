@@ -502,7 +502,7 @@
                     <div class="btn-group-actions">
 
                         {{-- Clôture caisse --}}
-                        @if ($venteAucunReglement == 0 && $totalVentesCaisse > 0)
+                        @if (($venteAucunReglement == 0 && $totalVentesCaisse > 0)  || ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0))
                             <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
                                 👍 Clôturer la caisse <i class="ri ri-bill"></i>
                             </a>

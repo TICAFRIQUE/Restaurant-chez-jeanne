@@ -49,7 +49,7 @@
                                         <td>{{ $item['phone'] }}</td>
 
                                         <td>
-                                            {{ number_format($item['ventesClient']->sum('montant_total'), 0, ',', ' ') }}
+                                            {{ number_format($item['ventesClient']->sum('montant_restant'), 0, ',', ' ') }}
                                             FCFA
                                         </td>
 

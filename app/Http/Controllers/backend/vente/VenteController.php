@@ -246,10 +246,16 @@ class VenteController extends Controller
 
 
 
-            // les reglements des impayés des ventre autrement que la session de la caisse actuelle
-            $reglementImpayes = Reglement::whereHas('vente', function ($q) {
-                $q->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente);
-            })
+
+            /** Récupération des reglements impayés */
+
+            // Récupération des ventes impayées autres que la date de session actuelle
+            $venteImpayes = Vente::where('statut_paiement', 'impaye')
+                ->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente)
+                ->get();
+
+            // Récupération des règlements faits aujourd'hui sur ces ventes impayées
+            $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
                 ->whereDate('created_at', auth()->user()->caisse->session_date_vente)
                 ->get();
 
@@ -905,12 +911,19 @@ class VenteController extends Controller
                     ->sum('montant_restant');
 
 
-                // les reglements des impayés des ventre autrement que la session de la caisse actuelle
-                $reglementImpayes = Reglement::whereHas('vente', function ($q) {
-                    $q->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente);
-                })
+
+                /** Récupération des reglements impayés */
+
+                // Récupération des ventes impayées autres que la date de session actuelle
+                $venteImpayes = Vente::where('statut_paiement', 'impaye')
+                    ->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente)
+                    ->get();
+
+                // Récupération des règlements faits aujourd'hui sur ces ventes impayées
+                $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
                     ->whereDate('created_at', auth()->user()->caisse->session_date_vente)
                     ->sum('montant_reglement');
+
 
 
                 $totalVenteCaisse = ($totalVente + $reglementImpayes) - $totalVenteImpayer;
@@ -1180,16 +1193,24 @@ class VenteController extends Controller
             $famille = Categorie::whereNull('parent_id')->whereIn('type', ['bar', 'menu'])->orderBy('name', 'DESC')->get();
 
 
-            // les reglements des impayés des ventre autrement que la session de la caisse actuelle
-            $reglementImpayes = Reglement::whereHas('vente', function ($q) {
-                $q->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente);
-            })
+
+
+            /** Récupération des reglements impayés */
+
+            // Récupération des ventes impayées autres que la date de session actuelle
+            $venteImpayes = Vente::where('statut_paiement', 'impaye')
+                ->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente)
+                ->get();
+
+            // Récupération des règlements faits aujourd'hui sur ces ventes impayées
+            $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
                 ->whereDate('created_at', auth()->user()->caisse->session_date_vente)
                 ->sum('montant_reglement');
 
 
 
-            return view('backend.pages.vente.rapportVente', compact('reglementImpayes' ,'platsVendus', 'produitsVendus', 'caisses', 'categorieFamille', 'famille', 'modes', 'type_mobile_money', 'resultats' , ));
+
+            return view('backend.pages.vente.rapportVente', compact('reglementImpayes', 'platsVendus', 'produitsVendus', 'caisses', 'categorieFamille', 'famille', 'modes', 'type_mobile_money', 'resultats',));
         } catch (\Exception $e) {
             return back()->with('error', 'Une erreur s\'est produite : ' . $e->getMessage());
         }

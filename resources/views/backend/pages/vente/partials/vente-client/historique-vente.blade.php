@@ -42,6 +42,8 @@
                                     <th>N° de Table</th>
                                     <th>Session vente</th>
                                     <th>Montant</th>
+                                    <th>montant payé</th>
+                                    <th>Montant restant</th>
                                     <th>Vendu le</th>
                                     <th>Vendu par</th>
                                     <th>Caisse</th>
@@ -69,6 +71,8 @@
                                         <td> {{ \Carbon\Carbon::parse($item['date_vente'])->format('d-m-Y') }}
                                             {{ $item['created_at']->format('à H:i') }} </td>
                                         <td> {{ number_format($item['montant_total'], 0, ',', ' ') }} FCFA </td>
+                                        <td> {{ number_format($item['montant_recu'], 0, ',', ' ') }} FCFA </td>
+                                        <td> {{ number_format($item['montant_restant'], 0, ',', ' ') }} FCFA </td>
                                         <td> {{ $item['created_at']->format('d-m-Y à H:i') }} </td>
                                         <td> {{ $item['user']['first_name'] }} {{ $item['user']['last_name'] }} </td>
                                         <td> {{ $item['caisse']['libelle'] ?? '' }} </td>
