@@ -32,12 +32,49 @@
                                         <div class="alert alert-primary fs-5">
                                             <strong>Important !</strong> Veuillez effectuer la billetterie pour vérifier si
                                             le montant physique en caisse correspond à votre montant de vente du systeme
-                                           <ul>
-                                            <li> Total de la vente: <strong>{{ number_format($totalVente, 0, ',', ' ') }} FCFA</strong>.</li>
-                                            <li> Total Impayées: <strong>{{ number_format($totalVenteImpayer, 0, ',', ' ') }} FCFA</strong>.</li>
-                                            <li class="text-danger"> Total des impayées réglées: <strong>{{ number_format($reglementImpayes, 0, ',', ' ') }} FCFA</strong>.</li>
-                                            <li> Total en caisse: <strong>{{ number_format($totalVenteCaisse, 0, ',', ' ') }} FCFA</strong>.</li>
-                                           </ul>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <ul>
+                                                        <li> Total de la vente:
+                                                            <strong>{{ number_format($totalVente, 0, ',', ' ') }}
+                                                                FCFA</strong>.
+                                                        </li>
+                                                        <li> Total Impayées:
+                                                            <strong>{{ number_format($totalVenteImpayer, 0, ',', ' ') }}
+                                                                FCFA</strong>.
+                                                        </li>
+
+                                                        <li> Total en caisse:
+                                                            <strong>{{ number_format($totalVenteCaisse, 0, ',', ' ') }}
+                                                                FCFA</strong>.
+                                                        </li>
+                                                    </ul>
+                                                </div>
+
+
+                                                <div class="col-md-6">
+                                                    <ul>
+
+                                                        <li class="text-danger"> Total des impayées réglées:
+                                                            <strong>{{ number_format($reglementImpayes, 0, ',', ' ') }}
+                                                                FCFA</strong>.
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+
+                                                <div>
+                                                    <p class="fw-bold fs-4">
+                                                        Total en caisse:
+                                                        <strong>{{ number_format($totalVenteCaisse, 0, ',', ' ') }}
+                                                            FCFA</strong>.
+
+                                                    </p>
+                                                </div>
+                                            </div>
+
+
                                         </div>
 
                                         {{-- <a href="{{ route('vente.rapport-caisse') }}" class="btn btn-primary">Rapport de

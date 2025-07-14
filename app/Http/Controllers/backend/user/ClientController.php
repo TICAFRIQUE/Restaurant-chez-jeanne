@@ -69,7 +69,7 @@ class ClientController extends Controller
                             $query->where('statut_paiement', $statutPaiement);
                         }
                     ])
-                    ;
+                ;
             }
 
 
@@ -108,11 +108,13 @@ class ClientController extends Controller
                 $query->where('name', 'client');
             })
                 ->whereHas('ventesClient', function ($query) {
-                    $query->where('statut_paiement', 'impaye');
+                    $query->where('statut_paiement', 'impaye')
+                        ->where('statut_cloture', true);
                 })
-                ->with('ventesClient' , function ($query) {
+                ->with(['ventesClient' => function ($query) {
                     $query->where('statut_paiement', 'impaye');
-                });
+                }]);
+
 
             // request des filtres
             $dateDebut = $request->input('date_debut');

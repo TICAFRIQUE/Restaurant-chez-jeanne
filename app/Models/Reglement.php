@@ -18,6 +18,7 @@ class Reglement extends Model
         'montant_reglement', // montant du reglement
         'montant_restant', // montant restant
         'mode_paiement', // mode de paiement
+        'date_reglement', // date du reglement
     ];
 
 

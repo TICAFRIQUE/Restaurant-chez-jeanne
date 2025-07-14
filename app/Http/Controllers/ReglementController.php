@@ -121,7 +121,7 @@ class ReglementController extends Controller
             // 🔐 2. Générer le code et associer l'utilisateur
             $data['code'] = 'REG-' . strtoupper(Str::random(5));
             $data['user_id'] = auth()->id();
-            $data['created_at'] = auth()->user()->caisse->session_date_vente; // Statut de la vente
+            $data['date_reglement'] = auth()->user()->caisse->session_date_vente; // Statut de la vente
 
             // 💾 3. Créer le règlement
             $reglement = Reglement::create($data);
