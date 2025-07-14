@@ -251,7 +251,7 @@ class VenteController extends Controller
 
             // Récupération des ventes impayées autres que la date de session actuelle
             $venteImpayes = Vente::where('statut_paiement', 'impaye')
-                ->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente)
+                // ->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente)
                 ->where('statut_cloture', true)
                 ->get();
 
