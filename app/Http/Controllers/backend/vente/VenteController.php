@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\backend\vente;
 
+use Exception;
 use Carbon\Carbon;
 use App\Models\Menu;
 use App\Models\User;
@@ -212,6 +213,7 @@ class VenteController extends Controller
             $venteCaisseCloture = null;
             $venteAucunReglement = null;
             $totalVentesCaisse = null;
+            $reglementImpayes = collect(); // Initialiser une collection vide pour les règlements impayés
             if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
 
                 //Recuperer la session de la date vente manuelle
@@ -223,7 +225,7 @@ class VenteController extends Controller
                 $venteCaisseCloture = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', true)
-                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                    ->whereDate('date_vente', $sessionDate) // ✅ Compare seulement la date
                     ->count();
 
 
@@ -231,38 +233,41 @@ class VenteController extends Controller
                 $venteAucunReglement = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_reglement', false)
-                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente)
+                    ->whereDate('date_vente', $sessionDate) // ✅ Compare seulement la date
                     ->count();
 
                 // recuperer le montant total des ventes de la caisse actuelle
                 $totalVentesCaisse = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', false)
-                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente)
+                    ->whereDate('date_vente', $sessionDate)
                     ->sum('montant_total');
 
                 // dd($totalVentesCaisse);
+
+
+                /** Récupération des reglements impayés */
+
+                // Récupération des ventes impayées autres que la date de session actuelle
+                $venteImpayes = Vente::where('statut_paiement', 'impaye')
+                    // ->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente)
+                    ->where('statut_cloture', true)
+                    ->get();
+
+                // Récupération des règlements faits aujourd'hui sur ces ventes impayées
+                $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
+                    ->whereDate('date_reglement', $sessionDate)
+                    ->where('user_id', auth()->user()->id)
+                    ->get();
+
+
+                // dd($reglementImpayes->toArray());
             }
 
 
 
 
-            /** Récupération des reglements impayés */
 
-            // Récupération des ventes impayées autres que la date de session actuelle
-            $venteImpayes = Vente::where('statut_paiement', 'impaye')
-                // ->whereDate('date_vente', '!=', auth()->user()->caisse->session_date_vente)
-                ->where('statut_cloture', true)
-                ->get();
-
-            // Récupération des règlements faits aujourd'hui sur ces ventes impayées
-            $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
-                ->whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
-                ->where('user_id', auth()->user()->id)
-                ->get();
-
-
-            // dd($reglementImpayes->toArray());
 
             return view('backend.pages.vente.index', compact('reglementImpayes', 'data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients'));
         } catch (\Exception $e) {
@@ -719,7 +724,7 @@ class VenteController extends Controller
 
 
 
-    public function show($id)
+    public function show(Request $request , $id)
     {
         try {
             $vente = Vente::findOrFail($id);
@@ -731,14 +736,15 @@ class VenteController extends Controller
 
             //Recuperer la session de la date vente manuelle
             $sessionDate = null;
-            $sessionDate = Caisse::find(Auth::user()->caisse_id);
-            $sessionDate = $sessionDate->session_date_vente;
+          if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
+                $sessionDate = Caisse::whereId(Auth::user()->caisse_id)->value('session_date_vente');
+            }
+
 
             return view('backend.pages.vente.show', compact('vente', 'client', 'sessionDate'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return redirect()->route('vente.index')->with('error', "La vente demandée n'existe plus.");
-        } catch (\Exception $e) {
-            return redirect()->route('vente.index')->with('error', "Une erreur s'est produite. Veuillez réessayer.");
+        } catch (Exception $e) {
+            return back()->with('error', "La vente demandée n'existe plus." . $e->getMessage());
+            // return redirect()->route('vente.index')->with('error', "La vente demandée n'existe plus." , $e->getMessage());
         }
     }
 
