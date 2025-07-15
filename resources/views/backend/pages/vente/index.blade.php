@@ -449,9 +449,10 @@
                 </h5>
                 <p class="fw-bold text-center text-dark ">Caisse actuelle :
                     {{ auth()->user()->caisse->libelle ?? 'non définie' }}</p>
-                    <p class="fw-bold">
-                    Ventes impayées réglées :<span class="text-danger"> {{ number_format($reglementImpayes->sum('montant_reglement'), 0, ',', ' ')}}  FCFA</span>
-                    </p>
+                <p class="fw-bold">
+                    Ventes impayées réglées :<span class="text-danger">
+                        {{ number_format($reglementImpayes->sum('montant_reglement'), 0, ',', ' ') }} FCFA</span>
+                </p>
 
             </div>
             <!-- ========== End filter result libellé ========== -->
@@ -502,7 +503,9 @@
                     <div class="btn-group-actions">
 
                         {{-- Clôture caisse --}}
-                        @if (($venteAucunReglement == 0 && $totalVentesCaisse > 0)  || ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0))
+                        @if (
+                            ($venteAucunReglement == 0 && $totalVentesCaisse > 0) ||
+                                ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0))
                             <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
                                 👍 Clôturer la caisse <i class="ri ri-bill"></i>
                             </a>
@@ -719,7 +722,8 @@
                             @forelse ($data_vente as $key => $item)
                                 <tr id="row_{{ $item['id'] }}">
 
-                                    <td> {{ $loop->iteration }} <i class="ri ri-checkbox-blank-circle-fill text-success"></i> </td>
+                                    <td> {{ $loop->iteration }} <i
+                                            class="ri ri-checkbox-blank-circle-fill text-success"></i> </td>
                                     {{-- <td> <span
                                             class="badge bg-{{ $item['statut'] == 'en attente' ? 'warning' : 'success' }}">{{ $item['statut'] }}</span>
                                     </td> --}}
@@ -808,7 +812,12 @@
     <script>
         $(document).ready(function() {
 
-            // fonction pour choisir une date de session de vente
+
+            /** GESTION DE LA DATE DE SESSION DE VENTE */
+
+
+
+            // Lorsque une date n'est pas définie, on affiche une alerte
             $('.btnChoiceDate').click(function() {
                 Swal.fire({
                     title: 'Veuillez choisir une date de session de vente avant d\'effectuer une vente',
@@ -821,6 +830,95 @@
                     // cancelButtonText: 'Annuler'
                 })
             })
+            // empecher de choisir une date inferieur à la date du jour
+            // $('#dateSessionVente').on('change', function() {
+            //     var selectedDate = new Date($(this).val());
+            //     var today = new Date();
+            //     if (selectedDate < today-1) {
+            //         $(this).val(today.toISOString().split('T')[0]);
+            //         alert('Vous ne pouvez pas choisir une date de session de vente inférieur à la date du jour.');
+            //     }
+            // });
+
+
+
+            // $('#dateSessionVente').on('change', function() {
+            //     var selectedDate = new Date($(this).val());
+            //     var today = new Date();
+
+            //     // On récupère la date d'hier
+            //     var yesterday = new Date();
+            //     yesterday.setDate(today.getDate() - 1);
+
+            //     // On remet à zéro les heures, minutes, secondes pour une comparaison correcte
+            //     selectedDate.setHours(0, 0, 0, 0);
+            //     yesterday.setHours(0, 0, 0, 0);
+
+            //     if (selectedDate < yesterday) {
+            //         $(this).val(today.toISOString().split('T')[0]);
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Date invalide',
+            //             text: 'Vous ne pouvez pas choisir une date antérieure à date d\'hier. Veuillez choisir une date valide entre aujourd\'hui et Hier.',
+            //         });
+
+            //     }
+            //     if (selectedDate > today) {
+            //         $(this).val(today.toISOString().split('T')[0]);
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Date invalide',
+            //             text: 'Vous ne pouvez pas choisir une date postérieure à demain. Veuillez choisir une date valide entre aujourd\'hui et Hier.',
+            //         });
+
+            //     }
+            // });
+
+
+            const $input = $('#dateSessionVente');
+
+            function formatDate(date) {
+                return date.toISOString().split('T')[0];
+            }
+
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+
+            const todayStr = formatDate(today);
+            const yesterdayStr = formatDate(yesterday);
+
+            // Définir les limites du champ pour griser les autres dates
+            $input.attr('min', yesterdayStr);
+            $input.attr('max', todayStr);
+
+            // Contrôle au changement
+            $input.on('change', function() {
+                var selectedDate = new Date($(this).val());
+                selectedDate.setHours(0, 0, 0, 0);
+
+                today.setHours(0, 0, 0, 0);
+                yesterday.setHours(0, 0, 0, 0);
+
+                if (selectedDate < yesterday || selectedDate > today) {
+                    $(this).val(''); // Vide la valeur
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Date invalide',
+                        text: "Seules les dates d'hier et d'aujourd'hui sont autorisées.",
+                    });
+                }
+            });
+
+
+
+
+
+
+
+
+
+            // Fin de la gestion de la date de session de vente
 
             // scroller a liste des ventes lrsqu'on clique sur les cartes de statistiques
             function scrollListVente() {

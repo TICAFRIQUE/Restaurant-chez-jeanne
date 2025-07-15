@@ -10,25 +10,24 @@
                 <h5 class="modal-title" id="dateSessionVenteModalLabel">Sélectionnez la date de la session de vente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form class="needs-validation" action="{{route('vente.session-date')}}" method="POST" novalidate>
-            <div class="modal-body">
+            <form class="needs-validation" action="{{ route('vente.session-date') }}" method="POST" novalidate>
+                <div class="modal-body">
                     @csrf
                     <div class="mb-3">
                         <label for="dateSessionVente" class="col-form-label">Date:</label>
-                        @php
-                        $sessionDate = Session::get('session_date', 'Non définie')
-                   @endphp
-                        <input type="date" value="{{$sessionDate}}"  name="session_date" class="form-control" id="dateSessionVente" required>
+                       
+                        <input type="date" value="{{ $sessionDate ?? '' }}" name="session_date" class="form-control"
+                            id="dateSessionVente" required>
                         <!-- type="text" pour Flatpickr -->
                     </div>
-               
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-            </div>
 
-        </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>

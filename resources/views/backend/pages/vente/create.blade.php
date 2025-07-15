@@ -326,11 +326,13 @@
 
             function addToCart(id, name, price, stock, variante, varianteStock) {
                 let existingItem = cart.find(item => item.id === id);
-                if (existingItem) {
+                selectedProd = dataProduct.find(dataItem => dataItem.id == id)
+
+                if (existingItem && selectedProd.categorie.famille !== 'bar') {
                     existingItem.quantity += 1;
                     existingItem.selectedVariante = variante; // garde la variante sélectionnée
                 } else {
-                    selectedProd = dataProduct.find(dataItem => dataItem.id == id)
+                    // selectedProd = dataProduct.find(dataItem => dataItem.id == id)
                     cart.push({
                         id: id,
                         name: name,
@@ -343,8 +345,28 @@
                         discount: 0
                     });
                 }
+
+
+                console.log('panier : ', cart);
+
+                // Enregistre le produit dans le panier au tant qu'il n'est pas déjà dans le panier
+                // selectedProd = dataProduct.find(dataItem => dataItem.id == id)
+                // cart.push({
+                //     id: id,
+                //     name: name,
+                //     price: selectedProd.categorie.famille === 'bar' ? 0 : price,
+                //     stock: stock,
+                //     selectedVariante: variante ? variante :
+                //     null, // ajoute la variante choisie ou choisi la variante dans le select
+                //     varianteStock: variante ? variante.pivot.quantite_disponible : null,
+                //     quantity: 1,
+                //     discount: 0
+                // });
+
                 // console.log('panier : ', cart);
             }
+
+
 
 
 
@@ -436,8 +458,34 @@
                     let variantePrice = $(this).find('option:selected').data('price');
                     let varianteStock = $(this).find('option:selected').data('qte');
                     let selectedVarianteId = $(this).val();
+                    let selectedProductId = cart[index].id;
 
-                    // console.log(variantePrice, varianteStock, selectedVarianteId);
+
+                    // Vérifie si cette variante est déjà utilisée pour ce produit dans une autre ligne
+                    let duplicateVariante = cart.some((item, i) => {
+                        return (
+                            i !== index && // Ne pas comparer avec la ligne actuelle
+                            item.id === selectedProductId &&
+                            item.selectedVariante == selectedVarianteId
+                        );
+                    });
+
+                    if (duplicateVariante) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Attention !',
+                            text: 'Cette variante est déjà sélectionnée pour le même produit.' + cart[index].name,
+                        });
+                        $(this).val(''); // Réinitialiser la sélection
+                        cart[index].selectedVariante = null;
+                        cart[index].price = 0;
+                        cart[index].varianteStock = 0;
+
+                        $(this).closest('tr').find('.price-cell').text('0 FCFA');
+                        $(this).closest('tr').find('.total-cell').text('0 FCFA');
+                        updateGrandTotal();
+                        return; // Sortir pour éviter de continuer avec une valeur invalide
+                    }
 
 
                     if (variantePrice) {
@@ -452,8 +500,8 @@
                             ' FCFA');
                         updateGrandTotal();
                         verifyQty();
-
                     }
+
 
                 });
             }
@@ -539,7 +587,7 @@
 
                 cart.forEach((item) => {
                     var product = dataProduct.find(dataItem => dataItem.id == item.id);
-                    // console.log(item.varianteStock, qte);
+                    // console.log(item);
 
                     if (item.quantity > item.varianteStock && product.categorie.famille == 'bar') {
                         $('#errorMessage').text(
@@ -567,6 +615,7 @@
                 // Activer ou désactiver le bouton selon la validité des quantités
                 $('#validate-sale').prop('disabled', !allQuantitiesValid);
             }
+
 
 
             $(document).on('click', '.increase-qty', function() {
@@ -605,9 +654,6 @@
                     verifyQty();
                 }
             });
-
-
-
 
 
             $(document).on('change', '.quantity-input', function() {
