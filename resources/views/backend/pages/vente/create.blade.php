@@ -347,23 +347,8 @@
                 }
 
 
-                console.log('panier : ', cart);
-
-                // Enregistre le produit dans le panier au tant qu'il n'est pas déjà dans le panier
-                // selectedProd = dataProduct.find(dataItem => dataItem.id == id)
-                // cart.push({
-                //     id: id,
-                //     name: name,
-                //     price: selectedProd.categorie.famille === 'bar' ? 0 : price,
-                //     stock: stock,
-                //     selectedVariante: variante ? variante :
-                //     null, // ajoute la variante choisie ou choisi la variante dans le select
-                //     varianteStock: variante ? variante.pivot.quantite_disponible : null,
-                //     quantity: 1,
-                //     discount: 0
-                // });
-
                 // console.log('panier : ', cart);
+
             }
 
 
@@ -378,19 +363,49 @@
                     let variantesOptions = '';
                     let varianteSelectHtml = '';
 
+                    // if (selectedProduct && selectedProduct.variantes) {
+                    //     selectedProduct.variantes.forEach(variante => {
+                    //         // Garde la sélection de la variante dans le tableau affiché
+                    //         let isSelected = item.selectedVariante == variante.id ? 'selected' :
+                    //             '';
+                    //         variantesOptions += `
+                //             <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected}>
+                //                 ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)
+                //             </option>`;
+
+                    //     });
+
+                    // }
+
+                    // if (selectedProduct && selectedProduct.variantes) {
+                    //     selectedProduct.variantes.forEach(variante => {
+                    //         let isSelected = item.selectedVariante == variante.id ? 'selected' : '';
+                    //         let isDisabled = variante.pivot.quantite_disponible < 1 ? 'disabled' :
+                    //             '';
+
+                    //         variantesOptions += `
+                //         <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected} ${isDisabled}>
+                //             ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)
+                //         </option>`;
+                    //     });
+                    // }
+
                     if (selectedProduct && selectedProduct.variantes) {
                         selectedProduct.variantes.forEach(variante => {
-                            // Garde la sélection de la variante dans le tableau affiché
-                            let isSelected = item.selectedVariante == variante.id ? 'selected' :
+                            let isSelected = item.selectedVariante == variante.id ? 'selected' : '';
+                            let isDisabled = variante.pivot.quantite_disponible < 1 ? 'disabled' :
                                 '';
+                            let isIndisponible = variante.pivot.quantite_disponible < 1 ?
+                                ' - Indisponible' : '';
+
                             variantesOptions += `
-                                <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected}>
-                                    ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)
-                                </option>`;
-
+                            <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected} ${isDisabled}>
+                                ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)${isIndisponible}
+                            </option>`;
                         });
-
                     }
+
+
 
                     // Affichage du champ select pour les variantes ou texte 'Plat entier'
                     if (selectedProduct && selectedProduct.categorie && selectedProduct.categorie
@@ -474,7 +489,8 @@
                         Swal.fire({
                             icon: 'warning',
                             title: 'Attention !',
-                            text: 'Cette variante est déjà sélectionnée pour le même produit.' + cart[index].name,
+                            text: 'Cette variante est déjà sélectionnée pour le même produit.' +
+                                cart[index].name,
                         });
                         $(this).val(''); // Réinitialiser la sélection
                         cart[index].selectedVariante = null;

@@ -330,7 +330,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('inventaire')->controller(InventaireController::class)->group(function () {
         route::get('', 'index')->name('inventaire.index');
         route::get('show/{id}', 'show')->name('inventaire.show');
-        route::get('create', 'create')->name('inventaire.create')->middleware('check.inventaire');
+        route::get('create', 'create')->name('inventaire.create');
         route::post('store', 'store')->name('inventaire.store');
         route::get('fiche-inventaire', 'ficheInventaire')->name('inventaire.fiche-inventaire');
         route::get('delete/{id}', 'delete')->name('inventaire.delete');

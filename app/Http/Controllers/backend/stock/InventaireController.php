@@ -47,11 +47,11 @@ class InventaireController extends Controller
                 ->where('annee_concerne', $moisPrecedent->year)
                 ->exists();
 
-                // dd($inventaire_existe);
+            // dd($inventaire_existe);
 
             if ($inventaire_existe) {
                 return back()->with('error', 'Un inventaire du mois précédent existe déjà');
-            } 
+            }
 
             // Récupérer la date du dernier inventaire
             $date_dernier_inventaire = Inventaire::select('date_inventaire')
@@ -351,7 +351,7 @@ class InventaireController extends Controller
 
             //Appeler la methode miseAJourStockVariante
             // $this->miseAjourProduitInventaire();
-        // productsNotInInventaire();
+            // productsNotInInventaire();
 
 
 

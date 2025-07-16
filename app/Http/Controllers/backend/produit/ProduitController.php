@@ -148,7 +148,7 @@ class ProduitController extends Controller
             ->when($filter, function ($query) use ($filter) {
                 return $query->withWhereHas('typeProduit', fn($q) => $q->where('type', $filter));
             })->orderBy('created_at', 'DESC')
-            ->with(['variantes' ,'categorie' ])
+            ->with(['variantes','categorie'])
             ->get();
         // $data_produit = Produit::withWhereHas('typeProduit', fn($q) => $q->whereIn('type', ['restaurant', 'bar']))
         //     ->orderBy('created_at', 'DESC')->get();
