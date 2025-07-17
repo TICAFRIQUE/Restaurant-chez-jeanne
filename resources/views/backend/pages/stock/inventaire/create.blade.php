@@ -61,7 +61,7 @@
     </style>
     <!-- si le user a pour role developpeur on affiche les champs sinon on les cache-->
     @php
-        $dNone = Auth::user()->hasRole('developpeur') ? 'd-block' : 'd-none';
+        $dNone = Auth::user()->role == 'developpeur' ? '' : 'd-none';
     @endphp
 
     <!--End  si le user a pour role developpeur on affiche les champs sinon on les cache-->
@@ -234,6 +234,9 @@
                         <span class="error-text">Champ obligatoire</span> <!-- Conteneur pour l'erreur -->
                         <input type="number" name="stock_physique[]" class="form-control stockPhysique" required>
                     </div>
+
+
+                    <div class="variante-inputs row mb-3"></div>
 
                     <div class="col-md-2 mb-3 {{ $dNone }}">
                         <label class="form-label" for="stocks-input">Rapport Ecart
@@ -479,10 +482,25 @@
 
             // fonction qui permet selectionné les produits en fonction de la famille choisie
             function selectProduitsByFamille(form) {
-                var famille = form.find('.famille').val();
-
-
                 var produits = @json($data_produit); // Données du contrôleur
+                var famille = form.find('.famille').val(); // famille choisie par l'utilisateur bar ou restaurant
+                var familleOption = form.find('.famille option:selected')
+                    .text(); // famille choisie par l'utilisateur bar ou restaurant
+
+                //readonly de stock physique lorque famille bar
+                if (familleOption !== 'Bar') {
+                    form.find('.stockPhysique').prop('readonly', true);
+                } else {
+                    // sinon on reactive stock physique on efface les variantes du produit bar
+                    form.find('.stockPhysique').prop('readonly', false);
+                    form.find('.variante-inputs').html('');
+                }
+
+              
+
+
+
+                // recuperer les produits de la famille choisie (options)
                 var options = produits.filter(function(item) {
                     return item.type_id == famille;
                 })
@@ -510,7 +528,7 @@
 
             // attacher l'événement de changement aux champs famille 
             $(document).on('change', '.famille', function() {
-                var form = $(this).closest('.row');
+                var form = $(this).closest('.row'); // Obtenir le formulaire parent
                 selectProduitsByFamille(form);
             })
 
@@ -561,22 +579,55 @@
                 form.find('.observation').val('');
 
 
-                //recuperer les infos de produit
+                //recuperer les infos du produit selectionné
                 var dataProduct = @json($data_produit); // Données du contrôleur
+                // var productId = form.find('.productSelected').val();
+                // var product = dataProduct.find(function(item) {
+                //     return item.id == productId;
+                // });
+
+
+
+
                 var productId = form.find('.productSelected').val();
                 var product = dataProduct.find(function(item) {
                     return item.id == productId;
                 });
 
+
+
+                // On sélectionne l'élément où injecter les inputs
+                var variantesContainer = form.find('.variante-inputs');
+                variantesContainer.html(''); // Réinitialise l'affichage
+
+                if (product && product.variantes && product.variantes.length > 0) {
+                    product.variantes.forEach(function(variante) {
+                        var inputHTML = `
+                            <div class="col-md-2">
+                                <label>${variante.libelle}</label>
+                                <input type="number" name="variantes[${variante.id}]" data-quantite="${variante.pivot.quantite}" value="0" min="0" class="form-control variante-input" />
+                            </div>
+                        `;
+                        variantesContainer.append(inputHTML);
+                    });
+                }
+                // console.log('product selected', product.variantes);
+
+
+
+                // cacher le champs  stock physique si famille bar
+                if (product.categorie.famille == 'bar') {
+                    form.find('.stockPhysique').prop('readonly', true);
+                } else {
+                    form.find('.stockPhysique').prop('readonly', false);
+                }
+
+
+
+
                 //############stock theorique deplacé ##############
 
 
-
-
-
-                // form.find('.stockActuel').val(
-                //     ((product.stock_dernier_inventaire || 0) + (product.stock_initial || 0)).toFixed(2)
-                // );
 
                 let stockActuel = (product.stock_dernier_inventaire || 0) + (product.stock_initial || 0);
                 form.find('.stockActuel').val(stockActuel % 1 === 0 ? stockActuel : stockActuel.toFixed(2) ?? 0);
@@ -610,16 +661,46 @@
                 form.find('.stockLastInventaire').val(product.stock_dernier_inventaire) ||
                     0; // stock disponible pendant le dernier inventaire
 
-
-
             }
+
+
+
 
             // Attacher l'événement de changement aux champs select des produits
             $(document).on('change', '.productSelected', function() {
                 validateProductSelection();
-                var form = $(this).closest('.row');
+                var form = $(this).closest('.row'); // Obtenir le formulaire parent
                 getProductInfo(form);
+
             });
+
+
+
+
+            function calculerStockPhysique(form) {
+                var totalStock = 0;
+
+                form.find('.variante-input').each(function() {
+                    var saisie = parseFloat($(this).val()) || 0;
+                    var quantite = parseFloat($(this).data('quantite')) || 1;
+
+                    if (quantite > 0) {
+                        totalStock += saisie / quantite;
+                    }
+                });
+
+                form.find('.stockPhysique').val(totalStock);
+
+
+            }
+
+            $(document).on('input change', '.variante-input', function() {
+                var form = $(this).closest('.form-duplicate');
+                calculerStockPhysique(form);
+                calculEcart(form);
+                gestionEtatStock(form);
+            });
+
 
 
             // calculer l'ecart de stock
@@ -631,7 +712,6 @@
                 // form.find('.ecart').val(ecart.toFixed(2));
                 var ecart = stock_physique - stock_theorique;
                 form.find('.ecart').val(ecart % 1 === 0 ? ecart : ecart.toFixed(2));
-
             }
 
 
@@ -666,99 +746,7 @@
             }
 
 
-            // envoi du formulaire
 
-            // $('#myForm').on('submit', function(event) {
-            //     event.preventDefault(); // Empêcher le rechargement de la page
-
-            //     let hasError = false;
-
-            //     // Parcourir tous les champs ayant l'attribut `required`
-            //     $(this).find('[required]').each(function() {
-            //         // Vérifier si le champ est vide
-            //         if (!$(this).val()) {
-            //             hasError = true;
-            //             let fieldName = $(this).attr('name'); // Récupérer le nom du champ
-            //             let label = $(this).closest('div').find('label').text() ||
-            //                 fieldName; // Trouver le label ou utiliser le nom du champ
-
-            //             // Ajouter le texte d'erreur sous le champ
-            //             // $(this).closest('div').find('.error-text').text(
-            //             //     `Le champ ${label} est obligatoire.`).show();
-            //             $(this).closest('div').find('.error-text').text('Champs obligatoire')
-            //                 .show();
-
-
-            //             // Afficher une alerte avec SweetAlert
-            //             Swal.fire({
-            //                 title: 'Erreur',
-            //                 text: `Le champ ${label} est obligatoire.`,
-            //                 icon: 'error',
-            //                 confirmButtonText: 'OK',
-            //             });
-
-            //             return false; // Stopper l'itération et éviter l'envoi
-            //         } else {
-            //             // Cacher le message d'erreur si le champ est rempli
-            //             $(this).closest('div').find('.error-text').hide();
-            //         }
-            //     });
-
-
-            //     // Si une erreur a été trouvée, arrêter l'envoi
-            //     if (hasError) {
-            //         return false;
-            //     }
-
-            //     // Si tout est correct, soumettre le formulaire avec Ajax
-            //     let formData = $(this).serialize(); // Récupérer les données du formulaire
-            //     $.ajax({
-            //         url: $(this).attr('action'), // URL de la soumission du formulaire
-            //         type: 'POST',
-            //         data: formData,
-            //         dataType: 'json',
-            //         success: function(response, textStatus, xhr) {
-
-            //             let statusCode = xhr.status;
-
-            //             // Si la soumission est réussie
-            //             if (statusCode === 200) {
-            //                 Swal.fire({
-            //                     title: 'Succès',
-            //                     text: response.message,
-            //                     icon: 'success',
-            //                 });
-
-            //                 // Rediriger vers la liste des sortie
-            //                 var url =
-            //                     "{{ route('inventaire.index') }}"; // Rediriger vers la route liste sortie
-            //                 window.location.replace(url);
-            //             }
-            //         },
-            //         error: function(xhr, textStatus, errorThrown) {
-            //             let statusCode = xhr.status;
-
-            //             // Si une erreur serveur (500) est rencontrée
-            //             if (statusCode === 500) {
-            //                 Swal.fire({
-            //                     title: 'Erreur',
-            //                     text: xhr.responseJSON ? xhr.responseJSON.message :
-            //                         'Une erreur est survenue.',
-            //                     icon: 'error',
-            //                     confirmButtonText: 'OK',
-            //                 });
-            //             } else {
-            //                 Swal.fire({
-            //                     title: 'Erreur',
-            //                     text: xhr.responseJSON ? xhr.responseJSON.message :
-            //                         'Une erreur est survenue.',
-            //                     icon: 'error',
-            //                     confirmButtonText: 'OK',
-            //                 });
-            //             }
-            //         }
-            //     });
-            // });
 
             $('#myForm').on('submit', function(event) {
                 event.preventDefault(); // Empêcher le rechargement de la page

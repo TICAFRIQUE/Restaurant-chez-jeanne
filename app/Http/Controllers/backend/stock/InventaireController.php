@@ -59,9 +59,6 @@ class InventaireController extends Controller
                 ->first();
 
 
-
-
-
             $jour_mois_actuel = Carbon::now()->startOfMonth(); // 1er jour du mois actuel (1er avril)
             $jour_mois_precedent = $jour_mois_actuel->copy()->subMonth();    // 1er jour du mois précédent (1er mars)
 
@@ -107,14 +104,9 @@ class InventaireController extends Controller
                         ->whereMonth('sorties.date_sortie', $mois);
                 }], 'produit_sortie.quantite_utilise')
 
-                ->with('categorie')
+                ->with(['categorie' , 'variantes'])
                 ->alphabetique()
                 ->get();
-
-
-
-
-
 
 
             // recuperer les familles de categories bar et restaurant
@@ -278,6 +270,53 @@ class InventaireController extends Controller
         }
     }
 
+
+    /**
+     * Mettre à jour le stock des produits qui ne sont pas dans l'inventaire du mois à 0
+     *
+     * @return void
+     */
+    function productsNotInInventaire()
+    {
+        // ##START FONCTION POUR METTRE A JOUR LE STOCK DES PRODUITS QUI NE SONT PAS DANS L'INVENTAIRE DU MOIS
+
+
+        // recuperer l'inventaire du mois 
+        $inventaire_mois = Inventaire::whereYear('created_at', Carbon::now()->year)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->first();
+
+        // recuperer les produits de l'inventaire du mois
+        $produits_inventaire = Produit::whereHas('inventaires', function ($query) use ($inventaire_mois) {
+            $query->where('inventaires.id', $inventaire_mois->id);
+        })->get();
+
+
+        //recuperer les produits où la categorie famille est restaurant et  bar qui ne sont pas dans l'inventaire du mois
+        $produits_not_inventaire = Produit::whereDoesntHave('inventaires', function ($query) use ($inventaire_mois) {
+            $query->where('inventaires.id', $inventaire_mois->id);
+        })->whereHas('categorie', function ($query) {
+            $query->whereIn('famille', ['restaurant', 'bar']);
+        })->get();
+
+        // mettre le stock des produits qui ne sont pas dans l'inventaire du mois à 0
+        foreach ($produits_not_inventaire as $produit) {
+            $produit->update([
+                'stock' => 0,
+                'stock_dernier_inventaire' => 0,
+                'stock_initial' => 0,
+            ]);
+        }
+
+        // dd($produits_not_inventaire->toArray());
+
+        ##END
+
+
+    }
+
+
+
     /**
      * Store a newly created resource in storage.
      */
@@ -351,7 +390,7 @@ class InventaireController extends Controller
 
             //Appeler la methode miseAJourStockVariante
             // $this->miseAjourProduitInventaire();
-            // productsNotInInventaire();
+            $this->productsNotInInventaire();  // mettre à jour le stock des produits qui ne sont pas dans l'inventaire du mois à 0
 
 
 
