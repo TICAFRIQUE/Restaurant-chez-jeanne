@@ -488,7 +488,7 @@
                     .text(); // famille choisie par l'utilisateur bar ou restaurant
 
                 //readonly de stock physique lorque famille bar
-                if (familleOption !== 'Bar') {
+                if (familleOption == 'Bar') {
                     form.find('.stockPhysique').prop('readonly', true);
                 } else {
                     // sinon on reactive stock physique on efface les variantes du produit bar
