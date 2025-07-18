@@ -675,7 +675,7 @@
 
 
 
-
+            // calculer le stock physique avec les variantes
             function calculerStockPhysique(form) {
                 var totalStock = 0;
 
@@ -700,7 +700,7 @@
                 gestionEtatStock(form);
             });
 
-
+            //END
 
             // calculer l'ecart de stock
             function calculEcart(form) {
