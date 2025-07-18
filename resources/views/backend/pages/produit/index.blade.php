@@ -96,13 +96,40 @@
                                         {{-- <td>{{ $item['typeProduit']['name'] }}  </td> --}}
                                         @if ($item->categorie->famille == 'bar')
                                             <td>
-                                                <ol class="list-unstyled mb-0">
+                                                {{-- <ol class="list-unstyled mb-0">
                                                     @foreach ($item->variantes->sortBy('libelle') as $variantes)
                                                         <li>{{ $variantes->libelle }} :
                                                             <b> {{ $variantes->pivot->quantite_disponible }}</b>
                                                         </li>
                                                     @endforeach
+                                                </ol> --}}
+
+                                                <ol class="list-unstyled mb-0">
+                                                    @foreach ($item->variantes->sortBy('libelle') as $variante)
+                                                        @php
+                                                            $qte = $variante->pivot->quantite_disponible;
+                                                            $entier = floor($qte);
+                                                            $decimal = $qte - $entier;
+                                                            $ml = intval($decimal * 1000);
+                                                        @endphp
+                                                        <li>
+                                                            {{ $variante->libelle }} :
+                                                            <b>
+                                                                @if ($decimal == 0)
+                                                                    {{ $entier }}
+                                                                  
+                                                                @elseif ($entier > 0)
+                                                                    {{ $entier }}
+                                                                     et
+                                                                    {{ $ml }} ml
+                                                                @else
+                                                                    {{ $ml }} ml
+                                                                @endif
+                                                            </b>
+                                                        </li>
+                                                    @endforeach
                                                 </ol>
+
 
                                             </td>
                                         @else

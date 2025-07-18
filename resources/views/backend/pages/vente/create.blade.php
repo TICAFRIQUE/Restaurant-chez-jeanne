@@ -390,6 +390,26 @@
                     //     });
                     // }
 
+
+
+                    // Afficher que les quantités entieres avec virgule
+                    // if (selectedProduct && selectedProduct.variantes) {
+                    //     selectedProduct.variantes.forEach(variante => {
+                    //         let isSelected = item.selectedVariante == variante.id ? 'selected' : '';
+                    //         let isDisabled = variante.pivot.quantite_disponible < 1 ? 'disabled' :
+                    //             '';
+                    //         let isIndisponible = variante.pivot.quantite_disponible < 1 ?
+                    //             ' - Indisponible' : '';
+
+                    //         variantesOptions += `
+                //         <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected} ${isDisabled}>
+                //             ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)${isIndisponible}
+                //         </option>`;
+                    //     });
+                    // }
+
+
+                    // Afficher que les quantité entieres
                     if (selectedProduct && selectedProduct.variantes) {
                         selectedProduct.variantes.forEach(variante => {
                             let isSelected = item.selectedVariante == variante.id ? 'selected' : '';
@@ -397,15 +417,15 @@
                                 '';
                             let isIndisponible = variante.pivot.quantite_disponible < 1 ?
                                 ' - Indisponible' : '';
+                            let quantiteDisponibleEntiere = parseInt(variante.pivot
+                                .quantite_disponible);
 
                             variantesOptions += `
-                            <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected} ${isDisabled}>
-                                ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)${isIndisponible}
+                            <option value="${variante.id}" data-qte="${quantiteDisponibleEntiere}" data-price="${variante.pivot.prix}" ${isSelected} ${isDisabled}>
+                                ${variante.libelle} (${variante.pivot.prix} FCFA) (${quantiteDisponibleEntiere} Q)${isIndisponible}
                             </option>`;
                         });
                     }
-
-
 
                     // Affichage du champ select pour les variantes ou texte 'Plat entier'
                     if (selectedProduct && selectedProduct.categorie && selectedProduct.categorie

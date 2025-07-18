@@ -496,7 +496,6 @@
                     form.find('.variante-inputs').html('');
                 }
 
-              
 
 
 
