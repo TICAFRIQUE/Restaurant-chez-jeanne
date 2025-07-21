@@ -157,7 +157,7 @@ class Produit extends Model implements HasMedia
 
     public function inventaires()
     {
-        return $this->belongsToMany(Inventaire::class)->withPivot(['stock_initial', 'stock_vendu', 'stock_theorique', 'stock_physique', 'ecart', 'etat', 'observation', 'stock_dernier_inventaire'])->withTimestamps();
+        return $this->belongsToMany(Inventaire::class)->withPivot(['stock_initial', 'stock_vendu', 'stock_theorique', 'stock_physique', 'stock_physique_json', 'ecart', 'etat', 'observation', 'stock_dernier_inventaire'])->withTimestamps();
     }
 
     public function ventes()

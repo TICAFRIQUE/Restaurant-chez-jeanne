@@ -604,7 +604,7 @@
                         var inputHTML = `
                             <div class="col-md-2">
                                 <label>${variante.libelle}</label>
-                                <input type="number" name="variantes[${variante.id}]" data-quantite="${variante.pivot.quantite}" value="0" min="0" class="form-control variante-input" />
+                                <input type="number" name="variantes[${product.id}][${variante.libelle}]" data-quantite="${variante.pivot.quantite}" value="0" min="0" class="form-control variante-input" />
                             </div>
                         `;
                         variantesContainer.append(inputHTML);

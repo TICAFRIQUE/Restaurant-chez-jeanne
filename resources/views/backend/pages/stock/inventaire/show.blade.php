@@ -70,7 +70,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th class="{{Auth::user()->hasRole('developpeur') ? '' : 'd-none'}}">Code</th>
+                                    <th class="{{ Auth::user()->hasRole('developpeur') ? '' : 'd-none' }}">Code</th>
                                     <th>Nom</th>
                                     <th>stock dernier inventaire</th>
                                     <th>Achat après dernier inventaire</th>
@@ -84,29 +84,91 @@
                                 </tr>
                             </thead>
                             <tbody>
+
+                                @php
+                                    if (!function_exists('afficherStockConvertir')) {
+                                        function afficherStockConvertir($valeur, $unite = '')
+                                        {
+                                            $entier = floor($valeur);
+                                            $decimal = $valeur - $entier;
+                                            $ml = intval($decimal * 1000);
+                                            $texte = '';
+
+                                            if ($decimal == 0) {
+                                                $texte .= $entier . ' ' . $unite;
+                                            } elseif ($entier == 0 && $ml > 0) {
+                                                $texte .= $ml . ' ml';
+                                            } else {
+                                                $texte .= $entier . ' ' . $unite . ' et ' . $ml . ' ml';
+                                            }
+
+                                            return $texte ?: '0';
+                                        }
+                                    }
+                                @endphp
+
                                 @foreach ($inventaire->produits as $key => $item)
+                                    @php
+                                        // recuperer le stock physique json
+                                        $stockPhysique_json = json_decode($item['pivot']['stock_physique_json'], true);
+                                    @endphp
+
+
                                     <tr id="row_{{ $item['id'] }}">
                                         <td>{{ ++$key }}</td>
-                                        <td class="{{Auth::user()->hasRole('developpeur') ? '' : 'd-none'}}"> {{ $item['code'] }} </td>
-                                      
+                                        <td class="{{ Auth::user()->hasRole('developpeur') ? '' : 'd-none' }}">
+                                            {{ $item['code'] }}
+                                        </td>
                                         <td>{{ $item['nom'] }} <b>{{ $item['valeur_unite'] ?? '' }}</b>
-                                            {{ $item['unite']['abreviation'] ?? '' }} </td>
-                                        <td>{{ $item['pivot']['stock_dernier_inventaire'] ?? '' }}</td>
-                                        <td>{{ $item['pivot']['stock_initial'] }}
-                                            {{ $item['uniteSortie']['libelle'] ?? '' }}</td>
-                                        <td>{{ $item['pivot']['stock_dernier_inventaire'] + $item['pivot']['stock_initial'] }}
-                                            {{ $item['uniteSortie']['libelle'] ?? '' }}</td>
-                                        <td>{{ $item['pivot']['stock_vendu'] }}
-                                            {{ $item['uniteSortie']['libelle'] ?? '' }}</td>
-                                        <td>{{ $item['pivot']['stock_theorique'] }}
-                                            {{ $item['uniteSortie']['libelle'] ?? '' }}</td>
-                                        <td>{{ $item['pivot']['stock_physique'] }}
-                                            {{ $item['uniteSortie']['libelle'] ?? '' }}</td>
-                                        <td>{{ $item['pivot']['ecart'] }}</td>
+                                            {{ $item['unite']['abreviation'] ?? '' }}</td>
+
+                                        <td>{!! afficherStockConvertir(
+                                            $item['pivot']['stock_dernier_inventaire'] ?? 0,
+                                            $item['uniteSortie']['abreviation'] ?? '',
+                                        ) !!}</td>
+                                        <td>{!! afficherStockConvertir($item['pivot']['stock_initial'] ?? 0, $item['uniteSortie']['abreviation'] ?? '') !!}</td>
+                                        <td>
+                                            @php
+                                                $stock_total =
+                                                    ($item['pivot']['stock_dernier_inventaire'] ?? 0) +
+                                                    ($item['pivot']['stock_initial'] ?? 0);
+                                            @endphp
+                                            {!! afficherStockConvertir($stock_total, $item['uniteSortie']['abreviation'] ?? '') !!}
+                                        </td>
+                                        <td>{!! afficherStockConvertir($item['pivot']['stock_vendu'] ?? 0, $item['uniteSortie']['abreviation'] ?? '') !!}</td>
+                                        <td>{!! afficherStockConvertir($item['pivot']['stock_theorique'] ?? 0, $item['uniteSortie']['abreviation'] ?? '') !!}</td>
+                                        <td>
+                                            <ul class="mb-0">
+                                                @foreach ($stockPhysique_json as $libelle => $quantite)
+                                                    <li>{{ $libelle }} : {{ $quantite }}</li>
+                                                @endforeach
+                                            </ul>
+                                            {!! afficherStockConvertir($item['pivot']['stock_physique'] ?? 0, $item['uniteSortie']['abreviation'] ?? '') !!}
+                                        </td>
+                                        <td>
+                                            @php
+                                                $ecart = $item['pivot']['ecart'];
+                                                $entier = floor($ecart);
+                                                $decimal = $ecart - $entier; //partie decimal
+                                                $ml = intval($decimal * 1000); //convertir en millilitre
+                                            @endphp
+
+
+                                            @if ($decimal == 0)
+                                                {{ $entier }} {{ $item['uniteSortie']['abreviation'] ?? '' }}
+                                            @elseif ($entier == 0 && $ml > 0)
+                                                {{ $ml }} ml
+                                            @else
+                                                {{ $entier }} {{ $item['uniteSortie']['abreviation'] ?? '' }}
+                                                et
+                                                {{ $ml }} ml
+                                            @endif
+                                        </td>
                                         <td>{{ $item['pivot']['etat'] }}</td>
                                         <td>{{ $item['pivot']['observation'] }}</td>
                                     </tr>
                                 @endforeach
+
                             </tbody>
                         </table>
                     </div>

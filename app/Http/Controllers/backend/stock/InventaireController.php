@@ -104,7 +104,7 @@ class InventaireController extends Controller
                         ->whereMonth('sorties.date_sortie', $mois);
                 }], 'produit_sortie.quantite_utilise')
 
-                ->with(['categorie' , 'variantes'])
+                ->with(['categorie', 'variantes'])
                 ->alphabetique()
                 ->get();
 
@@ -353,12 +353,24 @@ class InventaireController extends Controller
                 // Trouver l'unité correspondante pour ce produit
                 $produit = Produit::find($produit_id);
 
+                // enregistrer les variantes en json
+                $varianteData = [];
+
+                if (!empty($request->variantes[$produit_id])) {
+                    foreach ($request->variantes[$produit_id] as $libelle => $quantite) {
+                        // if ((int) $quantite > 0) {
+                            $varianteData[$libelle] = (int) $quantite;
+                        // }
+                    }
+                }
+
                 // Attacher le produit à la sortie avec les informations associées
                 $inventaire->produits()->attach($produit_id, [
                     'stock_dernier_inventaire' => $produit->stock_dernier_inventaire, // direct dans la table produit
                     'stock_initial' => $request->stock_initial[$key], // nouveau stock ajouté apres l'inventaire precedent
                     'stock_theorique' => $request->stock_theorique[$key],
                     'stock_physique' => $request->stock_physique[$key],
+                    'stock_physique_json' => json_encode($varianteData), // stock hysique en json
                     'stock_vendu' => $request->stock_vendu[$key],
                     'ecart' => $request->ecart[$key],
                     'etat' => $request->etat[$key],

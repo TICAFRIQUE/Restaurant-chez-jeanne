@@ -117,12 +117,11 @@
                                                             <b>
                                                                 @if ($decimal == 0)
                                                                     {{ $entier }}
-                                                                  
-                                                                @elseif ($entier > 0)
-                                                                    {{ $entier }}
-                                                                     et
+                                                                @elseif ($entier == 0 && $ml > 0)
                                                                     {{ $ml }} ml
                                                                 @else
+                                                                    {{ $entier }}
+                                                                    et
                                                                     {{ $ml }} ml
                                                                 @endif
                                                             </b>

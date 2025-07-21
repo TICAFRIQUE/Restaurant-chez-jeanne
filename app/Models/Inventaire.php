@@ -31,7 +31,7 @@ class Inventaire extends Model
     }
 
     public function produits() {
-        return $this->belongsToMany(Produit::class)->withPivot(['stock_initial','stock_vendu','stock_theorique','stock_physique','ecart' ,'etat' , 'observation' , 'stock_dernier_inventaire'])->withTimestamps();
+        return $this->belongsToMany(Produit::class)->withPivot(['stock_initial','stock_vendu','stock_theorique','stock_physique', 'stock_physique_json' ,'ecart' ,'etat' , 'observation' , 'stock_dernier_inventaire'])->withTimestamps();
     }
 
     public function user()
