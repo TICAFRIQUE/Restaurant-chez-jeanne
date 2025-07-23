@@ -238,6 +238,9 @@
 
                     <div class="variante-inputs row mb-3"></div>
 
+                    <div class="variante-qte row mb-3"></div>
+
+
                     <div class="col-md-2 mb-3 {{ $dNone }}">
                         <label class="form-label" for="stocks-input">Rapport Ecart
                             <span class="text-danger">*</span>
@@ -594,7 +597,10 @@
                 });
 
 
+                console.log('product', product.variantes);
 
+
+                /* Gestion des variantes on affiche les inputs variantes en fonction du produit choisi*/
                 // On sélectionne l'élément où injecter les inputs
                 var variantesContainer = form.find('.variante-inputs');
                 variantesContainer.html(''); // Réinitialise l'affichage
@@ -613,6 +619,22 @@
                 // console.log('product selected', product.variantes);
 
 
+
+                // on affiche les quantités des variantes disponibles
+                var variantesQteContainer = form.find('.variante-qte');
+                variantesQteContainer.html(''); // Réinitialise l'affichage
+
+                if (product && product.variantes && product.variantes.length > 0) {
+                    product.variantes.forEach(function(variante) {
+                        var inputHTML = `
+                            <div class="col-md-2">
+                                <label>${variante.libelle}</label>
+                                <input type="number" name="variantesQte[${product.id}][${variante.libelle}]" data-quantite="${variante.pivot.quantite_disponible}" value="${variante.pivot.quantite_disponible}" min="0" class="form-control variante-qte" />
+                            </div>
+                        `;
+                        variantesQteContainer.append(inputHTML);
+                    });
+                }
 
                 // cacher le champs  stock physique si famille bar
                 if (product.categorie.famille == 'bar') {
@@ -654,7 +676,7 @@
                 // }
 
 
-                form.find('.stockTheorique').val(stockTheorique) || 0; // stock restante
+                form.find('.stockTheorique').val(stockTheorique.toFixed(2)) || 0; // stock restante
                 form.find('.stockRecent').val(product.stock_initial) ||
                     0; // stock nouveau ajouté apres last inventaire
                 form.find('.stockLastInventaire').val(product.stock_dernier_inventaire) ||

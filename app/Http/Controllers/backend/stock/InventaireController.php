@@ -103,8 +103,7 @@ class InventaireController extends Controller
                     $query->whereYear('sorties.date_sortie', $anneePrecedente)
                         ->whereMonth('sorties.date_sortie', $mois);
                 }], 'produit_sortie.quantite_utilise')
-
-                ->with(['categorie', 'variantes'])
+                ->with(['categorie', 'variantes' , 'ventes'])
                 ->alphabetique()
                 ->get();
 
@@ -359,7 +358,7 @@ class InventaireController extends Controller
                 if (!empty($request->variantes[$produit_id])) {
                     foreach ($request->variantes[$produit_id] as $libelle => $quantite) {
                         // if ((int) $quantite > 0) {
-                            $varianteData[$libelle] = (int) $quantite;
+                        $varianteData[$libelle] = (int) $quantite;
                         // }
                     }
                 }
