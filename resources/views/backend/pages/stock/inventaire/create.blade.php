@@ -597,7 +597,7 @@
                 });
 
 
-                console.log('product', product.variantes);
+                console.log('product', product.ventes);
 
 
                 /* Gestion des variantes on affiche les inputs variantes en fonction du produit choisi*/
@@ -621,20 +621,20 @@
 
 
                 // on affiche les quantités des variantes disponibles
-                var variantesQteContainer = form.find('.variante-qte');
-                variantesQteContainer.html(''); // Réinitialise l'affichage
+                // var variantesQteContainer = form.find('.variante-qte');
+                // variantesQteContainer.html(''); // Réinitialise l'affichage
 
-                if (product && product.variantes && product.variantes.length > 0) {
-                    product.variantes.forEach(function(variante) {
-                        var inputHTML = `
-                            <div class="col-md-2">
-                                <label>${variante.libelle}</label>
-                                <input type="number" name="variantesQte[${product.id}][${variante.libelle}]" data-quantite="${variante.pivot.quantite_disponible}" value="${variante.pivot.quantite_disponible}" min="0" class="form-control variante-qte" />
-                            </div>
-                        `;
-                        variantesQteContainer.append(inputHTML);
-                    });
-                }
+                // if (product && product.variantes && product.variantes.length > 0) {
+                //     product.variantes.forEach(function(variante) {
+                //         var inputHTML = `
+                //             <div class="col-md-2">
+                //                 <label>${variante.libelle}</label>
+                //                 <input type="number" name="variantesQte[${product.id}][${variante.libelle}]" data-quantite="${variante.pivot.quantite_disponible}" value="${variante.pivot.quantite_disponible}" min="0" class="form-control variante-qte" />
+                //             </div>
+                //         `;
+                //         variantesQteContainer.append(inputHTML);
+                //     });
+                // }
 
                 // cacher le champs  stock physique si famille bar
                 if (product.categorie.famille == 'bar') {
@@ -652,7 +652,6 @@
 
                 let stockActuel = (product.stock_dernier_inventaire || 0) + (product.stock_initial || 0);
                 form.find('.stockActuel').val(stockActuel % 1 === 0 ? stockActuel : stockActuel.toFixed(2) ?? 0);
-
 
 
                 var stockVendu;
@@ -710,7 +709,7 @@
                     }
                 });
 
-                form.find('.stockPhysique').val(totalStock);
+                form.find('.stockPhysique').val(totalStock.toFixed(2)); // Mettre à jour le stock physique
 
 
             }
@@ -768,7 +767,7 @@
 
 
 
-
+            // enregister le formulaire
             $('#myForm').on('submit', function(event) {
                 event.preventDefault(); // Empêcher le rechargement de la page
 
@@ -854,6 +853,10 @@
 
 
 
+
+
+
+            /****##############################################################################################################****/
 
 
 

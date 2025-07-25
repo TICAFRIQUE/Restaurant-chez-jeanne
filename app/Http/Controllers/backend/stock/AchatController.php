@@ -608,9 +608,9 @@ class AchatController extends Controller
         // Récupérer tous les achats liés à la facture
         $achats = Achat::where('facture_id', $id)->get();
 
-        if ($achats->isEmpty()) {
-            return response()->json(['message' => 'Aucun achat trouvé pour cette facture'], 404);
-        }
+        // if ($achats->isEmpty()) {
+        //     return response()->json(['message' => 'Aucun achat trouvé pour cette facture'], 404);
+        // }
 
         foreach ($achats as $achat) {
             // Récupérer le produit lié à l'achat

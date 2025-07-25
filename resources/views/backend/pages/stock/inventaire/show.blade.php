@@ -105,16 +105,30 @@
                                             return $texte ?: '0';
                                         }
                                     }
+
+
+                                    // recuperer les variantes des produits
+                                    $produitsVariante = $inventaire->produits->map(function ($produit) {
+                                      
+                                        return $produit->variantes->map(function ($variante)  {
+                                            return $variante->pivot;
+                                        });
+                                    });
                                 @endphp
+
+
+
+
 
                                 @foreach ($inventaire->produits as $key => $item)
                                     @php
                                         // recuperer le stock physique json
-                                        $stockPhysique_json = json_decode($item['pivot']['stock_physique_json'], true);
+                                        $stockPhysique_json = json_decode($item['pivot']['stock_physique_json'], true) ?? [];
                                     @endphp
 
 
                                     <tr id="row_{{ $item['id'] }}">
+                                        <td>{{$produitsVariante }}</td>
                                         <td>{{ ++$key }}</td>
                                         <td class="{{ Auth::user()->hasRole('developpeur') ? '' : 'd-none' }}">
                                             {{ $item['code'] }}

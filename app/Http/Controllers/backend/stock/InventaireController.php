@@ -103,7 +103,7 @@ class InventaireController extends Controller
                     $query->whereYear('sorties.date_sortie', $anneePrecedente)
                         ->whereMonth('sorties.date_sortie', $mois);
                 }], 'produit_sortie.quantite_utilise')
-                ->with(['categorie', 'variantes' , 'ventes'])
+                ->with(['categorie', 'variantes', 'ventes'])
                 ->alphabetique()
                 ->get();
 
@@ -427,7 +427,7 @@ class InventaireController extends Controller
             $etatFilter = request('filter_etat');
 
             // Récupérer l'inventaire précédent
-            $inventairePrecedent = Inventaire::with('produits')
+            $inventairePrecedent = Inventaire::with('produits' , fn($query) => $query->with('produit_variantes'))
                 ->where('id', '<', $id)
                 ->orderBy('id', 'desc')
                 ->first();
@@ -446,7 +446,7 @@ class InventaireController extends Controller
 
 
             // Récupérer l'inventaire actuel avec les produits
-            $query = Inventaire::with('produits')->where('id', $id);
+            $query = Inventaire::with('produits', 'produits.variantes')->where('id', $id);
 
             // Si un filtre d'état est défini, appliquer le filtrage sur les produits
             if ($etatFilter) {
@@ -461,6 +461,8 @@ class InventaireController extends Controller
             if (!$inventaire) {
                 return redirect()->route('inventaire.index')->with('error', "L'inventaire demandé n'existe pas.");
             }
+
+            // dd($inventaire->toArray());
 
             return view('backend.pages.stock.inventaire.show', compact('inventaire', 'inventairePrecedent', 'moisInventaire'));
         } catch (\Exception $e) {

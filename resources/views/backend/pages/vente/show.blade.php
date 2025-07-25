@@ -132,17 +132,20 @@
                         @can('creer-vente')
                             @if ($vente->statut_paiement != 'paye' && $sessionDate != null)
                                 <button class="btn btn-success me-2" data-bs-toggle="modal"
-                                    data-bs-target="#reglementModal{{ $vente->id }}"> 💷 Règlément</button>
-                            @else
+                                    data-bs-target="#reglementModal{{ $vente->id }}"> 💷 Règlement</button>
+
+                                @include('backend.pages.vente.reglement')
+                            @elseif($vente->statut_paiement != 'paye' && $sessionDate == null)
                                 <button class="btn btn-success me-2 btnChoiceDate"> 💷 Règlement </button>
                             @endif
-                            @include('backend.pages.vente.reglement')
 
                             @if ($sessionDate != null)
-                                <a href="{{ route('vente.create') }}" type="button" class="btn btn-primary"><i
-                                        class="ri-add-circle-line align-bottom me-1"></i> Nouvelle vente</a>
+                                <a href="{{ route('vente.create') }}" type="button" class="btn btn-primary">
+                                    <i class="ri-add-circle-line align-bottom me-1"></i> Nouvelle vente
+                                </a>
                             @endif
                         @endcan
+
                     </div>
                     {{-- @endif --}}
                 </div>
