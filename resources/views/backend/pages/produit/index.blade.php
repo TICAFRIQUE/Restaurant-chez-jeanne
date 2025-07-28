@@ -96,37 +96,64 @@
                                         {{-- <td>{{ $item['typeProduit']['name'] }}  </td> --}}
                                         @if ($item->categorie->famille == 'bar')
                                             <td>
-                                                {{-- <ol class="list-unstyled mb-0">
-                                                    @foreach ($item->variantes->sortBy('libelle') as $variantes)
-                                                        <li>{{ $variantes->libelle }} :
-                                                            <b> {{ $variantes->pivot->quantite_disponible }}</b>
-                                                        </li>
-                                                    @endforeach
-                                                </ol> --}}
+
 
                                                 <ol class="list-unstyled mb-0">
-                                                    @foreach ($item->variantes->sortBy('libelle') as $variante)
-                                                        @php
-                                                            $qte = $variante->pivot->quantite_disponible;
-                                                            $entier = floor($qte);
-                                                            $decimal = $qte - $entier;
-                                                            $ml = intval($decimal * 1000);
-                                                        @endphp
-                                                        <li>
-                                                            {{ $variante->libelle }} :
-                                                            <b>
-                                                                @if ($decimal == 0)
-                                                                    {{ $entier }}
-                                                                @elseif ($entier == 0 && $ml > 0)
-                                                                    {{ $ml }} ml
-                                                                @else
-                                                                    {{ $entier }}
-                                                                    et
-                                                                    {{ $ml }} ml
-                                                                @endif
-                                                            </b>
-                                                        </li>
-                                                    @endforeach
+                                                    @php
+                                                        $bouteille = $item->variantes
+                                                            ->where('libelle', 'Bouteille')
+                                                            ->first();
+                                                        $verre = $item->variantes->where('libelle', 'Verre')->first();
+                                                        $ballon = $item->variantes->where('libelle', 'Ballon')->first();
+
+                                                        $bouteilles_restantes = 0;
+                                                        $verres_restants = 0;
+                                                        $ballons_restants = 0;
+
+                                                        if ($bouteille && $verre) {
+                                                            $qte_disponible =
+                                                                $bouteille->pivot->quantite_disponible ?? 0;
+                                                            $verres_par_bouteille = $verre->pivot->quantite ?? 0;
+
+                                                            // Séparer partie entière (bouteilles pleines) et partie décimale
+                                                            $bouteilles_restantes = floor($qte_disponible);
+                                                            $partie_decimale = $qte_disponible - $bouteilles_restantes;
+
+                                                            // Convertir la partie décimale en verres
+                                                            $verres_restants =
+                                                               round($partie_decimale * $verres_par_bouteille , 2);
+                                                            
+
+                                                            // Si "ballon" existe et verre n'existe pas, on peut utiliser la conversion directe
+                                                            if ($verres_restants == 0 && $ballon) {
+                                                                $ballons_par_bouteille = $ballon->pivot->quantite ?? 0;
+                                                                $ballons_restants = 
+                                                                  round($partie_decimale * $ballons_par_bouteille , 2);
+                                                                
+                                                            }
+                                                        }
+                                                    @endphp
+
+                                                    <li>
+                                                        @if ($bouteilles_restantes > 0)
+                                                            {{ $bouteilles_restantes }} bouteille(s)
+                                                        @endif
+
+                                                        @if ($verres_restants > 0)
+                                                            @if ($bouteilles_restantes > 0)
+                                                                &
+                                                            @endif
+                                                            {{ floor($verres_restants) }} verre(s)
+                                                        @endif
+
+                                                        @if ($ballons_restants > 0)
+                                                            @if ($bouteilles_restantes > 0 || $verres_restants > 0)
+                                                                &
+                                                            @endif
+                                                            {{ floor($ballons_restants) }} ballon(s)
+                                                        @endif
+                                                    </li>
+
                                                 </ol>
 
 

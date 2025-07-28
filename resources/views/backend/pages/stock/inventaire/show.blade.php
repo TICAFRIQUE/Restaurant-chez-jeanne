@@ -86,34 +86,141 @@
                             <tbody>
 
                                 @php
-                                    if (!function_exists('afficherStockConvertir')) {
-                                        function afficherStockConvertir($valeur, $unite = '')
-                                        {
-                                            $entier = floor($valeur);
-                                            $decimal = $valeur - $entier;
-                                            $ml = intval($decimal * 1000);
+                                    // if (!function_exists('afficherStockConvertirAvecVariantes')) {
+                                    //     function afficherStockConvertirAvecVariantes(
+                                    //         $valeur,
+                                    //         $unite = '',
+                                    //         $variantes = null,
+                                    //     ) {
+                                    //         $entier = floor($valeur); // bouteilles pleines
+                                    //         $decimal = $valeur - $entier; // partie décimale
+                                    //         $texte = '';
+
+                                    //         // Par défaut on affiche juste les bouteilles
+                                    //         if ($decimal == 0) {
+                                    //             $texte .= $entier . ' ' . $unite;
+                                    //         } else {
+                                    //             $texte .= $entier . ' ' . $unite;
+
+                                    //             // Si variantes disponibles (verre ou ballon)
+                                    //             if ($variantes) {
+                                    //                 $verre = $variantes->where('libelle', 'Verre')->first();
+                                    //                 $ballon = $variantes->where('libelle', 'Ballon')->first();
+
+                                    //                 if ($verre && ($verre->pivot->quantite ?? 0) > 0) {
+                                    //                     $verres_par_bouteille = $verre->pivot->quantite;
+                                    //                     $verres = round($decimal * $verres_par_bouteille , 2);
+                                    //                     if ($verres > 0) {
+                                    //                         $texte .= ' et ' . floor($verres) . ' verre(s)';
+                                    //                     }
+                                    //                 } elseif ($ballon && ($ballon->pivot->quantite ?? 0) > 0) {
+                                    //                     $ballons_par_bouteille = $ballon->pivot->quantite;
+                                    //                     $ballons = round($decimal * $ballons_par_bouteille , 2);
+                                    //                     if ($ballons > 0) {
+                                    //                         $texte .= ' et ' . floor($ballons) . ' ballon(s)';
+                                    //                     }
+                                    //                 }
+                                    //             }
+                                    //         }
+
+                                    //         return $texte ?: '0';
+                                    //     }
+                                    // }
+
+                                    // if (!function_exists('afficherStockConvertirAvecVariantes')) {
+                                    //     function afficherStockConvertirAvecVariantes(
+                                    //         $valeur,
+                                    //         $unite = '',
+                                    //         $variantes = null,
+                                    //     ) {
+                                    //         $entier = floor($valeur); // bouteilles pleines
+                                    //         $decimal = $valeur - $entier; // partie décimale
+                                    //         $texte = '';
+
+                                    //         // Par défaut on affiche juste les bouteilles
+                                    //         if ($decimal == 0) {
+                                    //             if ($entier > 0) {
+                                    //                 $texte .= $entier . ' ' . $unite;
+                                    //             }
+                                    //         } else {
+                                    //             if ($entier > 0) {
+                                    //                 $texte .= $entier . ' ' . $unite;
+                                    //             }
+
+                                    //             // Si variantes disponibles (verre ou ballon)
+                                    //             if ($variantes) {
+                                    //                 $verre = $variantes->where('libelle', 'Verre')->first();
+                                    //                 $ballon = $variantes->where('libelle', 'Ballon')->first();
+
+                                    //                 if ($verre && ($verre->pivot->quantite ?? 0) > 0) {
+                                    //                     $verres_par_bouteille = $verre->pivot->quantite;
+                                    //                     $verres = round($decimal * $verres_par_bouteille, 2);
+                                    //                     if ($verres > 0) {
+                                    //                         $texte .=
+                                    //                             ($texte ? ' et ' : '') . floor($verres) . ' verre(s)';
+                                    //                     }
+                                    //                 } elseif ($ballon && ($ballon->pivot->quantite ?? 0) > 0) {
+                                    //                     $ballons_par_bouteille = $ballon->pivot->quantite;
+                                    //                     $ballons = round($decimal * $ballons_par_bouteille, 2);
+                                    //                     if ($ballons > 0) {
+                                    //                         $texte .=
+                                    //                             ($texte ? ' et ' : '') . floor($ballons) . ' ballon(s)';
+                                    //                     }
+                                    //                 }
+                                    //             }
+                                    //         }
+
+                                    //         return $texte ?: '0';
+                                    //     }
+                                    // }
+
+                                    if (!function_exists('afficherStockConvertirAvecVariantes')) {
+                                        function afficherStockConvertirAvecVariantes(
+                                            $valeur,
+                                            $unite = '',
+                                            $variantes = null,
+                                        ) {
+                                            $signe = $valeur < 0 ? '-' : '';
+                                            $valeur = abs($valeur);
+
+                                            $entier = floor($valeur); // bouteilles pleines
+                                            $decimal = $valeur - $entier; // partie décimale
                                             $texte = '';
 
                                             if ($decimal == 0) {
-                                                $texte .= $entier . ' ' . $unite;
-                                            } elseif ($entier == 0 && $ml > 0) {
-                                                $texte .= $ml . ' ml';
+                                                if ($entier > 0) {
+                                                    $texte .= $entier . ' ' . $unite;
+                                                }
                                             } else {
-                                                $texte .= $entier . ' ' . $unite . ' et ' . $ml . ' ml';
+                                                if ($entier > 0) {
+                                                    $texte .= $entier . ' ' . $unite;
+                                                }
+
+                                                if ($variantes) {
+                                                    $verre = $variantes->where('libelle', 'Verre')->first();
+                                                    $ballon = $variantes->where('libelle', 'Ballon')->first();
+
+                                                    if ($verre && ($verre->pivot->quantite ?? 0) > 0) {
+                                                        $verres_par_bouteille = $verre->pivot->quantite;
+                                                        $verres = round($decimal * $verres_par_bouteille, 2);
+                                                        if ($verres > 0) {
+                                                            $texte .=
+                                                                ($texte ? ' et ' : '') . floor($verres) . ' verre(s)';
+                                                        }
+                                                    } elseif ($ballon && ($ballon->pivot->quantite ?? 0) > 0) {
+                                                        $ballons_par_bouteille = $ballon->pivot->quantite;
+                                                        $ballons = round($decimal * $ballons_par_bouteille, 2);
+                                                        if ($ballons > 0) {
+                                                            $texte .=
+                                                                ($texte ? ' et ' : '') . floor($ballons) . ' ballon(s)';
+                                                        }
+                                                    }
+                                                }
                                             }
 
-                                            return $texte ?: '0';
+                                            return $texte ? $signe . $texte : '0';
                                         }
                                     }
-
-
-                                    // recuperer les variantes des produits
-                                    $produitsVariante = $inventaire->produits->map(function ($produit) {
-                                      
-                                        return $produit->variantes->map(function ($variante)  {
-                                            return $variante->pivot;
-                                        });
-                                    });
                                 @endphp
 
 
@@ -123,12 +230,13 @@
                                 @foreach ($inventaire->produits as $key => $item)
                                     @php
                                         // recuperer le stock physique json
-                                        $stockPhysique_json = json_decode($item['pivot']['stock_physique_json'], true) ?? [];
+                                        $stockPhysique_json =
+                                            json_decode($item['pivot']['stock_physique_json'], true) ?? [];
                                     @endphp
 
 
                                     <tr id="row_{{ $item['id'] }}">
-                                        <td>{{$produitsVariante }}</td>
+
                                         <td>{{ ++$key }}</td>
                                         <td class="{{ Auth::user()->hasRole('developpeur') ? '' : 'd-none' }}">
                                             {{ $item['code'] }}
@@ -136,46 +244,101 @@
                                         <td>{{ $item['nom'] }} <b>{{ $item['valeur_unite'] ?? '' }}</b>
                                             {{ $item['unite']['abreviation'] ?? '' }}</td>
 
-                                        <td>{!! afficherStockConvertir(
-                                            $item['pivot']['stock_dernier_inventaire'] ?? 0,
-                                            $item['uniteSortie']['abreviation'] ?? '',
-                                        ) !!}</td>
-                                        <td>{!! afficherStockConvertir($item['pivot']['stock_initial'] ?? 0, $item['uniteSortie']['abreviation'] ?? '') !!}</td>
                                         <td>
+
+                                            @if ($item->categorie->famille != 'bar')
+                                                {{ $item['pivot']['stock_dernier_inventaire'] }}
+                                            @else
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $item['pivot']['stock_dernier_inventaire'] ?? 0,
+                                                    $item['uniteSortie']['abreviation'] ?? '',
+                                                    $item->variantes,
+                                                ) !!}
+                                            @endif
+
+                                        </td>
+
+                                        <td>
+
+                                            @if ($item->categorie->famille != 'bar')
+                                                {{ $item['pivot']['stock_initial'] }}
+                                            @else
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $item['pivot']['stock_initial'] ?? 0,
+                                                    $item['uniteSortie']['abreviation'] ?? '',
+                                                    $item->variantes,
+                                                ) !!}
+                                            @endif
+
+                                        </td>
+
+                                        <td>
+
                                             @php
                                                 $stock_total =
                                                     ($item['pivot']['stock_dernier_inventaire'] ?? 0) +
                                                     ($item['pivot']['stock_initial'] ?? 0);
                                             @endphp
-                                            {!! afficherStockConvertir($stock_total, $item['uniteSortie']['abreviation'] ?? '') !!}
+                                            @if ($item->categorie->famille != 'bar')
+                                                {{ $stock_total }}
+                                            @else
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $stock_total,
+                                                    $item['uniteSortie']['abreviation'] ?? '',
+                                                    $item->variantes,
+                                                ) !!}
+                                            @endif
                                         </td>
-                                        <td>{!! afficherStockConvertir($item['pivot']['stock_vendu'] ?? 0, $item['uniteSortie']['abreviation'] ?? '') !!}</td>
-                                        <td>{!! afficherStockConvertir($item['pivot']['stock_theorique'] ?? 0, $item['uniteSortie']['abreviation'] ?? '') !!}</td>
+
+                                        <td>
+
+                                            @if ($item->categorie->famille != 'bar')
+                                                {{ $item['pivot']['stock_vendu'] }}
+                                            @else
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $item['pivot']['stock_vendu'] ?? 0,
+                                                    $item['uniteSortie']['abreviation'] ?? '',
+                                                    $item->variantes,
+                                                ) !!}
+                                            @endif
+
+                                        </td>
+
+                                        <td>
+                                            @if ($item->categorie->famille != 'bar')
+                                                {{ $item['pivot']['stock_theorique'] }}
+                                            @else
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $item['pivot']['stock_theorique'] ?? 0,
+                                                    $item['uniteSortie']['abreviation'] ?? '',
+                                                    $item->variantes,
+                                                ) !!}
+                                            @endif
+
+                                        </td>
+
                                         <td>
                                             <ul class="mb-0">
                                                 @foreach ($stockPhysique_json as $libelle => $quantite)
                                                     <li>{{ $libelle }} : {{ $quantite }}</li>
                                                 @endforeach
                                             </ul>
-                                            {!! afficherStockConvertir($item['pivot']['stock_physique'] ?? 0, $item['uniteSortie']['abreviation'] ?? '') !!}
+
+                                            @if ($item->categorie->famille != 'bar')
+                                                {{ $item['pivot']['stock_physique'] }}
+                                            @endif
+
+
                                         </td>
                                         <td>
-                                            @php
-                                                $ecart = $item['pivot']['ecart'];
-                                                $entier = floor($ecart);
-                                                $decimal = $ecart - $entier; //partie decimal
-                                                $ml = intval($decimal * 1000); //convertir en millilitre
-                                            @endphp
-
-
-                                            @if ($decimal == 0)
-                                                {{ $entier }} {{ $item['uniteSortie']['abreviation'] ?? '' }}
-                                            @elseif ($entier == 0 && $ml > 0)
-                                                {{ $ml }} ml
+                                            @if ($item->categorie->famille != 'bar')
+                                                {{ $item['pivot']['ecart'] }}
                                             @else
-                                                {{ $entier }} {{ $item['uniteSortie']['abreviation'] ?? '' }}
-                                                et
-                                                {{ $ml }} ml
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $item['pivot']['ecart'] ?? 0,
+                                                    $item['uniteSortie']['abreviation'] ?? '',
+                                                    $item->variantes,
+                                                ) !!}
                                             @endif
                                         </td>
                                         <td>{{ $item['pivot']['etat'] }}</td>

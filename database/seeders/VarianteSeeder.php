@@ -17,7 +17,7 @@ class VarianteSeeder extends Seeder
         {
             // Ajout de variantes avec des prix par défaut si souhaité
             // Ajouter les variantes si elles n'existent pas déjà
-            Variante::firstOrCreate(['libelle' => 'Tournée'], ['slug' => 'tournée']);
+            // Variante::firstOrCreate(['libelle' => 'Tournée'], ['slug' => 'tournée']);
             Variante::firstOrCreate(['libelle' => 'Ballon'], ['slug' => 'ballon']);
             Variante::firstOrCreate(['libelle' => 'Verre'], ['slug' => 'verre']);
             Variante::firstOrCreate(['libelle' => 'Bouteille'], ['slug' => 'bouteille']);
