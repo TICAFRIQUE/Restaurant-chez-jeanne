@@ -110,26 +110,24 @@
                                                         $verres_restants = 0;
                                                         $ballons_restants = 0;
 
-                                                        if ($bouteille && $verre) {
+                                                        if ($bouteille) {
                                                             $qte_disponible =
                                                                 $bouteille->pivot->quantite_disponible ?? 0;
-                                                            $verres_par_bouteille = $verre->pivot->quantite ?? 0;
-
-                                                            // Séparer partie entière (bouteilles pleines) et partie décimale
                                                             $bouteilles_restantes = floor($qte_disponible);
                                                             $partie_decimale = $qte_disponible - $bouteilles_restantes;
 
-                                                            // Convertir la partie décimale en verres
-                                                            $verres_restants =
-                                                               round($partie_decimale * $verres_par_bouteille , 2);
-                                                            
-
-                                                            // Si "ballon" existe et verre n'existe pas, on peut utiliser la conversion directe
-                                                            if ($verres_restants == 0 && $ballon) {
+                                                            if ($verre) {
+                                                                $verres_par_bouteille = $verre->pivot->quantite ?? 0;
+                                                                $verres_restants = round(
+                                                                    $partie_decimale * $verres_par_bouteille,
+                                                                    2,
+                                                                );
+                                                            } elseif ($ballon) {
                                                                 $ballons_par_bouteille = $ballon->pivot->quantite ?? 0;
-                                                                $ballons_restants = 
-                                                                  round($partie_decimale * $ballons_par_bouteille , 2);
-                                                                
+                                                                $ballons_restants = round(
+                                                                    $partie_decimale * $ballons_par_bouteille,
+                                                                    2,
+                                                                );
                                                             }
                                                         }
                                                     @endphp
@@ -157,6 +155,7 @@
                                                             0
                                                         @endif
                                                     </li>
+
 
                                                 </ol>
 
