@@ -203,14 +203,14 @@
                                                     if ($verre && ($verre->pivot->quantite ?? 0) > 0) {
                                                         $verres_par_bouteille = $verre->pivot->quantite;
                                                         $verres = round($decimal * $verres_par_bouteille, 2);
-                                                        if ($verres > 0) {
+                                                        if (floor($verres) > 0) {
                                                             $texte .=
                                                                 ($texte ? ' et ' : '') . floor($verres) . ' verre(s)';
                                                         }
                                                     } elseif ($ballon && ($ballon->pivot->quantite ?? 0) > 0) {
                                                         $ballons_par_bouteille = $ballon->pivot->quantite;
                                                         $ballons = round($decimal * $ballons_par_bouteille, 2);
-                                                        if ($ballons > 0) {
+                                                        if (floor($ballons) > 0) {
                                                             $texte .=
                                                                 ($texte ? ' et ' : '') . floor($ballons) . ' ballon(s)';
                                                         }

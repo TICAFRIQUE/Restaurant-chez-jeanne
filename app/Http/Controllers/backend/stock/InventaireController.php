@@ -427,10 +427,10 @@ class InventaireController extends Controller
             $etatFilter = request('filter_etat');
 
             // Récupérer l'inventaire précédent
-            $inventairePrecedent = Inventaire::with('produits' , fn($query) => $query->with('produit_variantes'))
-                ->where('id', '<', $id)
-                ->orderBy('id', 'desc')
-                ->first();
+            // $inventairePrecedent = Inventaire::with(['produits' , 'produits.produit_variante'])
+            //     ->where('id', '<', $id)
+            //     ->orderBy('id', 'desc')
+            //     ->first();
 
             // recuperer la date de l'inventaire 
             $dateInventaire = Inventaire::where('id', $id)->first()->date_inventaire;
@@ -464,7 +464,7 @@ class InventaireController extends Controller
 
             // dd($inventaire->toArray());
 
-            return view('backend.pages.stock.inventaire.show', compact('inventaire', 'inventairePrecedent', 'moisInventaire'));
+            return view('backend.pages.stock.inventaire.show', compact('inventaire',  'moisInventaire'));
         } catch (\Exception $e) {
             return redirect()->route('inventaire.index')->with('error', "Une erreur s'est produite. Veuillez réessayer.");
         }
