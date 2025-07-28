@@ -152,6 +152,10 @@
                                                             @endif
                                                             {{ floor($ballons_restants) }} ballon(s)
                                                         @endif
+
+                                                        @if ($bouteilles_restantes == 0 && $verres_restants == 0 && $ballons_restants == 0)
+                                                            0
+                                                        @endif
                                                     </li>
 
                                                 </ol>
