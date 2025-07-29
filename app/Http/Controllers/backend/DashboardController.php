@@ -105,7 +105,7 @@ class DashboardController extends Controller
         //     ->get();
 
         $revenus = DB::table('ventes')
-            ->selectRaw("MONTHNAME(date_vente) as mois, MONTH(date_vente) as mois_num, SUM(montant_total) as total_revenu")
+            ->selectRaw("MONTHNAME(date_vente) as mois, MONTH(date_vente) as mois_num, SUM(montant_avant_remise) as total_revenu")
             ->groupBy('mois', 'mois_num')
             ->orderBy('mois_num')
             ->get();

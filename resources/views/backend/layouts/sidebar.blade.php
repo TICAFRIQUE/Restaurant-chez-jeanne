@@ -180,13 +180,11 @@
                                         class="nav-link {{ Route::is('etat-stock.*') ? 'active' : '' }}">Etat du stock</a>
                                 </li>
 
-                                <li class="nav-item active">
+                                {{-- <li class="nav-item active">
                                     <a href="{{ route('etat-stock.suiviStock') }}"
                                         class="nav-link {{ Route::is('suivi-stock.*') ? 'active' : '' }}">Suivi du
                                         stock</a>
-                                </li>
-
-
+                                </li> --}}
                             </ul>
                         </div>
                     </li>
@@ -241,7 +239,8 @@
 
                                 <li class="nav-item active">
                                     <a href="{{ route('client.vente-impaye') }}"
-                                        class="nav-link {{ Route::is('client.*') ? 'active' : '' }}">Clients ventes impayés </a>
+                                        class="nav-link {{ Route::is('client.*') ? 'active' : '' }}">Clients ventes
+                                        impayés </a>
                                 </li>
 
 

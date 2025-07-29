@@ -96,8 +96,6 @@
                                         {{-- <td>{{ $item['typeProduit']['name'] }}  </td> --}}
                                         @if ($item->categorie->famille == 'bar')
                                             <td>
-
-
                                                 <ol class="list-unstyled mb-0">
                                                     @php
                                                         $bouteille = $item->variantes

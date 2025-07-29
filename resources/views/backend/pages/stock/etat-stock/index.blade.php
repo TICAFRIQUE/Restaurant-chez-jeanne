@@ -24,7 +24,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
-                    <h5 class="card-title mb-0">Liste des produits en stock
+                    <h5 class="card-title mb-0 filter">Etat du stock
                         @if (request()->has('statut'))
                             - <b>{{ request('statut') }}</b>
                         @endif
@@ -34,7 +34,7 @@
                     </h5>
 
                     <div class="dropdown">
-                        <button class="btn btn-primary">Suivi de stock</button>
+                        {{-- <button class="btn btn-primary">Suivi de stock</button> --}}
 
                         <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton1"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -60,7 +60,7 @@
                                     <th>Catégorie</th>
                                     <th>Stock actuel</th>
                                     <th>Stock alerte</th>
-                                    <th>État du stock</th>
+                                    <th>Statut du stock</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -80,16 +80,92 @@
                                             </p>
                                         </td>
                                         <td>{{ $produit->categorie->name }}</td>
-                                        <td>
+                                        {{-- <td>
                                             {{ $produit->stock }} {{ $produit->uniteSortie?->libelle ?? '' }}
                                             {{ $produit->uniteSortie?->abreviation ? '(' . $produit->uniteSortie?->abreviation . ')' : '' }}
-                                        </td>
+                                        </td> --}}
+
+
+                                        @if ($produit->categorie->famille == 'bar')
+                                            <td>
+                                                <ol class="list-unstyled mb-0">
+                                                    @php
+                                                        $bouteille = $produit->variantes
+                                                            ->where('libelle', 'Bouteille')
+                                                            ->first();
+                                                        $verre = $produit->variantes
+                                                            ->where('libelle', 'Verre')
+                                                            ->first();
+                                                        $ballon = $produit->variantes
+                                                            ->where('libelle', 'Ballon')
+                                                            ->first();
+
+                                                        $bouteilles_restantes = 0;
+                                                        $verres_restants = 0;
+                                                        $ballons_restants = 0;
+
+                                                        if ($bouteille) {
+                                                            $qte_disponible =
+                                                                $bouteille->pivot->quantite_disponible ?? 0;
+                                                            $bouteilles_restantes = floor($qte_disponible);
+                                                            $partie_decimale = $qte_disponible - $bouteilles_restantes;
+
+                                                            if ($verre) {
+                                                                $verres_par_bouteille = $verre->pivot->quantite ?? 0;
+                                                                $verres_restants = round(
+                                                                    $partie_decimale * $verres_par_bouteille,
+                                                                    2,
+                                                                );
+                                                            } elseif ($ballon) {
+                                                                $ballons_par_bouteille = $ballon->pivot->quantite ?? 0;
+                                                                $ballons_restants = round(
+                                                                    $partie_decimale * $ballons_par_bouteille,
+                                                                    2,
+                                                                );
+                                                            }
+                                                        }
+                                                    @endphp
+
+                                                    <li>
+                                                        @if ($bouteilles_restantes > 0)
+                                                            {{ $bouteilles_restantes }} bouteille(s)
+                                                        @endif
+
+                                                        @if ($verres_restants > 0)
+                                                            @if ($bouteilles_restantes > 0)
+                                                                &
+                                                            @endif
+                                                            {{ floor($verres_restants) }} verre(s)
+                                                        @endif
+
+                                                        @if ($ballons_restants > 0)
+                                                            @if ($bouteilles_restantes > 0 || $verres_restants > 0)
+                                                                &
+                                                            @endif
+                                                            {{ floor($ballons_restants) }} ballon(s)
+                                                        @endif
+
+                                                        @if ($bouteilles_restantes == 0 && $verres_restants == 0 && $ballons_restants == 0)
+                                                            0
+                                                        @endif
+                                                    </li>
+
+
+                                                </ol>
+
+
+                                            </td>
+                                        @else
+                                            <td><b>{{ $produit['stock'] }}</b>
+                                                {{ $produit['uniteSortie']['abreviation'] ?? '' }}</td>
+                                            </td>
+                                        @endif
 
                                         <td>
                                             {{ $produit->stock_alerte }} {{ $produit->uniteSortie?->libelle ?? '' }}
                                             {{ $produit->uniteSortie?->abreviation ? '(' . $produit->uniteSortie?->abreviation . ')' : '' }}
                                         </td>
-                                        
+
                                         <td>
                                             @if ($produit->stock <= $produit->stock_alerte)
                                                 <span class="badge bg-danger">Alerte</span>
@@ -118,4 +194,111 @@
     <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
     <script src="{{ URL::asset('build/js/pages/datatables.init.js') }}"></script>
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
+
+
+
+    <script>
+        $(document).ready(function() {
+            // Détruire DataTable s’il existe déjà
+            if ($.fn.DataTable.isDataTable('#buttons-datatables')) {
+                $('#buttons-datatables').DataTable().destroy();
+            }
+
+
+            // Réinitialiser DataTable
+            $('#buttons-datatables').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'print', 'pdf', 'csv', 'copy', 'excel'
+                ],
+                buttons: [{
+                        extend: 'print',
+                        text: 'Imprimer',
+                        exportOptions: {
+                            columns: [0, 2, 3, 4]
+                        },
+                        messageTop: function() {
+                            return $('.filter').text().trim();
+                        },
+                        title: '',
+                        customize: function(win) {
+                            $(win.document.body).css('text-align', 'center');
+                            $(win.document.body).find('h1').css('text-align',
+                                'center');
+                        }
+                    },
+                    // {
+                    //     extend: 'pdf',
+                    //     text: 'pdf',
+                    //     exportOptions: {
+                    //         columns: [0, 2, 3, 4]
+                    //     },
+                    //     messageTop: function() {
+                    //         return $('.filter').text().trim();
+                    //     },
+                    //     title: '',
+                    //     customize: function(win) {
+                    //         $(win.document.body).css('text-align', 'center');
+                    //         $(win.document.body).find('h1').css('text-align',
+                    //             'center');
+                    //     }
+                    // },
+
+                    {
+                        extend: 'csv',
+                        text: 'Csv',
+                        exportOptions: {
+                            columns: [0, 2, 3, 4]
+                        },
+                        messageTop: function() {
+                            return $('.filter').text().trim();
+                        },
+                        title: '',
+                        // customize: function(win) {
+                        //     $(win.document.body).css('text-align', 'center');
+                        //     $(win.document.body).find('h1').css('text-align',
+                        //         'center');
+                        // }
+                    },
+
+                    // {
+                    //     extend: 'copy',
+                    //     text: 'copier',
+                    //     exportOptions: {
+                    //         columns: [0, 2, 3, 4]
+                    //     },
+                    //     messageTop: function() {
+                    //         return $('.filter').text().trim();
+                    //     },
+                    //     title: '',
+                    //     customize: function(win) {
+                    //         $(win.document.body).css('text-align', 'center');
+                    //         $(win.document.body).find('h1').css('text-align',
+                    //             'center');
+                    //     }
+                    // },
+                    {
+                        extend: 'excel',
+                        text: 'Excel',
+                        exportOptions: {
+                            columns: [0, 2, 3, 4]
+                        },
+                        messageTop: function() {
+                            return $('.filter').text().trim();
+                        },
+                        title: '',
+                        // customize: function(win) {
+                        //     $(win.document.body).css('text-align', 'center');
+                        //     $(win.document.body).find('h1').css('text-align',
+                        //         'center');
+                        // }
+                    }
+
+                ],
+              
+            });
+          
+
+        });
+    </script>
 @endsection
