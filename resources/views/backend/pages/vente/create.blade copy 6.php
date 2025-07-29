@@ -93,8 +93,8 @@
                                                         <th>Mode de vente</th>
                                                         <th>Prix unitaire</th>
                                                         <th>Quantité</th>
+                                                        {{-- <th>Remise (%)</th> --}}
                                                         <th>Total</th>
-                                                        <th>Offert <i class="ri ri-gift-2-fill"></i> (%)</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -324,66 +324,37 @@
                 updateChangeAmount();
             });
 
-            // function addToCart(id, name, price, stock, variante, varianteStock) {
-            //     let existingItem = cart.find(item => item.id === id);
-            //     selectedProd = dataProduct.find(dataItem => dataItem.id == id)
-
-            //     if (existingItem && selectedProd.categorie.famille !== 'bar') {
-            //         existingItem.quantity += 1;
-            //         existingItem.selectedVariante = variante; // garde la variante sélectionnée
-            //     } else {
-            //         // selectedProd = dataProduct.find(dataItem => dataItem.id == id)
-            //         cart.push({
-            //             id: id,
-            //             name: name,
-            //             price: selectedProd.categorie.famille === 'bar' ? 0 : price,
-            //             stock: stock,
-            //             selectedVariante: variante ? variante :
-            //             null, // ajoute la variante choisie ou choisi la variante dans le select
-            //             varianteStock: variante ? variante.pivot.quantite_disponible : null,
-            //             quantity: 1,
-            //             discount: 0
-            //         });
-            //     }
-
-
-            //     // console.log('panier : ', cart);
-
-            // }
-
-
             function addToCart(id, name, price, stock, variante, varianteStock) {
                 let existingItem = cart.find(item => item.id === id);
                 selectedProd = dataProduct.find(dataItem => dataItem.id == id)
 
-                // Cherche la valeur "offert" déjà présente
-                let existingOffer = existingItem ? existingItem.offert : 0;
-
                 if (existingItem && selectedProd.categorie.famille !== 'bar') {
                     existingItem.quantity += 1;
                     existingItem.selectedVariante = variante; // garde la variante sélectionnée
-                    existingItem.offert = existingOffer; // garde la valeur offerte
                 } else {
+                    // selectedProd = dataProduct.find(dataItem => dataItem.id == id)
                     cart.push({
                         id: id,
                         name: name,
                         price: selectedProd.categorie.famille === 'bar' ? 0 : price,
                         stock: stock,
-                        selectedVariante: variante ? variante : null,
+                        selectedVariante: variante ? variante :
+                        null, // ajoute la variante choisie ou choisi la variante dans le select
                         varianteStock: variante ? variante.pivot.quantite_disponible : null,
                         quantity: 1,
-                        discount: 0,
-                        offert: 0 // valeur par défaut
+                        discount: 0
                     });
                 }
+
+
+                // console.log('panier : ', cart);
+
             }
 
 
 
 
 
-            /* Fonction pour mettre à jour le tableau du panier*/
-            // Met à jour le tableau du panier avec les produits ajoutés
             function updateCartTable() {
                 let tbody = $('#cart-table tbody');
                 tbody.empty();
@@ -392,6 +363,50 @@
                     let variantesOptions = '';
                     let varianteSelectHtml = '';
 
+                    // if (selectedProduct && selectedProduct.variantes) {
+                    //     selectedProduct.variantes.forEach(variante => {
+                    //         // Garde la sélection de la variante dans le tableau affiché
+                    //         let isSelected = item.selectedVariante == variante.id ? 'selected' :
+                    //             '';
+                    //         variantesOptions += `
+                //             <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected}>
+                //                 ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)
+                //             </option>`;
+
+                    //     });
+
+                    // }
+
+                    // if (selectedProduct && selectedProduct.variantes) {
+                    //     selectedProduct.variantes.forEach(variante => {
+                    //         let isSelected = item.selectedVariante == variante.id ? 'selected' : '';
+                    //         let isDisabled = variante.pivot.quantite_disponible < 1 ? 'disabled' :
+                    //             '';
+
+                    //         variantesOptions += `
+                //         <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected} ${isDisabled}>
+                //             ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)
+                //         </option>`;
+                    //     });
+                    // }
+
+
+
+                    // Afficher que les quantités entieres avec virgule
+                    // if (selectedProduct && selectedProduct.variantes) {
+                    //     selectedProduct.variantes.forEach(variante => {
+                    //         let isSelected = item.selectedVariante == variante.id ? 'selected' : '';
+                    //         let isDisabled = variante.pivot.quantite_disponible < 1 ? 'disabled' :
+                    //             '';
+                    //         let isIndisponible = variante.pivot.quantite_disponible < 1 ?
+                    //             ' - Indisponible' : '';
+
+                    //         variantesOptions += `
+                //         <option value="${variante.id}" data-qte="${variante.pivot.quantite_disponible}" data-price="${variante.pivot.prix}" ${isSelected} ${isDisabled}>
+                //             ${variante.libelle} (${variante.pivot.prix} FCFA) (${variante.pivot.quantite_disponible} Q)${isIndisponible}
+                //         </option>`;
+                    //     });
+                    // }
 
 
                     // Afficher que les quantité entieres
@@ -443,39 +458,32 @@
                             <td class="price-cell">${item.price} FCFA</td>
                             <td class="d-flex justify-content-center align-items-center">
                                 <div class="d-flex align-items-center">
-                                    <button class="btn btn-primary btn-sm decrease-qty" data-index="${index}">-</button>
-                                    <input type="number" class="form-control quantity-input text-center mx-2" 
-                                        value="${item.quantity}" min="0" step="any" style="width: 50px;" data-index="${index}">
+                                <button class="btn btn-primary btn-sm decrease-qty" data-index="${index}">-</button>
+                                
+                                    <input  type="number" class="form-control quantity-input text-center mx-2" 
+                                        value="${item.quantity}" min="0" step="any" style="width: 50px;" data-index="${index}" >
                                     <button class="btn btn-secondary btn-sm increase-qty" data-index="${index}">+</button>
+
                                 </div>
                             </td>
+
                             <td class="d-none">
                                 <input type="number" class="form-control discount-input" value="${item.discount}" min="0" max="100" data-index="${index}">
                             </td>
                             <td class="total-cell">${calculateTotal(item)} FCFA</td>
-
-                            <!-- Nouvelle colonne "Offert" -->
-                           <td class="text-center">
-                                <select class="form-select form-select-sm offer-select" data-index="${index}">
-                                    <option value="0" ${item.offert == 0 ? 'selected' : ''}>Non</option>
-                                    <option value="1" ${item.offert == 1 ? 'selected' : ''}>Oui</option>
-                                </select>
-                           </td>
-
-                            <!-- Colonne Action -->
-                            <td class="text-center">
-                                <button class="btn btn-danger btn-sm remove-item" data-index="${index}">
-                                    <i class="ri ri-delete-bin-2-fill"></i>
+                            <td>
+                                <button class="btn btn-danger btn-sm remove-item" data-index="${index}"> 
+                                    <i class="ri ri-delete-bin-2-fill"></i> 
                                 </button>
                             </td>
                         </tr>
-                    `);
 
+                    `);
                 });
 
 
 
-                /*GESTION DES VARIANTES **/
+
                 // Ajoute un événement de changement sur chaque select de variante pour mettre à jour la sélection
                 tbody.find('.variante-select').change(function() {
 
@@ -701,18 +709,6 @@
                 updateCartTable();
                 updateGrandTotal();
             });
-
-            // gestion des offert au select 
-            $(document).on('change', '.offer-select', function() {
-                const index = $(this).data('index');
-                cart[index].offert = parseInt($(this).val());
-
-                console.log(cart[index].offert);
-                
-            });
-
-
-
 
             $(document).on('click', '.remove-item', function() {
                 let index = $(this).data('index');
