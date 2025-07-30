@@ -544,7 +544,7 @@ class InventaireController extends Controller
         try {
             $type = $request->query('type'); // 'bar', 'restaurant' ou null
 
-            $query = Produit::alphabetique()->with(['categorie', 'variantes']);
+            $query = Produit::alphabetique()->active()->with(['categorie', 'variantes']);
 
             if (in_array($type, ['bar', 'restaurant'])) {
                 $query->whereHas('categorie', fn($q) => $q->where('famille', $type));
