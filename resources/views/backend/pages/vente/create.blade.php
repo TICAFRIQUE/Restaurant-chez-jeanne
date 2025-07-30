@@ -254,25 +254,6 @@
 
                 //recuperer les infos du produit selectionné 
 
-
-                //
-                //   // recuperer son Id et son stock
-                //   let idVarianteBtle = variante.id, stockVarianteBtle = variante.pivot.quantite_disponible;
-
-                //mettre dans le panier les infos par defaut
-                // cart.push({
-                //     id: productId,
-                //     name: productName,
-                //     price: productPrice,
-                //     stock: productStock,
-                //     quantity: 1,
-                //     selectedVariante: idVarianteBtle,
-                //     varianteStock: stockVarianteBtle,
-                //     discount: 0
-                // });
-
-
-
                 if (productId) {
                     addToCart(productId, productName, productPrice, productStock);
                     updateCartTable();
@@ -281,31 +262,6 @@
 
                     // Réinitialiser Select2 à l'option par défaut
                     $(this).val(null).trigger('change'); // Réinitialise Select2
-
-
-                    //           // Pour chaque ligne attribuer la variante bouteille par defaut
-                    //       cart.forEach((item, index) => {
-                    //         let dataVariante = dataProduct.find(dataItem => dataItem.id == item.id);
-
-                    //         if (dataVariante.categorie
-                    //         .famille === 'bar') {
-                    //             let varianteBtle = dataVariante.variantes.find(variante => variante.slug =='bouteille');
-
-                    //      // id
-                    //      let idVarianteBtle = varianteBtle.id, stockVarianteBtle = varianteBtle.pivot.quantite_disponible;
-                    //      // mettre dans le panier les infos par defaut
-                    //      cart[index].selectedVariante = idVarianteBtle;
-                    //      cart[index].varianteStock = stockVarianteBtle;
-
-                    //   //    console.log(cart[index].selectedVariante, cart[index].varianteStock);
-
-
-                    //         }
-                    //         // recuperer la variante bouteille par defaut
-
-
-
-                    //     })
                 }
 
             });
@@ -324,32 +280,6 @@
                 updateChangeAmount();
             });
 
-            // function addToCart(id, name, price, stock, variante, varianteStock) {
-            //     let existingItem = cart.find(item => item.id === id);
-            //     selectedProd = dataProduct.find(dataItem => dataItem.id == id)
-
-            //     if (existingItem && selectedProd.categorie.famille !== 'bar') {
-            //         existingItem.quantity += 1;
-            //         existingItem.selectedVariante = variante; // garde la variante sélectionnée
-            //     } else {
-            //         // selectedProd = dataProduct.find(dataItem => dataItem.id == id)
-            //         cart.push({
-            //             id: id,
-            //             name: name,
-            //             price: selectedProd.categorie.famille === 'bar' ? 0 : price,
-            //             stock: stock,
-            //             selectedVariante: variante ? variante :
-            //             null, // ajoute la variante choisie ou choisi la variante dans le select
-            //             varianteStock: variante ? variante.pivot.quantite_disponible : null,
-            //             quantity: 1,
-            //             discount: 0
-            //         });
-            //     }
-
-
-            //     // console.log('panier : ', cart);
-
-            // }
 
 
             function addToCart(id, name, price, stock, variante, varianteStock) {
@@ -438,7 +368,10 @@
                     // Ajoute une ligne pour chaque produit dans le tableau
                     tbody.append(`
                         <tr>
-                            <td>${item.name}</td>
+                            <td>
+                                ${item.name} 
+                                ${item.offert == 1 ? ' <span class="badge bg-success ms-2">Offert</span>' : ''}
+                            </td>
                             <td>${varianteSelectHtml}</td>
                             <td class="price-cell">${item.price} FCFA</td>
                             <td class="d-flex justify-content-center align-items-center">
@@ -452,7 +385,8 @@
                             <td class="d-none">
                                 <input type="number" class="form-control discount-input" value="${item.discount}" min="0" max="100" data-index="${index}">
                             </td>
-                            <td class="total-cell">${calculateTotal(item)} FCFA</td>
+                            <td class="total-cell">${calculateTotal(item)} FCFA
+                                </td>
 
                             <!-- Nouvelle colonne "Offert" -->
                            <td class="text-center">
@@ -460,6 +394,7 @@
                                     <option value="0" ${item.offert == 0 ? 'selected' : ''}>Non</option>
                                     <option value="1" ${item.offert == 1 ? 'selected' : ''}>Oui</option>
                                 </select>
+                                 
                            </td>
 
                             <!-- Colonne Action -->
@@ -497,27 +432,28 @@
                         );
                     });
 
-                    if (duplicateVariante) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Attention !',
-                            text: 'Cette variante est déjà sélectionnée pour le même produit.' +
-                                cart[index].name,
-                        });
-                        $(this).val(''); // Réinitialiser la sélection
-                        cart[index].selectedVariante = null;
-                        cart[index].price = 0;
-                        cart[index].varianteStock = 0;
+                    // if (duplicateVariante) {
+                    //     Swal.fire({
+                    //         icon: 'warning',
+                    //         title: 'Attention !',
+                    //         text: 'Cette variante est déjà sélectionnée pour le même produit.' +
+                    //             cart[index].name,
+                    //     });
+                    //     $(this).val(''); // Réinitialiser la sélection
+                    //     cart[index].selectedVariante = null;
+                    //     cart[index].price = 0;
+                    //     cart[index].varianteStock = 0;
 
-                        $(this).closest('tr').find('.price-cell').text('0 FCFA');
-                        $(this).closest('tr').find('.total-cell').text('0 FCFA');
-                        updateGrandTotal();
-                        return; // Sortir pour éviter de continuer avec une valeur invalide
-                    }
+                    //     $(this).closest('tr').find('.price-cell').text('0 FCFA');
+                    //     $(this).closest('tr').find('.total-cell').text('0 FCFA');
+                    //     updateGrandTotal();
+                    //     return; // Sortir pour éviter de continuer avec une valeur invalide
+                    // }
 
 
                     if (variantePrice) {
                         // Met à jour le prix et la variante sélectionnée dans le panier
+                        // cart[index].price = cart[index].offert === 1 ? 0 : variantePrice;
                         cart[index].price = variantePrice;
                         cart[index].selectedVariante = selectedVarianteId;
                         cart[index].varianteStock = varianteStock;
@@ -528,17 +464,95 @@
                             ' FCFA');
                         updateGrandTotal();
                         verifyQty();
+
                     }
 
 
+
                 });
+
+
+
+
+                // gestion des offert au select 
+
+
+                // function handleOfferChange(index, value) {
+                //     cart[index].offert = parseInt(value);
+
+                //     if (cart[index].offert === 1) {
+                //         cart[index].price = 0;
+
+
+                //     } else {
+                //         // Si une variante est sélectionnée, on remet son prix
+                //         let selectedVariante = cart[index].selectedVariante;
+                //         if (selectedVariante) {
+                //             const varianteOption = $(
+                //                 `.variante-select[data-index="${index}"] option[value="${selectedVariante}"]`);
+                //             const variantePrice = parseFloat(varianteOption.data('price'));
+
+                //             if (!isNaN(variantePrice)) {
+                //                 cart[index].price = variantePrice;
+                //             }
+                //         }
+
+                //     }
+                //      updateCartTable();
+
+                //     updateGrandTotal();
+                // }
+
+                function handleOfferChange(index, value) {
+                    cart[index].offert = parseInt(value);
+
+                    if (cart[index].offert === 0) {
+                        // Si une variante est sélectionnée, on remet son prix
+                        let selectedVariante = cart[index].selectedVariante;
+                        if (selectedVariante) {
+                            const varianteOption = $(
+                                `.variante-select[data-index="${index}"] option[value="${selectedVariante}"]`);
+                            const variantePrice = parseFloat(varianteOption.data('price'));
+
+                            if (!isNaN(variantePrice)) {
+                                cart[index].price = variantePrice;
+                            }
+                        }
+                    }
+
+                    updateCartTable(); // on met à jour le tableau dans tous les cas
+                    updateGrandTotal();
+                }
+
+
+
+                // Gestion de l'événement de changement pour le select des offres
+                $(document).on('change', '.offer-select', function() {
+                    const index = $(this).data('index');
+                    const value = $(this).val();
+                    handleOfferChange(index, value);
+                });
+
+
             }
 
-
             function calculateTotal(item) {
+                if (item.offert === 1) {
+                    return 0;
+                }
+
                 let discountAmount = (item.price * item.quantity) * (item.discount / 100);
                 return (item.price * item.quantity) - discountAmount;
             }
+
+
+            // function calculateTotal(item) {
+            //     let discountAmount = (item.price * item.quantity) * (item.discount / 100);
+            //     return (item.price * item.quantity) - discountAmount;
+            // }
+
+
+
 
 
             function updateGrandTotal(totalAddPlatMenu = null) {
@@ -700,15 +714,6 @@
                 cart[index].discount = newDiscount;
                 updateCartTable();
                 updateGrandTotal();
-            });
-
-            // gestion des offert au select 
-            $(document).on('change', '.offer-select', function() {
-                const index = $(this).data('index');
-                cart[index].offert = parseInt($(this).val());
-
-                console.log(cart[index].offert);
-                
             });
 
 
@@ -978,194 +983,6 @@
 
 
 
-
-
-            // ###########################Fonction pour sauvegarder la vente en attente dans le stockage local ###########################
-
-            // $('#save-sale-in-local').click(function() {
-            //     const venteTemp = {
-            //         cart: cart,
-            //         tableNumber: $('#table-number').val(),
-            //         covers: $('#number-covers').val(),
-            //         date: new Date().toISOString(),
-
-            //         // Champs à ajouter
-            //         montantAvantRemise: parseFloat($('#totalNet').text() || 0),
-            //         montantApresRemise: parseFloat($('#total-after-discount').text() || 0),
-            //         montantRemise: parseFloat($('#discount-amount').text() || 0),
-            //         typeRemise: $('#discount-type').val(), // % ou montant
-            //         valeurRemise: $('#total-discount').val(), // la valeur entrée
-            //         montantRecu: parseFloat($('#received-amount').val() || 0),
-            //         montantRendu: parseFloat($('#change-amount').text() || 0),
-            //         modePaiement: $('#payment-method').val()
-            //     };
-
-
-            //     let ventes = JSON.parse(localStorage.getItem('ventes_en_attente')) || [];
-
-            //     ventes.push({
-            //         id: Date.now(),
-            //         data: venteTemp
-            //     });
-
-            //     localStorage.setItem('ventes_en_attente', JSON.stringify(ventes));
-
-            //     // Réinitialiser l'interface
-            //     cart = [];
-            //     updateCartTable();
-            //     updateGrandTotal();
-            //     $('#table-number').val('');
-            //     $('#number-covers').val(1);
-
-            //     Swal.fire({
-            //         icon: 'info',
-            //         title: 'Vente mise en attente',
-            //         text: 'Commencez une nouvelle vente.'
-            //     });
-
-            //     // Mise à jour de l'affichage des ventes en attente
-            //     // afficherVentesLocales();
-            // });
-
-
-            // $('#save-sale-in-local').click(function() {
-            //     const plats = document.querySelectorAll('.plat-checkbox:checked');
-            //     let panier = []; // 🟢 Déclaration ici
-
-            //     plats.forEach((plat) => {
-            //         const platId = plat.value;
-            //         const platNom = plat.nextElementSibling.textContent.trim();
-            //         const platQuantite = parseInt(plat.closest('.form-check').querySelector(
-            //             '.quantityPlat').value);
-            //         const prixPlat = plat.getAttribute('data-price');
-
-            //         const complements = [];
-            //         const garnitures = [];
-
-            //         // Compléments
-            //         const complementCheckboxes = plat.closest('.card-body').querySelectorAll(
-            //             '.complement-checkbox');
-            //         complementCheckboxes.forEach((complement) => {
-            //             if (complement.checked) {
-            //                 const quantite = parseInt(complement.closest('.form-check')
-            //                     .querySelector('.quantityComplement').value);
-            //                 complements.push({
-            //                     id: complement.value,
-            //                     nom: complement.nextElementSibling.textContent
-            //                         .trim(),
-            //                     quantity: quantite,
-            //                 });
-            //             }
-            //         });
-
-            //         // Garnitures
-            //         const garnitureCheckboxes = plat.closest('.card-body').querySelectorAll(
-            //             '.garniture-checkbox');
-            //         garnitureCheckboxes.forEach((garniture) => {
-            //             if (garniture.checked) {
-            //                 const quantite = parseInt(garniture.closest('.form-check')
-            //                     .querySelector('.quantityGarniture').value);
-            //                 garnitures.push({
-            //                     id: garniture.value,
-            //                     nom: garniture.nextElementSibling.textContent
-            //                         .trim(),
-            //                     quantity: quantite,
-            //                 });
-            //             }
-            //         });
-
-            //         // Ajout au panier menu
-            //         panier.push({
-            //             plat: {
-            //                 id: platId,
-            //                 nom: platNom,
-            //                 quantity: platQuantite,
-            //                 price: prixPlat
-            //             },
-            //             complements,
-            //             garnitures,
-            //         });
-            //     });
-
-            //     // Enregistrer la vente complète
-            //     const venteTemp = {
-            //         cart: cart,
-            //         cartMenu: panier, // 🟢 OK maintenant
-            //         tableNumber: $('#table-number').val() ||
-            //         '', // Valeur par défaut vide si non renseignée
-            //         covers: $('#number-covers').val() || 0, // Valeur par défaut de 1 si vide
-            //         date: new Date().toISOString(),
-
-            //         montantAvantRemise: parseFloat($('#totalNet').text() || 0),
-            //         montantApresRemise: parseFloat($('#total-after-discount').text() || 0),
-            //         montantRemise: parseFloat($('#discount-amount').text() || 0),
-            //         typeRemise: $('#discount-type').val(),
-            //         valeurRemise: $('#total-discount').val(),
-            //         montantRecu: parseFloat($('#received-amount').val() || 0),
-            //         montantRendu: parseFloat($('#change-amount').text() || 0),
-            //         modePaiement: $('#payment-method').val()
-            //     };
-
-            //     let ventes = JSON.parse(localStorage.getItem('ventes_en_attente')) || [];
-            //     ventes.push({
-            //         id: Date.now(),
-            //         data: venteTemp
-            //     });
-            //     localStorage.setItem('ventes_en_attente', JSON.stringify(ventes));
-
-            //     // Nettoyage UI
-            //     cart = []; // 🟢 Nettoyage ici du panier
-            //     updateCartTable();
-            //     updateGrandTotal();
-            //     $('#table-number').val('');
-            //     $('#number-covers').val('');
-
-            //     Swal.fire({
-            //         icon: 'info',
-            //         title: 'Vente mise en attente',
-            //         text: 'Que souhaitez-vous faire ?',
-            //         showCancelButton: true,
-            //         confirmButtonText: 'Nouvelle vente',
-            //         cancelButtonText: 'Liste des ventes',
-            //         reverseButtons: true,
-            //         allowOutsideClick: false,
-            //         allowEscapeKey: false
-            //     }).then((result) => {
-            //         if (result.isConfirmed) {
-            //             Swal.fire({
-            //                 title: 'Chargement...',
-            //                 html: 'Redirection vers une nouvelle vente',
-            //                 allowOutsideClick: false,
-            //                 allowEscapeKey: false,
-            //                 didOpen: () => {
-            //                     Swal.showLoading();
-            //                     setTimeout(() => {
-            //                         window.location.href =
-            //                             "{{ route('vente.create') }}";
-            //                     }, 1200); // délai simulé
-            //                 }
-            //             });
-            //         } else if (result.dismiss === Swal.DismissReason.cancel) {
-            //             Swal.fire({
-            //                 title: 'Chargement...',
-            //                 html: 'Redirection vers la liste des ventes',
-            //                 allowOutsideClick: false,
-            //                 allowEscapeKey: false,
-            //                 didOpen: () => {
-            //                     Swal.showLoading();
-            //                     setTimeout(() => {
-            //                         window.location.href =
-            //                             "{{ route('vente.index') }}";
-            //                     }, 1200);
-            //                 }
-            //             });
-            //         }
-            //     });
-
-
-            // });
-
-
             $('#save-sale-in-local').click(function() {
                 Swal.fire({
                     title: 'Mettre en attente ?',
@@ -1316,45 +1133,8 @@
             });
 
 
-
-
-            // ###########################Fonction pour charger une vente en attente
-            // const data = localStorage.getItem('vente_en_cours');
-            // if (data) {
-            //     const vente = JSON.parse(data);
-
-            //     // Restaurer le panier
-            //     cart = vente.data.cart || [];
-            //     updateCartTable();
-            //     updateGrandTotal();
-
-            //     // Champs standards
-            //     $('#table-number').val(vente.data.tableNumber);
-            //     $('#number-covers').val(vente.data.covers);
-
-            //     // Champs financiers
-            //     $('#totalNet').text(vente.data.montantAvantRemise ?? 0);
-            //     $('#total-after-discount').text(vente.data.montantApresRemise ?? 0);
-            //     $('#discount-amount').text(vente.data.montantRemise ?? 0);
-            //     $('#total-discount').val(vente.data.valeurRemise ?? 0);
-            //     $('#discount-type').val(vente.data.typeRemise ?? ''); // ou 'montant'
-            //     $('#received-amount').val(vente.data.montantRecu ?? 0);
-            //     $('#change-amount').text(vente.data.montantRendu ?? 0);
-            //     $('#payment-method').val(vente.data.modePaiement ?? '');
-
-            //     // Supprimer la vente temporaire après chargement
-            //     localStorage.removeItem('vente_en_cours');
-
-            //     // Optionnel : alerte utilisateur
-            //     Swal.fire({
-            //         icon: 'info',
-            //         title: 'Vente rechargée',
-            //         text: 'Les données de la vente en attente ont été restaurées.'
-            //     });
-            // }
-
-
-
+            // ========== 4. Restaurer la vente en cours ==========
+            // Recharger la vente en cours
 
             const data = localStorage.getItem('vente_en_cours');
             if (!data) return;
