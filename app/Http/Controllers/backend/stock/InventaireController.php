@@ -41,7 +41,11 @@ class InventaireController extends Controller
         try {
 
             // verifier si un inventaire du mois precedent existe
-            $moisPrecedent = Carbon::now()->subMonth();
+            // $moisPrecedent = Carbon::now()->subMonth();
+            $moisPrecedent = Carbon::now()->subMonthNoOverflow();
+
+
+            // dd($moisPrecedent->toDateString());
 
             $inventaire_existe = Inventaire::where('mois_concerne', $moisPrecedent->month)
                 ->where('annee_concerne', $moisPrecedent->year)
