@@ -8,6 +8,7 @@ use App\Models\Menu;
 use App\Models\User;
 use App\Models\Vente;
 use App\Models\Caisse;
+use App\Models\Offert;
 use App\Models\Produit;
 use App\Models\Categorie;
 use App\Models\Reglement;
@@ -571,6 +572,7 @@ class VenteController extends Controller
                         'prix_unitaire' => $item['price'],
                         'total' => $item['price'] * $item['quantity'],
                         'variante_id' => $item['selectedVariante'] ?? null,
+                        'offert' => $item['offert'] ?? false, // Ajout de la colonne 'offert'
                     ]);
 
                     // Récupérer le produit
@@ -618,6 +620,32 @@ class VenteController extends Controller
 
                 // Mettre à jour le stock des ventes uniquement pour les produits de la famille "bar"
                 $this->miseAJourStockVente();
+
+
+
+                // ajouter les offerts dans la vente
+                // 1. Vérifier s'il y a des produits offerts
+                $offerts = array_filter($cart, function ($item) {
+                    return isset($item['offert']) && $item['offert'] == true;
+                });
+
+                // 2. Si des produits sont offerts, enregistrer dans la table `offerts`
+                if (!empty($offerts)) {
+                    foreach ($offerts as $item) {
+                        Offert::create([
+                            'produit_id' => $item['id'],
+                            'vente_id' => $vente->id,
+                            'quantite' => $item['quantity'],
+                            'variante_id' => $item['selectedVariante'] ?? null,
+                            'statut_view' => false,
+                            'approuved_at' => null,
+                            'user_approuved' => null,
+                            'user_created' => $vente->user_id,
+                            'date_created' => Carbon::now(),
+                            'date_approuved' => null,
+                        ]);
+                    }
+                }
             }
 
 
@@ -634,6 +662,8 @@ class VenteController extends Controller
                     ]);
                 }
             }
+
+
             $idVente = $vente->id;
 
             // retur response
@@ -653,7 +683,7 @@ class VenteController extends Controller
 
 
 
-    public function show(Request $request , $id)
+    public function show(Request $request, $id)
     {
         try {
             $vente = Vente::findOrFail($id);
@@ -665,7 +695,7 @@ class VenteController extends Controller
 
             //Recuperer la session de la date vente manuelle
             $sessionDate = null;
-          if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
+            if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
                 $sessionDate = Caisse::whereId(Auth::user()->caisse_id)->value('session_date_vente');
             }
 
