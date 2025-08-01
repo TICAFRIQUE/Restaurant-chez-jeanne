@@ -516,7 +516,7 @@ class VenteController extends Controller
             $nombreDeCouverts = $request->input('nombreDeCouverts');
 
 
-            // Création de la vente
+            // GENERER LE CODE DE LA VENTE
             // Obtenir les deux premières lettres du nom de la caissière
             $initialesCaissiere = substr(auth()->user()->first_name, 0, 2);
             $initialesCaisse = substr(auth()->user()->caisse->libelle, 0, 2);

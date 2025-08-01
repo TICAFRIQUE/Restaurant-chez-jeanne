@@ -278,31 +278,33 @@
 
                 <div class="ticket-products">
                     <table
-                        style="width: 100%; font-size: 18px; border-collapse: collapse; margin-bottom: 10px; font-weight:600;">
+                        style="width: 100%; font-size: 16px; border-collapse: collapse; margin-bottom: 10px; font-weight:600;">
                         <thead style="border-bottom: 1px dashed black;">
                             <tr>
-                                <th style="text-align: left;">DESIGNATION</th>
-                                <th style="text-align: right;">P.U.</th>
-                                <th style="text-align: right;">TOTAL</th>
+                                <th style="text-align: center;">DESIGNATION</th>
+                                <th style="text-align: center;">QTE</th>
+                                <th style="text-align: center;">TOTAL</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($vente->produits as $produit)
                                 <tr>
-                                    <td>{{ $produit->nom }} x <b>{{ $produit->pivot->quantite }}</b>
+                                    <td>{{ ucfirst(strtolower($produit->nom)) }}
+                                        x
                                         @if ($produit->categorie->famille == 'bar' && isset($produit['pivot']['variante_id']))
                                             @php
                                                 $variante = \App\Models\Variante::find(
                                                     $produit['pivot']['variante_id'],
                                                 );
                                             @endphp
-                                            {{ $variante ? $variante->libelle : '' }}
+                                            {{ $variante ? Str::substr($variante->libelle, 0, 1) : '' }}
                                         @endif
 
                                     </td>
-                                    <td style="text-align: right;">
-                                        {{ number_format($produit->pivot->prix_unitaire, 0, ',', ' ') }}</td>
-                                    <td style="text-align: right;">
+                                    <td style="text-align: center;">
+                                        {{ $produit->pivot->quantite }}</td>
+                                    <td style="text-align: center;">
+                                     
                                         {{ number_format($produit->pivot->quantite * $produit->pivot->prix_unitaire, 0, ',', ' ') }}
                                     </td>
                                 </tr>
@@ -311,25 +313,26 @@
                             @foreach ($vente->plats as $plat)
                                 <tr>
                                     <td>
-                                        {{ $plat->nom }} x{{ $plat->pivot->quantite }}
+                                        {{ ucfirst(strtolower($plat->nom)) }}
+
                                         @if (json_decode($plat['pivot']['garniture']))
-                                            <small><br>- Garniture:
+                                            <small><br>-
                                                 @foreach (json_decode($plat['pivot']['garniture']) as $garniture)
-                                                    {{ $garniture->nom }} (Qté: {{ $garniture->quantity }})
+                                                    <i>{{ $garniture->nom }} </i>
                                                 @endforeach
                                             </small>
                                         @endif
                                         @if (json_decode($plat['pivot']['complement']))
-                                            <small><br>- Complément:
+                                            <small><br>-
                                                 @foreach (json_decode($plat['pivot']['complement']) as $complement)
-                                                    {{ $complement->nom }} (Qté: {{ $complement->quantity }})
+                                                    <i>{{ $complement->nom }}  </i>
                                                 @endforeach
                                             </small>
                                         @endif
                                     </td>
-                                    <td style="text-align: right;">
-                                        {{ number_format($plat->pivot->prix_unitaire, 0, ',', ' ') }}</td>
-                                    <td style="text-align: right;">
+                                    <td style="text-align: center;">
+                                        {{ $plat->pivot->quantite }}</td>
+                                    <td style="text-align: center;">
                                         {{ number_format($plat->pivot->quantite * $plat->pivot->prix_unitaire, 0, ',', ' ') }}
                                     </td>
                                 </tr>
@@ -340,7 +343,7 @@
                     <p style="border-top: 1px dashed black; margin: 5px 0;"></p>
                 </div>
 
-                <table style="width: 100%; font-size: 18px; margin-bottom: 10px; font-weight:bold;">
+                <table style="width: 100%; font-size: 16px; margin-bottom: 10px; font-weight:bold;">
                     @if ($vente->valeur_remise > 0)
                         <tr>
                             <td><strong>TOTAL FACTURE:</strong></td>
