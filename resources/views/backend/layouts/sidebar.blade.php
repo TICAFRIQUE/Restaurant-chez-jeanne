@@ -228,7 +228,7 @@
                             aria-controls="sideBarVente">
                             <i class="ri ri-file-list-line"></i> <span>GESTION DES VENTES</span>
                         </a>
-                        <div class="collapse menu-dropdown {{ Route::is('vente.*') || Route::is('commande.*') || Route::is('client.*') ? 'show' : '' }}"
+                        <div class="collapse menu-dropdown {{ Route::is('vente.*') || Route::is('commande.*') || Route::is('client.*') || Route::is('offert.*') ? 'show' : '' }}"
                             id="sideBarVente">
                             <ul class="nav nav-sm flex-column">
 
