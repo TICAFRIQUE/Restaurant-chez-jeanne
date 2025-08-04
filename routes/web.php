@@ -373,7 +373,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     //offert
     Route::prefix('offert')->controller(OffertController::class)->group(function () {
         route::get('', 'index')->name('offert.index'); // liste des offerts
-        route::get('getOffertNoApprouved', 'getOffertNoApprouved')->name('offerts.non_approuves'); // liste des offerts non approuvés  
+        route::get('getOffertNoApprouved', 'getOffertNoApprouved')->name('offert.non_approuves'); // liste des offerts non approuvés  
 
         // route::get('show/{id}', 'show')->name('offert.show'); // detail offert
         // route::get('create', 'create')->name('offert.create'); // vue de la page de creation offert

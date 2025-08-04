@@ -518,7 +518,7 @@
 
             function checkOfferts() {
     $.ajax({
-        url: '{{ route('offerts.non_approuves') }}',
+        url: '{{ route('offert.non_approuves') }}',
         type: 'GET',
         success: function(response) {
             const offerts = response.offerts;

@@ -260,7 +260,7 @@
 
                                 <li class="nav-item active">
                                     <a href="{{ route('offert.index') }}"
-                                        class="nav-link {{ Route::is('vente.*') ? 'active' : '' }}">Offerts</a>
+                                        class="nav-link {{ Route::is('offert.*') ? 'active' : '' }}">Offerts</a>
                                 </li>
 
                     </li>
