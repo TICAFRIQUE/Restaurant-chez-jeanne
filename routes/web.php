@@ -27,6 +27,7 @@ use App\Http\Controllers\backend\vente\VenteController;
 use App\Http\Controllers\backend\stock\SortieController;
 use App\Http\Controllers\backend\menu\PlatMenuController;
 use App\Http\Controllers\backend\module\ModuleController;
+use App\Http\Controllers\backend\offert\OffertController;
 use App\Http\Controllers\backend\vente\CommandeController;
 use App\Http\Controllers\backend\depense\DepenseController;
 use App\Http\Controllers\backend\permission\RoleController;
@@ -367,6 +368,19 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::post('store', 'store')->name('reglement.store');
         route::get('show/{id}', 'show')->name('reglement.show');
         route::get('delete/{id}', 'delete')->name('reglement.delete');
+    });
+
+    //offert
+    Route::prefix('offert')->controller(OffertController::class)->group(function () {
+        route::get('', 'index')->name('offert.index'); // liste des offerts
+        route::get('getOffertNoApprouved', 'getOffertNoApprouved')->name('offerts.non_approuves'); // liste des offerts non approuvés  
+
+        // route::get('show/{id}', 'show')->name('offert.show'); // detail offert
+        // route::get('create', 'create')->name('offert.create'); // vue de la page de creation offert
+        // route::post('store', 'store')->name('offert.store'); // ajouter offert
+        // route::get('edit/{id}', 'edit')->name('offert.edit'); // modifier offert
+        // route::post('update/{id}', 'update')->name('offert.update'); // mettre a jour offert
+        // route::get('delete/{id}', 'delete')->name('offert.delete'); // supprimer offert
     });
 
     // Commande

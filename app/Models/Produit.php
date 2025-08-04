@@ -189,6 +189,14 @@ class Produit extends Model implements HasMedia
         ])->withTimestamps();
     }
 
+    //relations offerts
+    public function offerts()
+    {
+        return $this->hasMany(Offert::class, 'produit_id');
+    }
+
+
+
 
 
     // ScopeActive produits

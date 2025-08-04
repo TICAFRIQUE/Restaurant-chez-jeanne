@@ -107,4 +107,10 @@ class Vente extends Model
     {
         return $this->hasMany(Reglement::class, 'user_id');
     }
+
+    // relations offres
+    public function offerts()
+    {
+        return $this->hasMany(Offert::class);
+    }
 }

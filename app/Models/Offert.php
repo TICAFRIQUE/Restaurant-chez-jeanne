@@ -35,4 +35,20 @@ class Offert extends Model
             mt_rand()]);
         });
     }
+
+
+    // Relations
+    public function vente()
+    {
+        return $this->belongsTo(Vente::class , 'vente_id');
+    }
+    public function produit()
+    {
+        return $this->belongsTo(Produit::class, 'produit_id');
+    }
+
+    public function variante()
+    {
+        return $this->belongsTo(Variante::class, 'variante_id');
+    }
 }

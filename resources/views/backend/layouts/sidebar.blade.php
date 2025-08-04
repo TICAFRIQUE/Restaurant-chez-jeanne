@@ -258,6 +258,11 @@
                                     </li>
                                 @endif
 
+                                <li class="nav-item active">
+                                    <a href="{{ route('offert.index') }}"
+                                        class="nav-link {{ Route::is('vente.*') ? 'active' : '' }}">Offerts</a>
+                                </li>
+
                     </li>
 
                     <!-- ========== End si le role est caisse ou supercaisse on redirige les vente direct sur vente non reglé par defaut ========== -->
