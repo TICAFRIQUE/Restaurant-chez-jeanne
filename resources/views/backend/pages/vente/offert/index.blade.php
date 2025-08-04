@@ -291,6 +291,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Statut</th>
+                                <th>N° de vente</th>
                                 <th>produit</th>
                                 <th>Crée par</th>
                                 <th>Date</th>
@@ -302,19 +303,25 @@
                                 <tr id="row_{{ $item['id'] }}">
                                     <td> {{ ++$key }} </td>
                                     <td>
-                                        @if ($item['approuved_at'] == null)
+                                        @if ($item['offert_statut'] == null)
                                             <span class="badge bg-warning">En attente</span>
-                                        @elseif ($item['approuved_at'] == 1)
+                                        @elseif ($item['offert_statut'] == 1)
                                             <span class="badge bg-success">Approuvé</span>
+                                            <br><small>par {{ $item['userApprouved']['first_name'] }} </small>
                                         @else
                                             <span class="badge bg-danger">Rejeté</span>
                                         @endif
                                     </td>
                                     <td>
+                                        <a href="{{ route('vente.show', $item['vente']['id']) }}"
+                                            class="text-decoration-none">
+                                            {{ $item['vente']['code'] }}
+                                        </a>
+                                    <td>
                                         {{ $item['produit']['nom'] }}
 
                                         * {{ $item['quantite'] }}
-                                        {{ $item['variante']['libelle'] }}
+                                        {{ $item['variante']['libelle'] }} de {{ $item['prix'] }} FCFA
                                     </td>
 
                                     <td>
@@ -326,9 +333,6 @@
                                     </td>
 
 
-
-
-
                                     <td class="d-block">
                                         <div class="dropdown d-inline-block">
                                             <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
@@ -337,28 +341,32 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">
 
-                                                <li>
-                                                    <a href="#" class="dropdown-item remove-item-btn"
-                                                        data-id={{ $item['id'] }}>
-                                                        <i class="ri-check-line align-bottom me-2 text-muted"></i>
-                                                        Approuver
-                                                    </a>
-                                                </li>
+                                                @if ($item['offert_statut'] == null)
+                                                    <li>
+                                                        <a href="{{ route('offert.approuvedOffert', ['offert' => $item['id'], 'approuved' => 1]) }}"
+                                                            class="dropdown-item remove-item-btn"
+                                                            data-id={{ $item['id'] }}>
+                                                            <i class="ri-check-line align-bottom me-2 text-muted"></i>
+                                                            Approuver
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ route('offert.approuvedOffert', ['offert' => $item['id'], 'approuved' => 0]) }}"
+                                                            class="dropdown-item remove-item-btn"
+                                                            data-id={{ $item['id'] }}>
+                                                            <i class="ri-close-line align-bottom me-2 text-muted"></i>
+                                                            Rejeter
+                                                        </a>
+                                                    </li>
+                                                @endif
 
-                                                <li>
-                                                    <a href="#" class="dropdown-item remove-item-btn"
-                                                        data-id={{ $item['id'] }}>
-                                                        <i class="ri-close-line align-bottom me-2 text-muted"></i>
-                                                        Rejeter
-                                                    </a>
-                                                </li>
-                                                <li>
+                                                {{-- <li>
                                                     <a href="#" class="dropdown-item remove-item-btn delete"
                                                         data-id={{ $item['id'] }}>
                                                         <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
                                                         Supprimer
                                                     </a>
-                                                </li>
+                                                </li> --}}
                                             </ul>
                                         </div>
                                     </td>
@@ -420,105 +428,103 @@
             let lastIds = [];
 
             // Fonction pour vérifier les offerts
-           
+
 
 
             function checkOfferts() {
-    $.ajax({
-        url: '{{ route('offert.non_approuves') }}',
-        type: 'GET',
-        success: function(response) {
-            const offerts = response.offerts;
+                $.ajax({
+                    url: '{{ route('offert.non_approuves') }}',
+                    type: 'GET',
+                    success: function(response) {
+                        const offerts = response.offerts;
 
-            const newItems = offerts.filter(o => !lastIds.includes(o.id));
+                        const newItems = offerts.filter(o => !lastIds.includes(o.id));
 
-            if (newItems.length > 0) {
-                Swal.fire({
-                    position: 'center',
-                    icon: 'warning',
-                    title: 'Vous avez ' + newItems.length + ' offerts non approuvés',
-                    showConfirmButton: false,
-                    timer: 5000
+                        if (newItems.length > 0) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'warning',
+                                title: 'Vous avez ' + newItems.length +
+                                    ' offerts non approuvés',
+                                showConfirmButton: false,
+                                timer: 5000
+                            });
+                        }
+
+                        // Ajouter les nouveaux offerts au tableau uniquement s'ils ne sont pas déjà dans le DOM
+                        newItems.forEach(item => {
+                            if (!document.getElementById('row_' + item.id)) {
+                                $('#buttons-datatables tbody').prepend(`
+                                <tr id="row_${item.id}">
+                                    <td></td>
+                                    <td>
+                                        ${item.offert_statut === null
+                                            ? '<span class="badge bg-warning">En attente</span>'
+                                            : item.offert_statut == 1
+                                                ? '<span class="badge bg-success">Approuvé</span>'
+                                                : '<span class="badge bg-danger">Rejeté</span>'
+                                        }
+                                    </td>
+                                    <td>
+                                        ${item.produit.nom} * ${item.quantite} ${item.variante.libelle} de ${item.prix}
+                                    </td>
+                                    <td>
+                                        ${item.vente.user.first_name} - ${item.vente.caisse?.libelle ?? 'N/A'}
+                                    </td>
+                                    <td>
+                                        ${item.date_created ? new Date(item.date_created).toLocaleDateString('fr-FR', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        }) : ''}
+                                    </td>
+                                    <td class="d-block">
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="ri-more-fill align-middle"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                               if (item.offert_statut === null) {
+                                                    <li>
+                                                    <a href="{{ route('offert.approuvedOffert', ['offert' => $item->id, 'approuved' => 1]) }}" class="dropdown-item remove-item-btn" data-id="${item.id}">
+                                                        <i class="ri-check-line align-bottom me-2 text-muted"></i>
+                                                        Approuver
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ route('offert.approuvedOffert', ['offert' => $item->id, 'approuved' => 0]) }}" class="dropdown-item remove-item-btn" data-id="${item.id}">
+                                                        <i class="ri-close-line align-bottom me-2 text-muted"></i>
+                                                        Rejeter
+                                                    </a>
+                                                </li>
+                                               }
+                                               
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `);
+
+                                lastIds.push(item.id);
+                            }
+                        });
+
+                        // Réindexe les lignes après ajout
+                        $('#buttons-datatables tbody tr').each(function(index) {
+                            $(this).find('td:first').text(index + 1);
+                        });
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error('Erreur lors de la récupération des offerts:', textStatus, errorThrown);
                 });
             }
 
-            // Ajouter les nouveaux offerts au tableau uniquement s'ils ne sont pas déjà dans le DOM
-            newItems.forEach(item => {
-                if (!document.getElementById('row_' + item.id)) {
-                    $('#buttons-datatables tbody').prepend(`
-                        <tr id="row_${item.id}">
-                            <td></td>
-                            <td>
-                                ${item.approuved_at === null
-                                    ? '<span class="badge bg-warning">En attente</span>'
-                                    : item.approuved_at == 1
-                                        ? '<span class="badge bg-success">Approuvé</span>'
-                                        : '<span class="badge bg-danger">Rejeté</span>'
-                                }
-                            </td>
-                            <td>
-                                ${item.produit.nom} * ${item.quantite} ${item.variante.libelle}
-                            </td>
-                            <td>
-                                ${item.vente.user.first_name} - ${item.vente.caisse?.libelle ?? 'N/A'}
-                            </td>
-                            <td>
-                                ${item.date_created ? new Date(item.date_created).toLocaleDateString('fr-FR', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                }) : ''}
-                            </td>
-                            <td class="d-block">
-                                <div class="dropdown d-inline-block">
-                                    <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="ri-more-fill align-middle"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li>
-                                            <a href="#" class="dropdown-item remove-item-btn" data-id="${item.id}">
-                                                <i class="ri-check-line align-bottom me-2 text-muted"></i>
-                                                Approuver
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="dropdown-item remove-item-btn" data-id="${item.id}">
-                                                <i class="ri-close-line align-bottom me-2 text-muted"></i>
-                                                Rejeter
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" class="dropdown-item remove-item-btn delete" data-id="${item.id}">
-                                                <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
-                                                Supprimer
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    `);
-
-                    lastIds.push(item.id);
-                }
-            });
-
-            // Réindexe les lignes après ajout
-            $('#buttons-datatables tbody tr').each(function(index) {
-                $(this).find('td:first').text(index + 1);
-            });
-        }
-    }).fail(function(jqXHR, textStatus, errorThrown) {
-        console.error('Erreur lors de la récupération des offerts:', textStatus, errorThrown);
-    });
-}
-
 
             // Vérifie toutes les 10 secondes
-            setInterval(checkOfferts, 10000);
+            setInterval(checkOfferts, 30000);
         });
     </script>
 @endsection

@@ -33,6 +33,7 @@ return new class extends Migration
 
             $table->integer('quantite')->default(0); // Quantité de l'offre
 
+
             $table->foreignId('user_approuved') // user qui approuve l'offre
                 ->nullable()
                 ->constrained('users')
@@ -48,7 +49,7 @@ return new class extends Migration
             $table->timestamp('date_created')->nullable(); // Date de création de l'offre
             $table->timestamp('date_approuved')->nullable(); // Date de création de l'offre
 
-            $table->boolean('approuved_at')->nullable(); // Offre approuvée ou non
+            $table->boolean('offert_statut')->nullable(); // Offre approuvée ou non
             $table->boolean('statut_view')->default(false); // Statut de la vue de l'offre par le le gestionnaire
 
 

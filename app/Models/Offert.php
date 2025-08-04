@@ -14,8 +14,9 @@ class Offert extends Model
         'produit_id',
         'vente_id',
         'quantite',
+        'prix',
         'variante_id', // Variante du produit, 
-        'approuved_at', // Offre approuvée ou non
+        'offert_statut', // Offre approuvée ou non
         'statut_view', // Statut de la vue de l'offre par le gestionnaire
         'user_approuved', // Utilisateur qui approuve l'offre
         'user_created', // Utilisateur qui crée l'offre
@@ -27,7 +28,7 @@ class Offert extends Model
 
 
 
-     public static function boot()
+    public static function boot()
     {
         parent::boot();
         self::creating(function ($model) {
@@ -40,7 +41,7 @@ class Offert extends Model
     // Relations
     public function vente()
     {
-        return $this->belongsTo(Vente::class , 'vente_id');
+        return $this->belongsTo(Vente::class, 'vente_id');
     }
     public function produit()
     {
@@ -50,5 +51,10 @@ class Offert extends Model
     public function variante()
     {
         return $this->belongsTo(Variante::class, 'variante_id');
+    }
+
+    public function userApprouved()
+    {
+        return $this->belongsTo(User::class, 'user_approuved');
     }
 }

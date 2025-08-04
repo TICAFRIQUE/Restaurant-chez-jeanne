@@ -169,6 +169,7 @@ class Produit extends Model implements HasMedia
                 'prix_unitaire',
                 'total',
                 'offert', // Ajout de la colonne 'offert'
+                'offert_statut', // Ajout de la colonne 'offert_statut'
                 'unite_vente_id',
                 'variante_id'
             )

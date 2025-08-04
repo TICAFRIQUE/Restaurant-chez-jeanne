@@ -79,47 +79,19 @@ class VenteController extends Controller
             })->get();
 
 
-
-            // ##Filtres de recherche
-            // $query = Vente::with('produits')
-            //     ->whereStatut('confirmée')
-            //     ->orderBy('date_vente', 'desc');
-
-            // // Filtre par date
-            // if ($request->filled('date_debut') && $request->filled('date_fin')) {
-            //     $query->whereBetween('date_vente', [$request->date_debut, $request->date_fin]);
-            // } elseif ($request->filled('date_debut')) {
-            //     $query->whereDate('date_vente', '>=', $request->date_debut);
-            // } elseif ($request->filled('date_fin')) {
-            //     $query->whereDate('date_vente', '<=', $request->date_fin);
-            // }
-
-            // // Filtre par caisse
-            // if ($request->filled('caisse')) {
-            //     $query->where('caisse_id', $request->caisse);
-            // }
-
-            // if ($request->user()->hasRole('caisse')) {
-            //     $query->where('caisse_id', auth()->user()->caisse_id)
-            //         ->where('user_id', auth()->user()->id)
-            //         ->where('statut_cloture', false);
-            // }
-
-            // $data_vente = $query->get();
-            // // dd($data_vente->toArray());
-
-
-
-            $query = Vente::with('produits')
+            // Récupérer les ventes avec les relations nécessaires
+            $query = Vente::with(['produits', 'produitsOfferts', 'offerts'])
                 ->whereStatut('confirmée')
+                ->withCount([
+                    'offerts as offerts_en_attente' => function ($query) {
+                        $query->whereNull('offert_statut');
+                    },
+                    'offerts as offerts_approuved' => function ($query) {
+                        $query->whereNotNull('offert_statut');
+                    },
+                ])
                 ->orderBy('created_at', 'desc');
 
-
-            // Vérifier si aucune période ou date spécifique n'a été fournie on par défaut on affiche les ventes du mois en cours
-            // if (!$request->filled('periode') && !$request->filled('date_debut') && !$request->filled('date_fin')) {
-            //     $query->whereMonth('date_vente', Carbon::now()->month)
-            //         ->whereYear('date_vente', Carbon::now()->year);
-            // }
 
 
             // sinon on applique le filtre des date et caisse
@@ -205,6 +177,10 @@ class VenteController extends Controller
             // retourne les données de vente filtrées
             $data_vente = $query->get();
 
+            // dd($data_vente->toArray());
+
+
+
 
             ## fin du filtre de recherche
 
@@ -274,6 +250,47 @@ class VenteController extends Controller
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes : ' . $e->getMessage());
             return back();
+        }
+    }
+
+
+    //recuperer les vente de la caisse actuelle
+    public function getVenteCaisse(Request $request)
+    {
+        try {
+
+            // Récupérer les ventes avec les relations nécessaires
+            $query = Vente::with(['produits', 'produitsOfferts', 'offerts'])
+                ->whereStatut('confirmée')
+                ->withCount([
+                    'offerts as offerts_en_attente' => function ($query) {
+                        $query->whereNull('offert_statut');
+                    },
+                    'offerts as offerts_approuved' => function ($query) {
+                        $query->whereNotNull('offert_statut');
+                    },
+                ])
+                ->orderBy('created_at', 'desc');
+
+
+            /**si l'utilisateur a le rôle 'caisse' ou 'supercaisse' on affiche les ventes de la caisse actuelle */
+            if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
+                $query->where('caisse_id', auth()->user()->caisse_id)
+                    ->where('user_id', auth()->user()->id)
+                    ->where('statut_cloture', false)
+                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente); // ✅ Compare seulement la date
+
+            }
+
+            // retourne les données de vente filtrées
+            $ventes = $query->get();
+
+            return response()->json([
+                'ventes' => $ventes,
+            ]);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Une erreur est survenue lors du chargement de la page.' . $e->getMessage());
+           
         }
     }
 
@@ -636,9 +653,10 @@ class VenteController extends Controller
                             'produit_id' => $item['id'],
                             'vente_id' => $vente->id,
                             'quantite' => $item['quantity'],
+                            'prix' => $item['price'],
                             'variante_id' => $item['selectedVariante'] ?? null,
                             'statut_view' => false,
-                            'approuved_at' => null,
+                            'offert_statut' => null,
                             'user_approuved' => null,
                             'user_created' => $vente->user_id,
                             'date_created' => Carbon::now(),

@@ -173,7 +173,17 @@
                                                 src="{{ $item->getFirstMediaUrl('ProduitImage') }}" width="50px"
                                                 alt="{{ $item['nom'] }}">
                                         </td> --}}
-                                        <td>{{ $item['nom'] }}</td>
+                                        <td>{{ $item['nom'] }}
+
+                                            @if ($item['pivot']['offert'] == 1 && $item['pivot']['offert_statut'] === 1)
+                                                <span class="badge bg-success">Offert</span>
+                                            @elseif ($item['pivot']['offert'] == 1 && $item['pivot']['offert_statut'] === 0)
+                                                <span class="badge bg-danger">Offert rejeté</span>
+                                            @elseif ($item['pivot']['offert'] == 1 && is_null($item['pivot']['offert_statut']))
+                                                <span class="badge bg-warning">Offert en attente</span>
+                                            @endif
+
+                                        </td>
                                         <!-- Recuperer le libelle de la variante en fonction de son id -->
 
 
@@ -304,7 +314,7 @@
                                     <td style="text-align: center;">
                                         {{ $produit->pivot->quantite }}</td>
                                     <td style="text-align: center;">
-                                     
+
                                         {{ number_format($produit->pivot->quantite * $produit->pivot->prix_unitaire, 0, ',', ' ') }}
                                     </td>
                                 </tr>
@@ -325,7 +335,7 @@
                                         @if (json_decode($plat['pivot']['complement']))
                                             <small><br>-
                                                 @foreach (json_decode($plat['pivot']['complement']) as $complement)
-                                                    <i>{{ $complement->nom }}  </i>
+                                                    <i>{{ $complement->nom }} </i>
                                                 @endforeach
                                             </small>
                                         @endif

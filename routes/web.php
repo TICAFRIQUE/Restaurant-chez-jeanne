@@ -358,6 +358,8 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::get('create-menu', 'createVenteMenu')->name('vente.menu.create')->middleware('can:creer-vente'); //vue de la page de vente menu
         route::post('store-menu', 'storeVenteMenu')->name('vente.menu.store')->middleware('can:creer-vente'); // ajouter vente menu
 
+        route::get('getVenteCaisse', 'getVenteCaisse')->name('vente.getVenteCaisse'); //Liste des ventes de la caisse actuelle en json
+
         ##supprimer une vente
         route::get('delete/{id}', 'delete')->name('vente.delete')->middleware('can:supprimer-vente'); // supprimer vente
     });
@@ -374,6 +376,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('offert')->controller(OffertController::class)->group(function () {
         route::get('', 'index')->name('offert.index'); // liste des offerts
         route::get('getOffertNoApprouved', 'getOffertNoApprouved')->name('offert.non_approuves'); // liste des offerts non approuvés  
+        route::get('approuvedOffert', 'approuvedOffert')->name('offert.approuvedOffert'); // approuver offert oui ou non 
 
         // route::get('show/{id}', 'show')->name('offert.show'); // detail offert
         // route::get('create', 'create')->name('offert.create'); // vue de la page de creation offert

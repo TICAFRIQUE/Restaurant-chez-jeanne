@@ -460,44 +460,6 @@
 
             <!-- ========== Start button action ========== -->
             <div class="card-header mb-3 d-flex justify-content-center">
-                {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
-                    <h5 class="card-title
-                {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
-                    <h5 class="card-title
-                {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
-                    <!-- ========== Start cloture caisse button ========== -->
-                    @if ($data_vente->sum('montant_total') > 0)
-                        <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg "> 👍Clôturer la
-                            caisse
-                            <i class="ri ri-bill"></i></a>
-                    @else
-                        <button class="btn btn-danger btn-lg" disabled>Clôturer la caisse <i
-                                class="ri ri-lock-line"></i></button>
-                    @endif
-                    <!-- ========== End cloture caisse button ========== -->
-
-
-                    <!-- ========== Start rapport caisse button ========== -->
-                    <!-- ========== Start Si il y a des ventes dejà realisé et cloturé par la caisse connecté ========== -->
-                    @if ($venteCaisseCloture > 0)
-                        <a href="{{ route('vente.rapport-caisse') }}" class="btn btn-success btn-lg">Voir le rapport de
-                            caisse <i class="ri ri-file-list-3-line"></i></a>
-                    @endif
-                    <!-- ========== End Section ========== -->
-                    <!-- ========== End rapport caisse button ========== -->
-
-                    <!-- ========== Start nouvelle vente button ========== -->
-                    @if ($sessionDate != null)
-                        <a href="{{ route('vente.create') }}" type="button" class="btn btn-primary btn-lg">
-                            Nouvelle vente 🛒</a>
-                    @else
-                        <button type="button" class="btn btn-info ms-2 btnChoiceDate btn-lg">
-                            Nouvelle vente 🛒
-                        </button>
-                    @endif
-                    <!-- ========== End nouvelle vente button ========== -->
-                @endif --}}
-
 
                 @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
                     <div class="btn-group-actions">
@@ -544,49 +506,6 @@
 
             <!-- ========== Start statistique caisse ========== -->
             <div class="card-body">
-                {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
-                <div class="row mb-3">
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Caisse actuelle</h5>
-                                <p class="card-text h3 text-primary">
-                                    {{ auth()->user()->caisse->libelle ?? 'Non définie' }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body d-flex justify-content-around bg-success">
-                                <h5 class="card-title text-white">Total des ventes du jour : <br> <strong
-                                        class="fs-3">{{ number_format($data_vente->sum('montant_total'), 0, ',', ' ') }}
-                                        FCFA</strong> </h5>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body d-flex justify-content-around">
-                                <h5 class="card-title">Vente en attente : <br> <strong
-                                        class="text-primary fs-3">5</strong> </h5>
-                            </div>
-                        </div>
-                    </div>
-
-
-                     <div class="col-md-3">
-                        <div class="card">
-                            <div class="card-body d-flex justify-content-around">
-                                <h5 class="card-title">Vente sans réglement : <br> <strong
-                                        class="text-danger fs-3">5</strong> </h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                    @endif --}}
-
 
                 @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
                     @php
@@ -604,20 +523,6 @@
 
 
                     <div class="row mb-3  d-flex flex-wrap justify-content-center">
-
-                        {{-- Carte 1 : Total des ventes --}}
-                        {{-- <div class="col-md-2">
-                          <a href="{{ route('vente.index') }}" class="text-decoration-none">
-                                <div class="card card-custom bg-gradient-primary text-white carte-vente-anim">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">Total ventes</h5>
-                                        <p class="card-value">
-                                            {{ $caisseVente->sum('montant_total') > 0 ? number_format($caisseVente->sum('montant_total'), 0, ',', ' ') : '0' }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div> --}}
 
                         {{-- Carte 2 : Ventes du jour --}}
                         <div class="col-md-3">
@@ -712,6 +617,7 @@
                                 <th>Caisse</th>
                                 <th>Statut paiement vente</th>
                                 <th>Statut réglement</th>
+                                <th>Offerts en attente<i class="ri ri-gift-2-fill"></i> </th>
 
                                 @if (auth()->user()->can('modifier-vente') || auth()->user()->can('supprimer-vente'))
                                     <th>Action</th>
@@ -727,8 +633,16 @@
                                     {{-- <td> <span
                                             class="badge bg-{{ $item['statut'] == 'en attente' ? 'warning' : 'success' }}">{{ $item['statut'] }}</span>
                                     </td> --}}
-                                    <td> <a class="fw-bold"
-                                            href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a> </td>
+                                    <td>
+                                        @if ($item['offerts_en_attente'] > 0)
+                                            <a class="fw-bold btnOffert text-danger"
+                                                href="#">#{{ $item['code'] }}</a>
+                                        @else
+                                            <a class="fw-bold"
+                                                href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a>
+                                        @endif
+
+                                    </td>
 
                                     <td> {{ $item['numero_table'] ?? 'non défini' }}</td>
                                     <td> {{ \Carbon\Carbon::parse($item['date_vente'])->format('d-m-Y') }}
@@ -749,6 +663,22 @@
                                             class="badge bg-{{ $item['statut_reglement'] == 1 ? 'success' : 'danger' }}">
                                             {{ $item['statut_reglement'] == 0 ? 'non effectué' : ($item['statut_reglement'] == 1 ? 'effectué' : '') }}
                                         </span>
+                                    </td>
+
+                                    <td>
+                                        @if (!empty($item['offerts']) && $item['offerts_en_attente'] > 0)
+                                            <span class="badge bg-warning text-dark fs-6">
+                                                {{ $item['offerts_en_attente'] }} en attente
+                                                <i class="ri ri-gift-2-fill fs-4"></i>
+                                            </span>
+                                        @else
+                                            Pas d'offerts en attente
+                                        @endif
+                                    </td>
+
+                                    {{-- Si l'utilisateur a le droit de modifier ou supprimer une vente --}}
+
+
                                     </td>
 
                                     @if (auth()->user()->can('modifier-vente') || auth()->user()->can('supprimer-vente'))
@@ -812,11 +742,17 @@
     <script>
         $(document).ready(function() {
 
+            // Message d'erreur si une vente a des offerts en attente
+            $('.btnOffert').click(function() {
+                Swal.fire({
+                    title: 'Attention ! Cette vente contient des offerts en attente de validation',
+                    text: "Veuillez contacter le gestionnaire de la vente pour valider ces offerts.",
+                    icon: 'warning',
+
+                })
+            })
 
             /** GESTION DE LA DATE DE SESSION DE VENTE */
-
-
-
             // Lorsque une date n'est pas définie, on affiche une alerte
             $('.btnChoiceDate').click(function() {
                 Swal.fire({

@@ -77,6 +77,7 @@ class Vente extends Model
                 'prix_unitaire',
                 'total',
                 'offert', // Ajout de la colonne 'offert'
+                'offert_statut', // Ajout de la colonne 'offert_statut'
                 'unite_vente_id',
                 'variante_id'
             )
@@ -112,5 +113,27 @@ class Vente extends Model
     public function offerts()
     {
         return $this->hasMany(Offert::class);
+    }
+
+
+    /**
+     * Renvoie les produits offerts pour cette vente
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function produitsOfferts()
+    {
+        return $this->belongsToMany(Produit::class, 'produit_vente')
+            ->withPivot(
+                'quantite',
+                'quantite_bouteille',
+                'prix_unitaire',
+                'total',
+                'offert', // Ajout de la colonne 'offert'
+                'offert_statut', // Ajout de la colonne 'offert_statut'
+                'unite_vente_id',
+                'variante_id'
+            )
+            ->wherePivot('offert', 1);
     }
 }
