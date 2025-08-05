@@ -17,7 +17,17 @@
 <script src="{{ URL::asset('build/js/pages/select2.init.js') }}"></script>
 
 
-    <script src="{{URL::asset('myJs/js/delete_row.js')}}"></script>
+<script src="{{ URL::asset('myJs/js/delete_row.js') }}"></script>
+
+
+{{-- <!-- Pusher JS -->
+  <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+
+<!-- Laravel Echo via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/laravel-echo/dist/echo.iife.js"></script> --}}
+
+
+
 
 @yield('script')
 @yield('script-bottom')
@@ -47,7 +57,8 @@
         })
     })()
 
-    
+
+   
 </script>
 
 <!-- ========== End other script  ========== -->

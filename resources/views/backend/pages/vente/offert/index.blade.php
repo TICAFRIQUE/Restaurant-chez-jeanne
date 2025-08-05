@@ -303,15 +303,16 @@
                                 <tr id="row_{{ $item['id'] }}">
                                     <td> {{ ++$key }} </td>
                                     <td>
-                                        @if ($item['offert_statut'] == null)
+                                        @if ($item['offert_statut'] === null)
                                             <span class="badge bg-warning">En attente</span>
-                                        @elseif ($item['offert_statut'] == 1)
+                                        @elseif ($item['offert_statut'] === 1)
                                             <span class="badge bg-success">Approuvé</span>
-                                            <br><small>par {{ $item['userApprouved']['first_name'] }} </small>
-                                        @else
+                                            <br><small>par {{ $item['userApprouved']['first_name'] ?? '' }}</small>
+                                        @elseif ($item['offert_statut'] === 0)
                                             <span class="badge bg-danger">Rejeté</span>
                                         @endif
                                     </td>
+
                                     <td>
                                         <a href="{{ route('vente.show', $item['vente']['id']) }}"
                                             class="text-decoration-none">
@@ -341,7 +342,7 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">
 
-                                                @if ($item['offert_statut'] == null)
+                                                @if ($item['offert_statut'] === null)
                                                     <li>
                                                         <a href="{{ route('offert.approuvedOffert', ['offert' => $item['id'], 'approuved' => 1]) }}"
                                                             class="dropdown-item remove-item-btn"
@@ -392,6 +393,8 @@
 @section('script')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+
 
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
@@ -454,59 +457,69 @@
                         // Ajouter les nouveaux offerts au tableau uniquement s'ils ne sont pas déjà dans le DOM
                         newItems.forEach(item => {
                             if (!document.getElementById('row_' + item.id)) {
+                                let approveUrlTemplate =
+                                    "{{ route('offert.approuvedOffert', ['offert' => ':offert', 'approuved' => ':approuved']) }}";
+
+                                let approveUrl = approveUrlTemplate
+                                    .replace(':offert', item.id)
+                                    .replace(':approuved', 1); // ou 0 si c'est rejeté
+
+                                let rejectUrl = approveUrlTemplate
+                                    .replace(':offert', item.id)
+                                    .replace(':approuved', 0);
+
                                 $('#buttons-datatables tbody').prepend(`
-                                <tr id="row_${item.id}">
-                                    <td></td>
-                                    <td>
-                                        ${item.offert_statut === null
-                                            ? '<span class="badge bg-warning">En attente</span>'
-                                            : item.offert_statut == 1
-                                                ? '<span class="badge bg-success">Approuvé</span>'
-                                                : '<span class="badge bg-danger">Rejeté</span>'
-                                        }
-                                    </td>
-                                    <td>
-                                        ${item.produit.nom} * ${item.quantite} ${item.variante.libelle} de ${item.prix}
-                                    </td>
-                                    <td>
-                                        ${item.vente.user.first_name} - ${item.vente.caisse?.libelle ?? 'N/A'}
-                                    </td>
-                                    <td>
-                                        ${item.date_created ? new Date(item.date_created).toLocaleDateString('fr-FR', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        }) : ''}
-                                    </td>
-                                    <td class="d-block">
-                                        <div class="dropdown d-inline-block">
-                                            <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="ri-more-fill align-middle"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                               if (item.offert_statut === null) {
-                                                    <li>
-                                                    <a href="{{ route('offert.approuvedOffert', ['offert' => $item->id, 'approuved' => 1]) }}" class="dropdown-item remove-item-btn" data-id="${item.id}">
-                                                        <i class="ri-check-line align-bottom me-2 text-muted"></i>
-                                                        Approuver
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ route('offert.approuvedOffert', ['offert' => $item->id, 'approuved' => 0]) }}" class="dropdown-item remove-item-btn" data-id="${item.id}">
-                                                        <i class="ri-close-line align-bottom me-2 text-muted"></i>
-                                                        Rejeter
-                                                    </a>
-                                                </li>
-                                               }
-                                               
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `);
+                                        <tr id="row_${item.id}">
+                                            <td></td>
+                                            <td>
+                                                ${item.offert_statut === null
+                                                    ? '<span class="badge bg-warning">En attente</span>'
+                                                    : item.offert_statut ===0
+                                                        ? '<span class="badge bg-success">Approuvé</span>'
+                                                        : '<span class="badge bg-danger">Rejeté</span>'
+                                                }
+                                            </td>
+                                            <td>
+                                                ${item.produit.nom} * ${item.quantite} ${item.variante.libelle} de ${item.prix}
+                                            </td>
+                                            <td>
+                                                ${item.vente.user.first_name} - ${item.vente.caisse?.libelle ?? 'N/A'}
+                                            </td>
+                                            <td>
+                                                ${item.date_created ? new Date(item.date_created).toLocaleDateString('fr-FR', {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                }) : ''}
+                                            </td>
+                                            <td class="d-block">
+                                                <div class="dropdown d-inline-block">
+                                                    <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="ri-more-fill align-middle"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        ${item.offert_statut === null ? `
+                                                                            <li>
+                                                                                <a href="${approveUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
+                                                                                    <i class="ri-check-line align-bottom me-2 text-muted"></i>
+                                                                                    Approuver
+                                                                                </a>
+                                                                            </li>
+                                                                            <li>
+                                                                                <a href="${rejectUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
+                                                                                    <i class="ri-close-line align-bottom me-2 text-muted"></i>
+                                                                                    Rejeter
+                                                                                </a>
+                                                                            </li>
+                                                                        ` : ''}
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `);
 
                                 lastIds.push(item.id);
                             }
@@ -524,7 +537,9 @@
 
 
             // Vérifie toutes les 10 secondes
-            setInterval(checkOfferts, 30000);
+            setInterval(checkOfferts, 10000);
+
+
         });
     </script>
 @endsection

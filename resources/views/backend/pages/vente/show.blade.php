@@ -175,11 +175,11 @@
                                         </td> --}}
                                         <td>{{ $item['nom'] }}
 
-                                            @if ($item['pivot']['offert'] == 1 && $item['pivot']['offert_statut'] === 1)
+                                            @if ($item['pivot']['offert'] === 1 && $item['pivot']['offert_statut'] === 1)
                                                 <span class="badge bg-success">Offert</span>
-                                            @elseif ($item['pivot']['offert'] == 1 && $item['pivot']['offert_statut'] === 0)
+                                            @elseif ($item['pivot']['offert'] === 1 && $item['pivot']['offert_statut'] === 0)
                                                 <span class="badge bg-danger">Offert rejeté</span>
-                                            @elseif ($item['pivot']['offert'] == 1 && is_null($item['pivot']['offert_statut']))
+                                            @elseif ($item['pivot']['offert'] === 1 && is_null($item['pivot']['offert_statut']))
                                                 <span class="badge bg-warning">Offert en attente</span>
                                             @endif
 

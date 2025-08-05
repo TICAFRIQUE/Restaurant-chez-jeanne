@@ -32,6 +32,38 @@
     @include('backend.layouts.head-css')
 </head>
 
+
+<!-- Pusher JS depuis CDN -->
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+
+<!-- Laravel Echo depuis un CDN non officiel -->
+<script src="https://unpkg.com/laravel-echo/dist/echo.iife.js"></script>
+
+<script>
+    // Initialisation de Laravel Echo avec Pusher
+    window.Pusher = Pusher;
+
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: '{{ config('broadcasting.connections.pusher.key') }}',
+        cluster: '{{ config('broadcasting.connections.pusher.options.cluster') }}',
+        forceTLS: true
+    });
+
+    // Écoute de l'événement offert.approved
+    window.Echo.channel('offerts')
+        .listen('.offert.approved', (e) => {
+            console.log('Un offert a été approuvé !', e.offert);
+
+            Swal.fire({
+                title: 'Nouveau offert approuvé',
+                text: `Offert #${e.offert.id} approuvé`,
+                icon: 'info',
+            });
+        });
+</script>
+
+
 <body>
     <!-- Begin page -->
     <div id="layout-wrapper">

@@ -6,6 +6,7 @@ use App\Models\Vente;
 use App\Models\Caisse;
 use App\Models\Offert;
 use Illuminate\Http\Request;
+use App\Events\OffertApprouved;
 use App\Http\Controllers\Controller;
 
 class OffertController extends Controller
@@ -107,15 +108,19 @@ class OffertController extends Controller
             // si l'offert n'est pas approuvé, on va ajouter le total du produit dans la vente
             if ($approuved == 0) {
                 // recuperer le produit de l'offert
-                $produit = $vente->produits()
-                    ->where('produit_id', $offert->produit_id)
-                    ->where('offert', true)
-                    ->whereNull('offert_statut')
-                    ->first();
-                $vente->total += $produit->total;
-                $vente->save();
+              
+               $vente->update([
+                    'montant_total' => $vente->montant_total+= ($offert->prix* $offert->quantite),
+                    'montant_avant_remise' => $vente->montant_avant_remise +=($offert->prix * $offert->quantite),
+                    'montant_restant' => $vente->montant_restant+= ($offert->prix* $offert->quantite),
+                    'statut_reglement' => 0, // non réglée
+                    'statut_paiement' => 'impaye', // non payée
+                ]);
             }
 
+
+            //ajouter l'evénement OffertApprouved
+            event(new OffertApprouved($offert));
 
             if (isset($approuved) && $approuved == 1) {
                 return redirect()->back()->with('success', 'L\'offert a été approuvé avec succès.');

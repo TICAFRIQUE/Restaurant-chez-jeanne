@@ -742,6 +742,33 @@
     <script>
         $(document).ready(function() {
 
+
+            // // Configuration de Laravel Echo avec Pusher
+            // window.Pusher = Pusher;
+
+            // window.Echo = new Echo({
+            //     broadcaster: 'pusher',
+            //     key: '{{ env('PUSHER_APP_KEY') }}',
+            //     cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+            //     forceTLS: true,
+            // });
+
+            // // Écoute de l'événement "offert.approved"
+            // window.Echo.channel('offerts')
+            //     .listen('.offert.approved', function(e) {
+            //         console.log('Un offert a été approuvé !', e.offert);
+
+            //         Swal.fire({
+            //             title: 'Nouveau offert approuvé',
+            //             text: `Offert #${e.offert.id} approuvé`,
+            //             icon: 'info',
+            //         });
+            //     });
+
+
+
+
+
             // Message d'erreur si une vente a des offerts en attente
             $('.btnOffert').click(function() {
                 Swal.fire({
