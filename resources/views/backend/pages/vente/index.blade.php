@@ -742,31 +742,52 @@
     <script>
         $(document).ready(function() {
 
+            function checkNotifications() {
+                $.ajax({
+                    url: "{{ route('notifications.check') }}",
+                    method: "GET",
+                    success: function(notifications) {
+                        if (notifications.length > 0) {
+                            notifications.forEach(function(notification) {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Nouvelle notification',
+                                    text: notification.message,
+                                    timer: 20000
+                                });
 
-            // // Configuration de Laravel Echo avec Pusher
-            // window.Pusher = Pusher;
+                                // Marquer la notification comme lue
+                                $.ajax({
+                                    url: "{{ route('notifications.markAsRead') }}",
+                                    method: "POST",
+                                    data: {
+                                        _token: '{{ csrf_token() }}',
+                                        id: notification.id
+                                    },
+                                    success: function(response) {
+                                        console.log("Notification " + notification
+                                            .id + " marquée comme lue.");
+                                    },
+                                    error: function(xhr) {
+                                        console.error(
+                                            "Erreur lors de la lecture de la notification."
+                                            );
+                                    }
+                                });
+                            });
 
-            // window.Echo = new Echo({
-            //     broadcaster: 'pusher',
-            //     key: '{{ env('PUSHER_APP_KEY') }}',
-            //     cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
-            //     forceTLS: true,
-            // });
-
-            // // Écoute de l'événement "offert.approved"
-            // window.Echo.channel('offerts')
-            //     .listen('.offert.approved', function(e) {
-            //         console.log('Un offert a été approuvé !', e.offert);
-
-            //         Swal.fire({
-            //             title: 'Nouveau offert approuvé',
-            //             text: `Offert #${e.offert.id} approuvé`,
-            //             icon: 'info',
-            //         });
-            //     });
+                            console.log("Vous avez " + notifications.length +
+                                " nouvelles notifications.");
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error("Erreur lors de la récupération des notifications.");
+                    }
+                });
+            }
 
 
-
+            setInterval(checkNotifications, 5000); // Toutes les 5 secondes
 
 
             // Message d'erreur si une vente a des offerts en attente
@@ -872,13 +893,6 @@
                     });
                 }
             });
-
-
-
-
-
-
-
 
 
             // Fin de la gestion de la date de session de vente

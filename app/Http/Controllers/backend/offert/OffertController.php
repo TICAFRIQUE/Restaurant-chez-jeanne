@@ -7,6 +7,7 @@ use App\Models\Caisse;
 use App\Models\Offert;
 use Illuminate\Http\Request;
 use App\Events\OffertApprouved;
+use App\Models\OffertNotification;
 use App\Http\Controllers\Controller;
 
 class OffertController extends Controller
@@ -108,19 +109,24 @@ class OffertController extends Controller
             // si l'offert n'est pas approuvé, on va ajouter le total du produit dans la vente
             if ($approuved == 0) {
                 // recuperer le produit de l'offert
-              
-               $vente->update([
-                    'montant_total' => $vente->montant_total+= ($offert->prix* $offert->quantite),
-                    'montant_avant_remise' => $vente->montant_avant_remise +=($offert->prix * $offert->quantite),
-                    'montant_restant' => $vente->montant_restant+= ($offert->prix* $offert->quantite),
+
+                $vente->update([
+                    'montant_total' => $vente->montant_total += ($offert->prix * $offert->quantite),
+                    'montant_avant_remise' => $vente->montant_avant_remise += ($offert->prix * $offert->quantite),
+                    'montant_restant' => $vente->montant_restant += ($offert->prix * $offert->quantite),
                     'statut_reglement' => 0, // non réglée
                     'statut_paiement' => 'impaye', // non payée
                 ]);
             }
 
 
-            //ajouter l'evénement OffertApprouved
-            event(new OffertApprouved($offert));
+            // enregistrer la notification AVANT de faire le redirect
+            OffertNotification::create([
+                'offert_id' => $offert->id,
+                'vente_id' => $vente->id,
+                'message' => $approuved == 1 ? 'L\'offert a été approuvé.' : 'L\'offert a été rejeté.',
+                'is_read' => false,
+            ]);
 
             if (isset($approuved) && $approuved == 1) {
                 return redirect()->back()->with('success', 'L\'offert a été approuvé avec succès.');
@@ -131,5 +137,30 @@ class OffertController extends Controller
             # code...
             return redirect()->back()->with('error', 'Une erreur est survenue lors du chargement de la page.' . $e->getMessage());
         }
+    }
+
+    public function checkNotifications()
+    {
+        try {
+            $notifications = OffertNotification::with(['offert', 'vente'])
+                ->where('is_read', false)
+                ->get();
+            return response()->json($notifications);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Une erreur est survenue lors du chargement des notifications.'
+            ], 500);
+        }
+    }
+
+    public function markAsRead(Request $request)
+    {
+        $notification = OffertNotification::find($request->id);
+
+        if ($notification) {
+            $notification->update(['is_read' => true]);
+        }
+
+        return response()->json(['status' => 'ok']);
     }
 }

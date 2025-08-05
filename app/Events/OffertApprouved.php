@@ -11,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class OffertApprouved
+class OffertApprouved implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -23,7 +23,7 @@ class OffertApprouved
     {
         //
         // Initialize the event with any necessary data
-        $this->offert = 'offert'; // Replace with actual offert data
+        $this->offert = $offert; // Replace with actual offert data
     }
 
     /**
@@ -34,7 +34,8 @@ class OffertApprouved
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('offerts'),
+            // new PrivateChannel('offerts'),
+            new Channel('offerts'),
         ];
     }
     /**
