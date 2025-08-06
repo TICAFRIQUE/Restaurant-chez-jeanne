@@ -47,6 +47,7 @@
         <div class="col-lg-12">
             <div class="card">
 
+
                 <div class=" p-3  mb-3">
                     <h6 class="text-muted">Détails de la vente</h6>
                     <div class="row">

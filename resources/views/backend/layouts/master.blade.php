@@ -72,6 +72,19 @@
                 <div class="container-fluid">
                     @include('sweetalert::alert')
                     @include('backend.components.alertMessage')
+
+                    @can('voir-offert')
+                        <div id="alert-checkOffertNotification" class="my-2"></div>
+                    @endcan
+
+                    <!-- ========== Start afficher la notification lorsque un offert est approuvé pour la caisse ========== -->
+
+                    @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
+                        <div id="alert-ApprouvedOffert" class="mt-3"></div>
+                    @endif
+                    <!-- ========== End Section ========== -->
+
+
                     @yield('content')
                 </div>
                 <!-- container-fluid -->

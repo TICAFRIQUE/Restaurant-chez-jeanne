@@ -445,9 +445,7 @@
                                 const rejectUrl =
                                     `${baseApproveUrl}?offert=${item.id}&approuved=0`;
 
-                                console.log("Lien approbation :", approveUrl);
-                                console.log("Lien rejet :", rejectUrl);
-                                console.log(approveUrl, rejectUrl);
+                           
 
 
                                 $('#buttons-datatables tbody').prepend(`

@@ -450,7 +450,8 @@
                 <p class="fw-bold text-center text-dark ">Caisse actuelle :
                     {{ auth()->user()->caisse->libelle ?? 'non définie' }}</p>
 
-                    <p><i class="ri ri-gift-2-fill fs-5"></i> :<span class="text-warning fw-bold"> {{ $offertsEnAttente }} </span></p>
+                <p><i class="ri ri-gift-2-fill fs-5"></i> :<span class="text-warning fw-bold"> {{ $offertsEnAttente }}
+                    </span></p>
                 <p class="fw-bold">
                     Ventes impayées réglées :<span class="text-danger">
                         {{ number_format($reglementImpayes->sum('montant_reglement'), 0, ',', ' ') }} FCFA</span>
@@ -468,8 +469,8 @@
 
                         {{-- Clôture caisse --}}
                         @if (
-                            ($venteAucunReglement == 0 && $totalVentesCaisse > 0 && $offertsEnAttente==0) ||
-                                ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0 && $offertsEnAttente==0) )
+                            ($venteAucunReglement == 0 && $totalVentesCaisse > 0 && $offertsEnAttente == 0) ||
+                                ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0 && $offertsEnAttente == 0))
                             <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
                                 👍 Clôturer la caisse <i class="ri ri-bill"></i>
                             </a>
@@ -644,8 +645,8 @@
                                                 href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a>
                                         @endif --}}
 
-                                         <a class="fw-bold"
-                                                href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a>
+                                        <a class="fw-bold"
+                                            href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a>
 
                                     </td>
 
@@ -747,65 +748,70 @@
     <script>
         $(document).ready(function() {
 
-            function checkNotifications() {
-                $.ajax({
-                    url: "{{ route('notifications.check') }}",
-                    method: "GET",
-                    success: function(notifications) {
-                        if (notifications.length > 0) {
-                            notifications.forEach(function(notification) {
-                                // Swal.fire({
-                                //     icon: 'info',
-                                //     title: 'Nouvelle notification',
-                                //     text: notification.message,
-                                //     timer: 20000
-                                // }); 
+            // function checkNotifications() {
+            //     $.ajax({
+            //         url: "{{ route('notifications.check') }}",
+            //         method: "GET",
+            //         success: function(notifications) {
+            //             if (notifications.length > 0) {
+            //                 notifications.forEach(function(notification) {
+            //                     // Swal.fire({
+            //                     //     icon: 'info',
+            //                     //     title: 'Nouvelle notification',
+            //                     //     text: notification.message,
+            //                     //     timer: 20000
+            //                     // }); 
 
 
-                                Swal.fire({
-                                    icon: 'info',
-                                    title: 'Nouvelle notification',
-                                    html: notification.message,
-                                    showCancelButton: true,
-                                    cancelButtonText: 'Fermer',
-                                    confirmButtonText: '<a href="/admin/vente/show/' +
-                                        notification.vente_id +
-                                        '" style="color:white;text-decoration:none;">Voir la vente</a>'
-                                });
+            //                     Swal.fire({
+            //                         icon: 'info',
+            //                         title: 'Nouvelle notification',
+            //                         html: notification.message,
+            //                         showCancelButton: true,
+            //                         cancelButtonText: 'Fermer',
+            //                         confirmButtonText: '<a href="/admin/vente/show/' +
+            //                             notification.vente_id +
+            //                             '" style="color:white;text-decoration:none;">Voir la vente</a>'
+            //                     });
 
 
-                                // Marquer la notification comme lue
-                                $.ajax({
-                                    url: "{{ route('notifications.markAsRead') }}",
-                                    method: "POST",
-                                    data: {
-                                        _token: '{{ csrf_token() }}',
-                                        id: notification.id
-                                    },
-                                    success: function(response) {
-                                        console.log("Notification " + notification
-                                            .id + " marquée comme lue.");
-                                    },
-                                    error: function(xhr) {
-                                        console.error(
-                                            "Erreur lors de la lecture de la notification."
-                                        );
-                                    }
-                                });
-                            });
-
-                            console.log("Vous avez " + notifications.length +
-                                " nouvelles notifications.");
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error("Erreur lors de la récupération des notifications.");
-                    }
-                });
-            }
+            //                     // 🔊 Joue le son
+            //                     const alertSound = new Audio("/sounds/sound1.mp3");
+            //                     alertSound.play();
 
 
-            setInterval(checkNotifications, 5000); // Toutes les 5 secondes
+            //                     // Marquer la notification comme lue
+            //                     $.ajax({
+            //                         url: "{{ route('notifications.markAsRead') }}",
+            //                         method: "POST",
+            //                         data: {
+            //                             _token: '{{ csrf_token() }}',
+            //                             id: notification.id
+            //                         },
+            //                         success: function(response) {
+            //                             console.log("Notification " + notification
+            //                                 .id + " marquée comme lue.");
+            //                         },
+            //                         error: function(xhr) {
+            //                             console.error(
+            //                                 "Erreur lors de la lecture de la notification."
+            //                             );
+            //                         }
+            //                     });
+            //                 });
+
+
+
+            //             }
+            //         },
+            //         error: function(xhr) {
+            //             console.error("Erreur lors de la récupération des notifications.");
+            //         }
+            //     });
+            // }
+
+
+            // setInterval(checkNotifications, 5000); // Toutes les 5 secondes
 
 
             // Message d'erreur si une vente a des offerts en attente
