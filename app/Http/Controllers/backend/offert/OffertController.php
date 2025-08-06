@@ -124,14 +124,14 @@ class OffertController extends Controller
             OffertNotification::create([
                 'offert_id' => $offert->id,
                 'vente_id' => $vente->id,
-                'message' => $approuved == 1 ? 'L\'offert a été approuvé.' : 'L\'offert a été rejeté.',
+                'message' => $approuved == 1 ? 'L\'offert du produit ' . $offert->produit->nom .  'de la vente ' . $vente->code . ' a été approuvé.' : 'L\'offert du produit ' . $offert->produit->nom .  'de la vente ' . $vente->code . ' a été rejeté.',
                 'is_read' => false,
             ]);
 
             if (isset($approuved) && $approuved == 1) {
-                return redirect()->back()->with('success', 'L\'offert a été approuvé avec succès.');
+                return redirect()->back()->with('success', 'L\'offert du produit' . $offert->produit->nom .  'de la vente ' . $vente->code . ' a été approuvé avec succès.');
             } else {
-                return redirect()->back()->with('success', 'L\'offert a été rejeté avec succès.');
+                return redirect()->back()->with('success', 'L\'offert du produit ' . $offert->produit->nom .  'de la vente ' . $vente->code . ' a été rejeté avec succès.');
             }
         } catch (\Throwable $e) {
             # code...

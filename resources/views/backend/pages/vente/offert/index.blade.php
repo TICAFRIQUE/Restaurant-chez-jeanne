@@ -124,7 +124,7 @@
 
 
 
-        @php
+        {{-- @php
             $selectedPeriode = request('periode');
             $selectedDateDebut = request('date_debut');
             $selectedDateFin = request('date_fin');
@@ -136,7 +136,7 @@
         <form action="{{ route('vente.index') }}" method="GET">
             <div class="row mb-3 d-flex justify-content-center">
 
-                {{-- Filtres réservés aux rôles autres que caisse/supercaisse --}}
+               <!-- Filtre pour les utilisateurs non caisse -->
                 @unless (auth()->user()->hasRole(['caisse', 'supercaisse']))
                     <div class="col-md-4">
                         <label for="periode" class="form-label">Période</label>
@@ -173,21 +173,10 @@
                         </select>
                     </div>
 
-                    {{-- Filtres visibles pour tous --}}
-                    {{-- <div class="col-md-4">
-                        <label for="client" class="form-label">Clients</label>
-                        <select class="form-select" id="client" name="client">
-                            <option value="">Tous les clients</option>
-                            @foreach ($clients as $client)
-                                <option value="{{ $client->id }}" {{ $selectedClient == $client->id ? 'selected' : '' }}>
-                                    {{ $client->first_name }} {{ $client->last_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div> --}}
+                   
 
 
-                    {{-- Boutons d'action --}}
+                    
                     <div class="col-md-2 d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary w-100">Filtrer</button>
                         <a href="{{ route('vente.index') }}" class="btn btn-outline-secondary w-100">Réinitialiser</a>
@@ -195,7 +184,7 @@
                 @endunless
 
             </div>
-        </form>
+        </form> --}}
 
         <!-- ========== End filtre ========== -->
 
@@ -204,7 +193,7 @@
 
         <div class="card">
             <!-- ========== Start filter result libellé ========== -->
-            <div class="card-header d-flex justify-content-between">
+            {{-- <div class="card-header d-flex justify-content-between">
 
 
                 @php
@@ -220,14 +209,7 @@
 
                 <h5 class="card-title mb-0" style="text-align: center;">
                     Liste des offerts
-                    @if (request()->filled('statut_paiement') ||
-                            request()->filled('periode') ||
-                            request()->filled('date_debut') ||
-                            request()->filled('date_fin') ||
-                            request()->filled('caisse') ||
-                            request()->filled('client') ||
-                            request()->filled('statut_vente') ||
-                            request()->filled('statut_reglement'))
+                    @if (request()->filled('statut_paiement') || request()->filled('periode') || request()->filled('date_debut') || request()->filled('date_fin') || request()->filled('caisse') || request()->filled('client') || request()->filled('statut_vente') || request()->filled('statut_reglement'))
                         @if (request()->filled('statut_paiement'))
                             - {{ request('statut_paiement') == 'paye' ? 'Payées' : 'Impayées' }}
                         @endif
@@ -281,7 +263,7 @@
                 </h5>
 
 
-            </div>
+            </div> --}}
             <!-- ========== End filter result libellé ========== -->
 
             <div class="card-body tableVente">
@@ -386,9 +368,6 @@
     </div>
     </div>
     <!--end row-->
-
-
-
 @endsection
 @section('script')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -457,16 +436,19 @@
                         // Ajouter les nouveaux offerts au tableau uniquement s'ils ne sont pas déjà dans le DOM
                         newItems.forEach(item => {
                             if (!document.getElementById('row_' + item.id)) {
-                                let approveUrlTemplate =
-                                    "{{ route('offert.approuvedOffert', ['offert' => ':offert', 'approuved' => ':approuved']) }}";
+                                // Génère l'URL de base via Laravel (sans paramètres)
+                                const baseApproveUrl = "{{ route('offert.approuvedOffert') }}";
 
-                                let approveUrl = approveUrlTemplate
-                                    .replace(':offert', item.id)
-                                    .replace(':approuved', 1); // ou 0 si c'est rejeté
+                              
+                                const approveUrl =
+                                    `${baseApproveUrl}?offert=${item.id}&approuved=1`;
+                                const rejectUrl =
+                                    `${baseApproveUrl}?offert=${item.id}&approuved=0`;
 
-                                let rejectUrl = approveUrlTemplate
-                                    .replace(':offert', item.id)
-                                    .replace(':approuved', 0);
+                                console.log("Lien approbation :", approveUrl);
+                                console.log("Lien rejet :", rejectUrl);
+                                console.log(approveUrl, rejectUrl);
+
 
                                 $('#buttons-datatables tbody').prepend(`
                                         <tr id="row_${item.id}">
@@ -479,6 +461,7 @@
                                                         : '<span class="badge bg-danger">Rejeté</span>'
                                                 }
                                             </td>
+                                            <td>${item.vente.code}</td>
                                             <td>
                                                 ${item.produit.nom} * ${item.quantite} ${item.variante.libelle} de ${item.prix}
                                             </td>
@@ -502,19 +485,19 @@
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end">
                                                         ${item.offert_statut === null ? `
-                                                                            <li>
-                                                                                <a href="${approveUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
-                                                                                    <i class="ri-check-line align-bottom me-2 text-muted"></i>
-                                                                                    Approuver
-                                                                                </a>
-                                                                            </li>
-                                                                            <li>
-                                                                                <a href="${rejectUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
-                                                                                    <i class="ri-close-line align-bottom me-2 text-muted"></i>
-                                                                                    Rejeter
-                                                                                </a>
-                                                                            </li>
-                                                                        ` : ''}
+                                                                                    <li>
+                                                                                        <a href="${approveUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
+                                                                                            <i class="ri-check-line align-bottom me-2 text-muted"></i>
+                                                                                            Approuver
+                                                                                        </a>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <a href="${rejectUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
+                                                                                            <i class="ri-close-line align-bottom me-2 text-muted"></i>
+                                                                                            Rejeter
+                                                                                        </a>
+                                                                                    </li>
+                                                                                ` : ''}
                                                     </ul>
                                                 </div>
                                             </td>

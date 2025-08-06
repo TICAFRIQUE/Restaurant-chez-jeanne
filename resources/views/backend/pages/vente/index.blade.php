@@ -634,13 +634,16 @@
                                             class="badge bg-{{ $item['statut'] == 'en attente' ? 'warning' : 'success' }}">{{ $item['statut'] }}</span>
                                     </td> --}}
                                     <td>
-                                        @if ($item['offerts_en_attente'] > 0)
+                                        {{-- @if ($item['offerts_en_attente'] > 0)
                                             <a class="fw-bold btnOffert text-danger"
                                                 href="#">#{{ $item['code'] }}</a>
                                         @else
                                             <a class="fw-bold"
                                                 href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a>
-                                        @endif
+                                        @endif --}}
+
+                                         <a class="fw-bold"
+                                                href="{{ route('vente.show', $item->id) }}">#{{ $item['code'] }}</a>
 
                                     </td>
 
@@ -749,12 +752,25 @@
                     success: function(notifications) {
                         if (notifications.length > 0) {
                             notifications.forEach(function(notification) {
+                                // Swal.fire({
+                                //     icon: 'info',
+                                //     title: 'Nouvelle notification',
+                                //     text: notification.message,
+                                //     timer: 20000
+                                // }); 
+
+
                                 Swal.fire({
                                     icon: 'info',
                                     title: 'Nouvelle notification',
-                                    text: notification.message,
-                                    timer: 20000
+                                    html: notification.message,
+                                    showCancelButton: true,
+                                    cancelButtonText: 'Fermer',
+                                    confirmButtonText: '<a href="/admin/vente/show/' +
+                                        notification.vente_id +
+                                        '" style="color:white;text-decoration:none;">Voir la vente</a>'
                                 });
+
 
                                 // Marquer la notification comme lue
                                 $.ajax({
@@ -771,7 +787,7 @@
                                     error: function(xhr) {
                                         console.error(
                                             "Erreur lors de la lecture de la notification."
-                                            );
+                                        );
                                     }
                                 });
                             });

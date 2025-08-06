@@ -717,8 +717,11 @@ class VenteController extends Controller
                 $sessionDate = Caisse::whereId(Auth::user()->caisse_id)->value('session_date_vente');
             }
 
+            // Vérifier si la vente a des produits offerts en attente
+            $offertsEnAttente = $vente->offerts->whereNull('offert_statut')->count();
 
-            return view('backend.pages.vente.show', compact('vente', 'client', 'sessionDate'));
+
+            return view('backend.pages.vente.show', compact('vente', 'client', 'sessionDate' , 'offertsEnAttente'));
         } catch (Exception $e) {
             return back()->with('error', "La vente demandée n'existe plus." . $e->getMessage());
             // return redirect()->route('vente.index')->with('error', "La vente demandée n'existe plus." , $e->getMessage());

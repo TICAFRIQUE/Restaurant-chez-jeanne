@@ -32,7 +32,7 @@
     <meta name="theme-color" content="#ffffff">
     @include('backend.layouts.head-css')
 
-    @vite('resources/js/app.js')
+    {{-- @vite('resources/js/app.js') --}}
 
 
     {{-- <script type="module">

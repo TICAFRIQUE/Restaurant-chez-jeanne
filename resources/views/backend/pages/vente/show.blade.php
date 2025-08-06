@@ -126,11 +126,14 @@
                     {{-- @if (auth()->user()->hasRole(['caisse', 'supercaisse']) &&
     $sessionDate != null) --}}
                     <div class="d-flex justify-content-end">
-                        <button id="btnImprimerTicket" class="btn btn-info me-2 flot-end"> <i
-                                class="ri-printer-line align-bottom me-1"></i> Imprimer le reçu</button>
+
+                        @if ($offertsEnAttente == 0)
+                            <button id="btnImprimerTicket" class="btn btn-info me-2 flot-end"> <i
+                                    class="ri-printer-line align-bottom me-1"></i> Imprimer le reçu</button>
+                        @endif
 
                         @can('creer-vente')
-                            @if ($vente->statut_paiement != 'paye' && $sessionDate != null)
+                            @if ($vente->statut_paiement != 'paye' && $sessionDate != null && $offertsEnAttente == 0)
                                 <button class="btn btn-success me-2" data-bs-toggle="modal"
                                     data-bs-target="#reglementModal{{ $vente->id }}"> 💷 Règlement</button>
 
@@ -254,180 +257,195 @@
 
 
             <!-- ========== Start facture generée ========== -->
-            <div class="ticket-container"
-                style="font-family: 'Courier New', monospace; font-size: 14px; width: 300px; margin: 0 auto;">
-                <div class="ticket-header" style="text-align: center; margin-bottom: 10px;">
-                    <h3 style="margin: 0;">CHEZ JEANNE</h3>
-                    <h5 style="margin: 0;">RESTAURANT LOUNGE</h5>
-                    <h5 style="margin: 5px 0;">AFRICAIN ET EUROPEEN</h5>
-                    <p style="border-top: 1px dashed black; margin: 5px 0;"></p>
+            @if ($offertsEnAttente == 0)
+                <div class="ticket-container"
+                    style="font-family: 'Courier New', monospace; font-size: 14px; width: 300px; margin: 0 auto;">
+                    <div class="ticket-header" style="text-align: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">CHEZ JEANNE</h3>
+                        <h5 style="margin: 0;">RESTAURANT LOUNGE</h5>
+                        <h5 style="margin: 5px 0;">AFRICAIN ET EUROPEEN</h5>
+                        <p style="border-top: 1px dashed black; margin: 5px 0;"></p>
 
-                    <table class="header" style="font-size: 16px">
-                        <tr style="text-align: left;">
-                            <td>Table <strong>N°: {{ $vente->numero_table ?? '' }}</strong> </td>
-                            <td>Couvert(s) <strong> : {{ $vente->nombre_couverts ?? '' }}</strong> </td>
-                        </tr>
-
-                        <tr style="text-align: left;">
-                            <td>Caissier: <strong> {{ $vente->user->first_name }}</strong>
-                            </td>
-                            <td>Caisse: <strong> {{ $vente->caisse->libelle ?? 'Non définie' }}</strong> </td>
-                        </tr>
-
-                        <tr style="text-align: left;">
-                            <td>Ticket <strong>N°: {{ $vente->code }}</strong> </td>
-
-                            <td>émis: <strong> {{ $vente->created_at->format('d/m/Y à H:i') }}</strong> </td>
-                        </tr>
-
-                    </table>
-
-                </div>
-
-
-
-                <div class="ticket-products">
-                    <table
-                        style="width: 100%; font-size: 16px; border-collapse: collapse; margin-bottom: 10px; font-weight:600;">
-                        <thead style="border-bottom: 1px dashed black;">
-                            <tr>
-                                <th style="text-align: center;">DESIGNATION</th>
-                                <th style="text-align: center;">QTE</th>
-                                <th style="text-align: center;">TOTAL</th>
+                        <table class="header" style="font-size: 16px">
+                            <tr style="text-align: left;">
+                                <td>Table <strong>N°: {{ $vente->numero_table ?? '' }}</strong> </td>
+                                <td>Couvert(s) <strong> : {{ $vente->nombre_couverts ?? '' }}</strong> </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($vente->produits as $produit)
+
+                            <tr style="text-align: left;">
+                                <td>Caissier: <strong> {{ $vente->user->first_name }}</strong>
+                                </td>
+                                <td>Caisse: <strong> {{ $vente->caisse->libelle ?? 'Non définie' }}</strong> </td>
+                            </tr>
+
+                            <tr style="text-align: left;">
+                                <td>Ticket <strong>N°: {{ $vente->code }}</strong> </td>
+
+                                <td>émis: <strong> {{ $vente->created_at->format('d/m/Y à H:i') }}</strong> </td>
+                            </tr>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <div class="ticket-products">
+                        <table
+                            style="width: 100%; font-size: 16px; border-collapse: collapse; margin-bottom: 10px; font-weight:600;">
+                            <thead style="border-bottom: 1px dashed black;">
                                 <tr>
-                                    <td>{{ ucfirst(strtolower($produit->nom)) }}
-                                        x
-                                        @if ($produit->categorie->famille == 'bar' && isset($produit['pivot']['variante_id']))
-                                            @php
-                                                $variante = \App\Models\Variante::find(
-                                                    $produit['pivot']['variante_id'],
-                                                );
-                                            @endphp
-                                            {{ $variante ? Str::substr($variante->libelle, 0, 1) : '' }}
-                                        @endif
-
-                                    </td>
-                                    <td style="text-align: center;">
-                                        {{ $produit->pivot->quantite }}</td>
-                                    <td style="text-align: center;">
-
-                                        {{ number_format($produit->pivot->quantite * $produit->pivot->prix_unitaire, 0, ',', ' ') }}
-                                    </td>
+                                    <th style="text-align: center;">DESIGNATION</th>
+                                    <th style="text-align: center;">QTE</th>
+                                    <th style="text-align: center;">TOTAL</th>
                                 </tr>
-                            @endforeach
+                            </thead>
+                            <tbody>
+                                @foreach ($vente->produits as $produit)
+                                    <tr>
+                                        <td>{{ ucfirst(strtolower($produit->nom)) }}
+                                            x
+                                            @if ($produit->categorie->famille == 'bar' && isset($produit['pivot']['variante_id']))
+                                                @php
+                                                    $variante = \App\Models\Variante::find(
+                                                        $produit['pivot']['variante_id'],
+                                                    );
+                                                @endphp
+                                                {{ $variante ? Str::substr($variante->libelle, 0, 1) : '' }}
+                                                <i style="font-size: 10px">
+                                                    @if ($produit['pivot']['offert'] === 1 && $produit['pivot']['offert_statut'] === 1)
+                                                       (Offert)
+                                                    @endif
+                                                </i>
+                                            @endif
 
-                            @foreach ($vente->plats as $plat)
-                                <tr>
-                                    <td>
-                                        {{ ucfirst(strtolower($plat->nom)) }}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {{ $produit->pivot->quantite }}</td>
+                                        <td style="text-align: center;">
 
-                                        @if (json_decode($plat['pivot']['garniture']))
-                                            <small><br>-
-                                                @foreach (json_decode($plat['pivot']['garniture']) as $garniture)
-                                                    <i>{{ $garniture->nom }} </i>
-                                                @endforeach
-                                            </small>
-                                        @endif
-                                        @if (json_decode($plat['pivot']['complement']))
-                                            <small><br>-
-                                                @foreach (json_decode($plat['pivot']['complement']) as $complement)
-                                                    <i>{{ $complement->nom }} </i>
-                                                @endforeach
-                                            </small>
-                                        @endif
-                                    </td>
-                                    <td style="text-align: center;">
-                                        {{ $plat->pivot->quantite }}</td>
-                                    <td style="text-align: center;">
-                                        {{ number_format($plat->pivot->quantite * $plat->pivot->prix_unitaire, 0, ',', ' ') }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
+                                            {{ number_format($produit->pivot->quantite * $produit->pivot->prix_unitaire, 0, ',', ' ') }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+
+                                @foreach ($vente->plats as $plat)
+                                    <tr>
+                                        <td>
+                                            {{ ucfirst(strtolower($plat->nom)) }}
+
+                                            @if (json_decode($plat['pivot']['garniture']))
+                                                <small><br>-
+                                                    @foreach (json_decode($plat['pivot']['garniture']) as $garniture)
+                                                        <i>{{ $garniture->nom }} </i>
+                                                    @endforeach
+                                                </small>
+                                            @endif
+                                            @if (json_decode($plat['pivot']['complement']))
+                                                <small><br>-
+                                                    @foreach (json_decode($plat['pivot']['complement']) as $complement)
+                                                        <i>{{ $complement->nom }} </i>
+                                                    @endforeach
+                                                </small>
+                                            @endif
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {{ $plat->pivot->quantite }}</td>
+                                        <td style="text-align: center;">
+                                            {{ number_format($plat->pivot->quantite * $plat->pivot->prix_unitaire, 0, ',', ' ') }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                        <p style="border-top: 1px dashed black; margin: 5px 0;"></p>
+                    </div>
+
+                    <table style="width: 100%; font-size: 16px; margin-bottom: 10px; font-weight:bold;">
+                        @if ($vente->valeur_remise > 0)
+                            <tr>
+                                <td><strong>TOTAL FACTURE:</strong></td>
+                                <td style="text-align: right;">
+                                    <strong>{{ number_format($vente->montant_avant_remise, 0, ',', ' ') }} FCFA</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Remise appliquée:</td>
+                                <td style="text-align: right;">
+                                    {{ $vente->valeur_remise }} {{ $vente->type_remise == 'amount' ? 'FCFA' : '%' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>TOTAL A PAYER:</strong></td>
+                                <td style="text-align: right;">
+                                    <strong>{{ number_format($vente->montant_total, 0, ',', ' ') }}
+                                        FCFA</strong>
+                                </td>
+                            </tr>
+                        @else
+                            <tr>
+                                <td><strong>TOTAL A PAYER:</strong></td>
+                                <td style="text-align: right;">
+                                    <strong>{{ number_format($vente->montant_total, 0, ',', ' ') }}
+                                        FCFA</strong>
+                                </td>
+                            </tr>
+                        @endif
                     </table>
 
-                    <p style="border-top: 1px dashed black; margin: 5px 0;"></p>
-                </div>
+                    <hr style="border-top: 1px dashed black; margin: 5px 0;">
 
-                <table style="width: 100%; font-size: 16px; margin-bottom: 10px; font-weight:bold;">
-                    @if ($vente->valeur_remise > 0)
-                        <tr>
-                            <td><strong>TOTAL FACTURE:</strong></td>
-                            <td style="text-align: right;">
-                                <strong>{{ number_format($vente->montant_avant_remise, 0, ',', ' ') }} FCFA</strong>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Remise appliquée:</td>
-                            <td style="text-align: right;">
-                                {{ $vente->valeur_remise }} {{ $vente->type_remise == 'amount' ? 'FCFA' : '%' }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>TOTAL A PAYER:</strong></td>
-                            <td style="text-align: right;"><strong>{{ number_format($vente->montant_total, 0, ',', ' ') }}
-                                    FCFA</strong></td>
-                        </tr>
-                    @else
-                        <tr>
-                            <td><strong>TOTAL A PAYER:</strong></td>
-                            <td style="text-align: right;"><strong>{{ number_format($vente->montant_total, 0, ',', ' ') }}
-                                    FCFA</strong></td>
-                        </tr>
+                    @if ($vente->statut_reglement == 1)
+                        <table style="width: 100%; font-size: 18px; font-weight:bold;">
+                            <tr>
+                                <td><strong>Règlement le :</strong></td>
+                                <td style="text-align: right;">{{ $vente->created_at->format('d/m/Y à H:i') }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Reçu :</strong></td>
+                                <td style="text-align: right;">
+                                    {{ $vente->montant_recu ? number_format($vente->montant_recu, 0, ',', ' ') : '0' }}
+                                    FCFA
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rendu:</strong></td>
+                                <td style="text-align: right;">
+                                    {{ $vente->montant_rendu ? number_format($vente->montant_rendu, 0, ',', ' ') : '0' }}
+                                    FCFA
+                                </td>
+                            </tr>
+                        </table>
                     @endif
-                </table>
-
-                <hr style="border-top: 1px dashed black; margin: 5px 0;">
-
-                @if ($vente->statut_reglement == 1)
-                    <table style="width: 100%; font-size: 18px; font-weight:bold;">
-                        <tr>
-                            <td><strong>Règlement le :</strong></td>
-                            <td style="text-align: right;">{{ $vente->created_at->format('d/m/Y à H:i') }}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Reçu :</strong></td>
-                            <td style="text-align: right;">
-                                {{ $vente->montant_recu ? number_format($vente->montant_recu, 0, ',', ' ') : '0' }} FCFA
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>Rendu:</strong></td>
-                            <td style="text-align: right;">
-                                {{ $vente->montant_rendu ? number_format($vente->montant_rendu, 0, ',', ' ') : '0' }} FCFA
-                            </td>
-                        </tr>
-                    </table>
-                @endif
 
 
-                <hr style="border-top: 1px dashed black; margin: 5px 0;">
+                    <hr style="border-top: 1px dashed black; margin: 5px 0;">
 
 
-                <div class="ticket-footer" style="text-align: center; font-size: 12px; font-weight: bold;">
-                    <span>MERCI DE VOTRE VISITE</span><br>
-                    <span>AU REVOIR ET À BIENTÔT</span><br>
-                    <span>RESERVATIONS: 07-49-88-95-18</span><br>
-                    <span>www.chezjeanne.ci</span>
+                    <div class="ticket-footer" style="text-align: center; font-size: 12px; font-weight: bold;">
+                        <span>MERCI DE VOTRE VISITE</span><br>
+                        <span>AU REVOIR ET À BIENTÔT</span><br>
+                        <span>RESERVATIONS: 07-49-88-95-18</span><br>
+                        <span>www.chezjeanne.ci</span>
+                    </div>
                 </div>
-            </div>
 
 
-            <script>
-                document.getElementById('btnImprimerTicket').addEventListener('click', function() {
-                    var ticketContent = document.querySelector('.ticket-container').innerHTML;
-                    var win = window.open('', '', 'height=700,width=700');
-                    win.document.write('<html><head><title>Ticket de vente</title></head><body>');
-                    win.document.write(ticketContent);
-                    win.document.write('</body></html>');
-                    win.document.close();
-                    win.print();
-                });
-            </script>
+                <script>
+                    document.getElementById('btnImprimerTicket').addEventListener('click', function() {
+                        var ticketContent = document.querySelector('.ticket-container').innerHTML;
+                        var win = window.open('', '', 'height=700,width=700');
+                        win.document.write('<html><head><title>Ticket de vente</title></head><body>');
+                        win.document.write(ticketContent);
+                        win.document.write('</body></html>');
+                        win.document.close();
+                        win.print();
+                    });
+                </script>
+            @endif
+
+
             <!-- ========== End facture generé ========== -->
 
 

@@ -378,9 +378,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::get('getOffertNoApprouved', 'getOffertNoApprouved')->name('offert.non_approuves'); // liste des offerts non approuvés  
         route::get('approuvedOffert', 'approuvedOffert')->name('offert.approuvedOffert'); // approuver offert oui ou non 
 
-      //OFFERT NOTIFICATION
-Route::get('/notifications/check',  'checkNotifications')->name('notifications.check');
-Route::post('/notifications/read',  'markAsRead')->name('notifications.markAsRead');
+        //OFFERT NOTIFICATION
+        Route::get('/notifications/check',  'checkNotifications')->name('notifications.check');
+        Route::post('/notifications/read',  'markAsRead')->name('notifications.markAsRead');
     });
 
     // Commande
