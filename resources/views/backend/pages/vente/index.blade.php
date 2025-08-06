@@ -449,6 +449,8 @@
                 </h5>
                 <p class="fw-bold text-center text-dark ">Caisse actuelle :
                     {{ auth()->user()->caisse->libelle ?? 'non définie' }}</p>
+
+                    <p><i class="ri ri-gift-2-fill fs-5"></i> :<span class="text-warning fw-bold"> {{ $offertsEnAttente }} </span></p>
                 <p class="fw-bold">
                     Ventes impayées réglées :<span class="text-danger">
                         {{ number_format($reglementImpayes->sum('montant_reglement'), 0, ',', ' ') }} FCFA</span>
@@ -466,8 +468,8 @@
 
                         {{-- Clôture caisse --}}
                         @if (
-                            ($venteAucunReglement == 0 && $totalVentesCaisse > 0) ||
-                                ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0))
+                            ($venteAucunReglement == 0 && $totalVentesCaisse > 0 && $offertsEnAttente==0) ||
+                                ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0 && $offertsEnAttente==0) )
                             <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
                                 👍 Clôturer la caisse <i class="ri ri-bill"></i>
                             </a>

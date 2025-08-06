@@ -258,10 +258,12 @@
                                     </li>
                                 @endif
 
-                                <li class="nav-item active">
-                                    <a href="{{ route('offert.index') }}"
-                                        class="nav-link {{ Route::is('offert.*') ? 'active' : '' }}">Offerts</a>
-                                </li>
+                                @can('voir-offert')
+                                    <li class="nav-item active">
+                                        <a href="{{ route('offert.index') }}"
+                                            class="nav-link {{ Route::is('offert.*') ? 'active' : '' }}">Offerts</a>
+                                    </li>
+                                @endcan
 
                     </li>
 

@@ -166,18 +166,21 @@ class VenteController extends Controller
 
 
             /**si l'utilisateur a le rôle 'caisse' ou 'supercaisse' on affiche les ventes de la caisse actuelle */
+            $offertsEnAttente = 0; // Initialiser la variable pour les offerts en attente
             if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
                 $query->where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', false)
                     ->whereDate('date_vente', auth()->user()->caisse->session_date_vente); // ✅ Compare seulement la date
 
+                // recuperer les offerts en attente
             }
 
             // retourne les données de vente filtrées
             $data_vente = $query->get();
 
-            // dd($data_vente->toArray());
+
+           
 
 
 
@@ -190,6 +193,8 @@ class VenteController extends Controller
             $venteCaisseCloture = null;
             $venteAucunReglement = null;
             $totalVentesCaisse = null;
+            $offertsEnAttente = 0;
+
             $reglementImpayes = collect(); // Initialiser une collection vide pour les règlements impayés
             if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
 
@@ -238,7 +243,20 @@ class VenteController extends Controller
                     ->get();
 
 
-                // dd($reglementImpayes->toArray());
+                    
+                // recuperer les offerts en attente
+                $offertsEnAttente = Vente::where('caisse_id', auth()->user()->caisse_id)
+                    ->where('user_id', auth()->user()->id)
+                    ->where('statut_cloture', false)
+                    ->whereDate('date_vente', $sessionDate) // ✅ Compare seulement la date
+                    ->whereHas('offerts', function ($query) {
+                        $query->whereNull('offert_statut');
+                    })->count();
+              
+                   
+
+
+                // dd($offertsEnAttente);
             }
 
 
@@ -246,7 +264,7 @@ class VenteController extends Controller
 
 
 
-            return view('backend.pages.vente.index', compact('reglementImpayes', 'data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients'));
+            return view('backend.pages.vente.index', compact('reglementImpayes', 'data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients', 'offertsEnAttente'));
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes : ' . $e->getMessage());
             return back();
@@ -290,7 +308,6 @@ class VenteController extends Controller
             ]);
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors du chargement de la page.' . $e->getMessage());
-           
         }
     }
 
@@ -721,7 +738,7 @@ class VenteController extends Controller
             $offertsEnAttente = $vente->offerts->whereNull('offert_statut')->count();
 
 
-            return view('backend.pages.vente.show', compact('vente', 'client', 'sessionDate' , 'offertsEnAttente'));
+            return view('backend.pages.vente.show', compact('vente', 'client', 'sessionDate', 'offertsEnAttente'));
         } catch (Exception $e) {
             return back()->with('error', "La vente demandée n'existe plus." . $e->getMessage());
             // return redirect()->route('vente.index')->with('error', "La vente demandée n'existe plus." , $e->getMessage());
