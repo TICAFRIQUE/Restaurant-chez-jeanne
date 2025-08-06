@@ -304,7 +304,7 @@
                                         {{ $item['produit']['nom'] }}
 
                                         * {{ $item['quantite'] }}
-                                        {{ $item['variante']['libelle'] }} de {{ $item['prix'] }} FCFA
+                                        {{ $item['variante']['libelle'] ?? '' }} de {{ $item['prix'] }} FCFA
                                     </td>
 
                                     <td>
