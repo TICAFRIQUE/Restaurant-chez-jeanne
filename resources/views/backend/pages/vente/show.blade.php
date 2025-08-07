@@ -21,6 +21,38 @@
         @endslot
     @endcomponent
 
+    <!-- ========== Start FONCTION PHP ========== -->
+    @php
+        function formatNomCourt($nom)
+        {
+            $mots = preg_split('/\s+/', trim($nom));
+            if (empty($mots) || count($mots) === 0) {
+                return '';
+            }
+
+            $formate = ucfirst(strtolower($mots[0]));
+
+            for ($i = 1; $i < count($mots); $i++) {
+                $mot = $mots[$i];
+                preg_match('/^([^\w]*)(\w)(.*)/u', $mot, $match);
+
+                if ($match) {
+                    $prefix = $match[1] ?? '';
+                    $lettre = strtoupper($match[2] ?? '');
+                    $formate .= ' ' . $prefix . $lettre . '.';
+                } else {
+                    $formate .= ' ' . strtoupper(substr($mot, 0, 1)) . '.';
+                }
+            }
+
+            return $formate;
+        }
+    @endphp
+
+
+    <!-- ========== End FONCTION PHP ========== -->
+
+
     <style>
         @media print {
             .ticket-container {
@@ -308,18 +340,8 @@
                                             {{ $produit->pivot->quantite }}
                                         </td>
                                         <td style="text-align: center;">
-                                            @php
-                                                $mots = explode(' ', $produit->nom);
-                                                $formateNomProduit = ucfirst(strtolower($mots[0]));
-                                                for ($i = 1; $i < count($mots); $i++) {
-                                                    $formateNomProduit .=
-                                                        ' ' . strtoupper(substr($mots[$i], 0, 1)) . '.';
-                                                }
-                                            @endphp
-
-
-                                            {{ $formateNomProduit }}
-
+                                         
+                                                {{ formatNomCourt($produit->nom) }}
                                             @if ($produit->categorie->famille == 'bar' && isset($produit['pivot']['variante_id']))
                                                 @php
                                                     $variante = \App\Models\Variante::find(
@@ -351,16 +373,9 @@
                                             {{ $plat->pivot->quantite }}
                                         </td>
                                         <td>
-                                            @php
-                                                $mots = explode(' ', $plat->nom);
-                                                $formateNomPlat = ucfirst(strtolower($mots[0]));
-                                                for ($i = 1; $i < count($mots); $i++) {
-                                                    $formateNomPlat .= ' ' . strtoupper(substr($mots[$i], 0, 1)) . '.';
-                                                }
-                                            @endphp
-
-
-                                            {{ $formateNomPlat }}
+                                           
+                                                {{ formatNomCourt($plat->nom) }}
+                                          
 
 
                                             @if (json_decode($plat['pivot']['garniture']))
@@ -378,7 +393,7 @@
                                                 </small>
                                             @endif
                                         </td>
-                                        
+
                                         <td style="text-align: center;">
                                             {{ number_format($plat->pivot->quantite * $plat->pivot->prix_unitaire, 0, ',', ' ') }}
                                         </td>
