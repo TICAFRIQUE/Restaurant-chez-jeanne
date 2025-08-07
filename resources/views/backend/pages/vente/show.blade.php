@@ -296,44 +296,72 @@
                             style="width: 100%; font-size: 16px; border-collapse: collapse; margin-bottom: 10px; font-weight:600;">
                             <thead style="border-bottom: 1px dashed black;">
                                 <tr>
-                                    <th style="text-align: center;">DESIGNATION</th>
                                     <th style="text-align: center;">QTE</th>
+                                    <th style="text-align: center;">DESIGNATION</th>
                                     <th style="text-align: center;">TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($vente->produits as $produit)
                                     <tr>
-                                        <td>{{ ucfirst(strtolower($produit->nom)) }}
-                                            x
+                                        <td style="text-align: center;">
+                                            {{ $produit->pivot->quantite }}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            @php
+                                                $mots = explode(' ', $produit->nom);
+                                                $formateNomProduit = ucfirst(strtolower($mots[0]));
+                                                for ($i = 1; $i < count($mots); $i++) {
+                                                    $formateNomProduit .=
+                                                        ' ' . strtoupper(substr($mots[$i], 0, 1)) . '.';
+                                                }
+                                            @endphp
+
+
+                                            {{ $formateNomProduit }}
+
                                             @if ($produit->categorie->famille == 'bar' && isset($produit['pivot']['variante_id']))
                                                 @php
                                                     $variante = \App\Models\Variante::find(
                                                         $produit['pivot']['variante_id'],
                                                     );
                                                 @endphp
-                                                {{ $variante ? Str::substr($variante->libelle, 0, 1) : '' }}
-                                                <i style="font-size: 10px">
-                                                    @if ($produit['pivot']['offert'] === 1 && $produit['pivot']['offert_statut'] === 1)
-                                                       (Offert)
-                                                    @endif
-                                                </i>
+                                                x {{ $variante ? Str::substr($variante->libelle, 0, 1) : '' }}
                                             @endif
 
                                         </td>
-                                        <td style="text-align: center;">
-                                            {{ $produit->pivot->quantite }}</td>
+
+
                                         <td style="text-align: center;">
 
-                                            {{ number_format($produit->pivot->quantite * $produit->pivot->prix_unitaire, 0, ',', ' ') }}
+                                            @if ($produit['pivot']['offert'] === 1 && $produit['pivot']['offert_statut'] === 1)
+                                                Offert
+                                            @else
+                                                {{ number_format($produit->pivot->quantite * $produit->pivot->prix_unitaire, 0, ',', ' ') }}
+                                            @endif
+
+
                                         </td>
                                     </tr>
                                 @endforeach
 
                                 @foreach ($vente->plats as $plat)
                                     <tr>
+                                        <td style="text-align: center;">
+                                            {{ $plat->pivot->quantite }}
+                                        </td>
                                         <td>
-                                            {{ ucfirst(strtolower($plat->nom)) }}
+                                            @php
+                                                $mots = explode(' ', $plat->nom);
+                                                $formateNomPlat = ucfirst(strtolower($mots[0]));
+                                                for ($i = 1; $i < count($mots); $i++) {
+                                                    $formateNomPlat .= ' ' . strtoupper(substr($mots[$i], 0, 1)) . '.';
+                                                }
+                                            @endphp
+
+
+                                            {{ $formateNomPlat }}
+
 
                                             @if (json_decode($plat['pivot']['garniture']))
                                                 <small><br>-
@@ -350,8 +378,7 @@
                                                 </small>
                                             @endif
                                         </td>
-                                        <td style="text-align: center;">
-                                            {{ $plat->pivot->quantite }}</td>
+                                        
                                         <td style="text-align: center;">
                                             {{ number_format($plat->pivot->quantite * $plat->pivot->prix_unitaire, 0, ',', ' ') }}
                                         </td>
