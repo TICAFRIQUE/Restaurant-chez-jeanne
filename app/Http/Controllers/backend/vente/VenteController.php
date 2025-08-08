@@ -180,7 +180,7 @@ class VenteController extends Controller
             $data_vente = $query->get();
 
 
-           
+
 
 
 
@@ -243,7 +243,7 @@ class VenteController extends Controller
                     ->get();
 
 
-                    
+
                 // recuperer les offerts en attente
                 $offertsEnAttente = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
@@ -252,8 +252,8 @@ class VenteController extends Controller
                     ->whereHas('offerts', function ($query) {
                         $query->whereNull('offert_statut');
                     })->count();
-              
-                   
+
+
 
 
                 // dd($offertsEnAttente);
@@ -368,6 +368,7 @@ class VenteController extends Controller
     {
         try {
 
+           
             // appeler la fonction calculeQteVarianteProduit
             $this->calculeQteVarianteProduit(); // calcule la quantité de chaque produit variantes
 
@@ -553,7 +554,7 @@ class VenteController extends Controller
             // GENERER LE CODE DE LA VENTE
             // Obtenir les deux premières lettres du nom de la caissière
             $initialesCaissiere = substr(auth()->user()->first_name, 0, 2);
-            $initialesCaisse = substr(auth()->user()->caisse->libelle, 0, 2);
+            $initialesCaisse = substr(auth()->user()->caisse->libelle, 0, 2); //
 
             // Obtenir le numéro d'ordre de la vente pour aujourd'hui
             $nombreVentes = Vente::count();
@@ -562,8 +563,11 @@ class VenteController extends Controller
             // Obtenir la date et l'heure actuelles
             $dateHeure = now()->format('dmYHi');
 
+            
+
             // Générer le code de vente
-            $codeVente = strtoupper($initialesCaissiere) . '-' . strtoupper($initialesCaisse) . $numeroOrdre . $dateHeure;
+            // $codeVente = strtoupper($initialesCaissiere) . '-' . strtoupper($initialesCaisse) . $numeroOrdre . $dateHeure;
+            $codeVente =  $numeroOrdre . $dateHeure;
 
             //session de la date manuelle
             $sessionDate = Caisse::find(Auth::user()->caisse_id);

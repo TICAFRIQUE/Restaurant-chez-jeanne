@@ -299,16 +299,16 @@
                         <h5 style="margin: 5px 0;">AFRICAIN ET EUROPEEN</h5>
                         <p style="border-top: 1px dashed black; margin: 5px 0;"></p>
 
-                        <table class="header" style="font-size: 16px">
+                        <table class="header" style="font-size: 14px ;">
                             <tr style="text-align: left;">
                                 <td>Table <strong>N°: {{ $vente->numero_table ?? '' }}</strong> </td>
-                                <td>Couvert(s) <strong> : {{ $vente->nombre_couverts ?? '' }}</strong> </td>
+                                <td>Couvert(s) <strong>: {{ $vente->nombre_couverts ?? '' }}</strong> </td>
                             </tr>
 
                             <tr style="text-align: left;">
                                 <td>Caissier: <strong> {{ $vente->user->first_name }}</strong>
                                 </td>
-                                <td>Caisse: <strong> {{ $vente->caisse->libelle ?? 'Non définie' }}</strong> </td>
+                                <td>Cais: <strong> {{ $vente->caisse->libelle ?? 'Non définie' }}</strong> </td>
                             </tr>
 
                             <tr style="text-align: left;">
@@ -340,8 +340,8 @@
                                             {{ $produit->pivot->quantite }}
                                         </td>
                                         <td style="text-align: center;">
-                                         
-                                                {{ formatNomCourt($produit->nom) }}
+
+                                            {{ formatNomCourt($produit->nom) }}
                                             @if ($produit->categorie->famille == 'bar' && isset($produit['pivot']['variante_id']))
                                                 @php
                                                     $variante = \App\Models\Variante::find(
@@ -373,10 +373,8 @@
                                             {{ $plat->pivot->quantite }}
                                         </td>
                                         <td>
-                                           
-                                                {{ formatNomCourt($plat->nom) }}
-                                          
 
+                                            {{ formatNomCourt($plat->nom) }}
 
                                             @if (json_decode($plat['pivot']['garniture']))
                                                 <small><br>-
@@ -440,9 +438,9 @@
                     <hr style="border-top: 1px dashed black; margin: 5px 0;">
 
                     @if ($vente->statut_reglement == 1)
-                        <table style="width: 100%; font-size: 18px; font-weight:bold;">
+                        <table style="width: 100%; font-size: 16px; font-weight:bold;">
                             <tr>
-                                <td><strong>Règlement le :</strong></td>
+                                <td><strong>Règlement:</strong></td>
                                 <td style="text-align: right;">{{ $vente->created_at->format('d/m/Y à H:i') }}</td>
                             </tr>
                             <tr>

@@ -124,13 +124,15 @@
 
 
 
-        {{-- @php
-            $selectedPeriode = request('periode');
+        @php
+            // $selectedPeriode = request('periode');
             $selectedDateDebut = request('date_debut');
             $selectedDateFin = request('date_fin');
-            $selectedCaisse = request('caisse');
-            $selectedClient = request('client');
-            $selectedStatut = request('statut_paiement');
+            // $selectedCaisse = request('caisse');
+            $selectedVente = request('vente');
+            $selectedStatut = request('statut');
+
+
         @endphp
 
         <form action="{{ route('vente.index') }}" method="GET">
@@ -138,7 +140,7 @@
 
                <!-- Filtre pour les utilisateurs non caisse -->
                 @unless (auth()->user()->hasRole(['caisse', 'supercaisse']))
-                    <div class="col-md-4">
+                    {{-- <div class="col-md-4">
                         <label for="periode" class="form-label">Période</label>
                         <select class="form-select" id="periode" name="periode">
                             <option value="">Toutes les périodes</option>
@@ -147,21 +149,27 @@
                                     {{ $label }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="date_debut" class="form-label">Date de début</label>
                         <input type="date" id="date_debut" name="date_debut" class="form-control"
                             value="{{ $selectedDateDebut }}">
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="date_fin" class="form-label">Date de fin</label>
                         <input type="date" id="date_fin" name="date_fin" class="form-control"
                             value="{{ $selectedDateFin }}">
                     </div>
 
-                    <div class="col-md-4">
+                     <div class="col-md-3">
+                        <label for="date_fin" class="form-label">Code vente</label>
+                        <input type="text"  name="vente" class="form-control"
+                            value="{{ $selectedVente }}">
+                    </div>
+
+                    {{-- <div class="col-md-4">
                         <label for="caisse" class="form-label">Caisse</label>
                         <select class="form-select" id="caisse" name="caisse">
                             <option value="">Toutes les caisses</option>
@@ -171,7 +179,7 @@
                                 </option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
 
                    
 
@@ -184,7 +192,7 @@
                 @endunless
 
             </div>
-        </form> --}}
+        </form>
 
         <!-- ========== End filtre ========== -->
 
@@ -193,7 +201,7 @@
 
         <div class="card">
             <!-- ========== Start filter result libellé ========== -->
-            {{-- <div class="card-header d-flex justify-content-between">
+            <div class="card-header d-flex justify-content-between">
 
 
                 @php
@@ -263,7 +271,7 @@
                 </h5>
 
 
-            </div> --}}
+            </div>
             <!-- ========== End filter result libellé ========== -->
 
             <div class="card-body tableVente">
@@ -356,7 +364,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center m-auto">Aucune vente trouvée dans cette session
+                                    <td colspan="6" class="text-center m-auto">Aucun offert trouvé dans cette session
                                     </td>
                                 </tr>
                             @endforelse
