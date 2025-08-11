@@ -13,9 +13,15 @@ use App\Http\Controllers\Controller;
 class OffertController extends Controller
 {
     //index
-    public function index()
+    public function index(Request $request)
     {
         try {
+
+            $dateDebut = $request->input('date_debut');
+            $dateFin = $request->input('date_fin');
+            $selectedStatut = $request->input('statut'); // Récupérer le statut sélectionné
+            // dd($selectedStatut);
+
             $data_offerts = Offert::with([
                 'vente',
                 'produit',
@@ -25,7 +31,30 @@ class OffertController extends Controller
                     $query->where('offert', true);
                 }
 
-            ])->get();
+            ])
+                ->when($dateDebut && $dateFin, function ($query) use ($dateDebut, $dateFin) {
+                    $query->whereBetween('created_at', [$dateDebut, $dateFin]);
+                })
+                ->when($selectedStatut, function ($query) use ($selectedStatut) {
+                    if ($selectedStatut === 'null') {
+                        // Si le statut est 'null', on filtre les offres en attente
+                        $query->whereNull('offert_statut');
+                    } elseif ($selectedStatut === '1') {
+                        // Si le statut est '1', on filtre les offres approuvées
+                        $query->where('offert_statut', 1);
+                    } elseif ($selectedStatut === '0') {
+                        // Si le statut est '0', on filtre les offres rejetées
+                        $query->where('offert_statut', 0);
+                    }
+                })
+                ->when($dateDebut, function ($query) use ($dateDebut) {
+                    $query->where('date_created', $dateDebut);
+                })
+                ->when($dateFin, function ($query) use ($dateFin) {
+                    $query->where('date_created', $dateFin);
+                })
+                ->orderBy('created_at', 'desc')
+                ->get();
 
 
             // recuperer la liste des caisses

@@ -132,13 +132,12 @@
             $selectedVente = request('vente');
             $selectedStatut = request('statut');
 
-
         @endphp
 
-        <form action="{{ route('vente.index') }}" method="GET">
+        <form action="{{ route('offert.index') }}" method="GET">
             <div class="row mb-3 d-flex justify-content-center">
 
-               <!-- Filtre pour les utilisateurs non caisse -->
+                <!-- Filtre pour les utilisateurs non caisse -->
                 @unless (auth()->user()->hasRole(['caisse', 'supercaisse']))
                     {{-- <div class="col-md-4">
                         <label for="periode" class="form-label">Période</label>
@@ -163,10 +162,16 @@
                             value="{{ $selectedDateFin }}">
                     </div>
 
-                     <div class="col-md-3">
-                        <label for="date_fin" class="form-label">Code vente</label>
-                        <input type="text"  name="vente" class="form-control"
-                            value="{{ $selectedVente }}">
+                    <div class="col-md-3">
+                        <label for="statut" class="form-label">Statut</label>
+                        <select name="statut" class="form-select">
+                            <option value="">Tous les statuts</option>
+                            <option value="null" {{ $selectedStatut === 'null' ? 'selected' : '' }}>En attente</option>
+                            <option value="1" {{ $selectedStatut === '1' ? 'selected' : '' }}>Approuvé</option>
+                            <option value="0" {{ $selectedStatut === '0' ? 'selected' : '' }}>Rejeté</option>
+                        </select>
+
+
                     </div>
 
                     {{-- <div class="col-md-4">
@@ -181,10 +186,10 @@
                         </select>
                     </div> --}}
 
-                   
 
 
-                    
+
+
                     <div class="col-md-2 d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary w-100">Filtrer</button>
                         <a href="{{ route('vente.index') }}" class="btn btn-outline-secondary w-100">Réinitialiser</a>
@@ -212,41 +217,25 @@
                     $caisseLabel = request('caisse')
                         ? optional(App\Models\Caisse::find(request('caisse')))->libelle
                         : null;
-                    $client = request('client') ? optional(App\Models\User::find(request('client')))->first_name : null;
                 @endphp
 
                 <h5 class="card-title mb-0" style="text-align: center;">
                     Liste des offerts
-                    @if (request()->filled('statut_paiement') || request()->filled('periode') || request()->filled('date_debut') || request()->filled('date_fin') || request()->filled('caisse') || request()->filled('client') || request()->filled('statut_vente') || request()->filled('statut_reglement'))
-                        @if (request()->filled('statut_paiement'))
-                            - {{ request('statut_paiement') == 'paye' ? 'Payées' : 'Impayées' }}
-                        @endif
+                    @if (request()->filled('statut') ||
+                            request()->filled('periode') ||
+                            request()->filled('date_debut') ||
+                            request()->filled('date_fin') ||
+                            request()->filled('caisse') ||
+                            request()->filled('client') ||
+                            request()->filled('statut_vente') ||
+                            request()->filled('statut_reglement'))
 
-                        @if (request()->filled('statut_vente'))
-                            - {{ request('statut_vente') }}
-                        @endif
 
-                        @if (request()->filled('statut_reglement'))
-                            - {{ request('statut_reglement') == 0 ? 'Non réglée' : 'Réglée' }}
-                        @endif
-
-                        @if (request()->filled('periode'))
+                        @if (request()->filled('statut'))
                             -
-                            @if (request('periode') === 'mois')
-                                du mois en cours - {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}
-                            @elseif (request('periode') === 'jour')
-                                du jour - {{ \Carbon\Carbon::now()->translatedFormat('d/m/Y') }}
-                            @elseif (request('periode') === 'semaine')
-                                de la semaine en cours -
-                                {{ \Carbon\Carbon::now()->startOfWeek()->translatedFormat('d/m/Y') }} au
-                                {{ \Carbon\Carbon::now()->endOfWeek()->translatedFormat('d/m/Y') }}
-                            @elseif (request('periode') === 'annee')
-                                de l'année en cours - {{ \Carbon\Carbon::now()->translatedFormat('Y') }}
-                            @else
-                                - {{ request('periode') }}
-                            @endif
+                            {{ request('statut') == null ? 'En attente' : (request('statut') == 1 ? 'Approuvé' : 'Rejeté') }}
+                            -
                         @endif
-
 
                         @if ($dateDebut || $dateFin)
                             - du
@@ -256,14 +245,6 @@
                             @if ($dateFin)
                                 au {{ $dateFin }}
                             @endif
-                        @endif
-
-                        @if ($caisseLabel)
-                            - {{ ucfirst($caisseLabel) }}
-                        @endif
-
-                        @if ($client)
-                            de {{ ucfirst($client) }}
                         @endif
                     @else
                         de toutes les periodes
@@ -447,13 +428,13 @@
                                 // Génère l'URL de base via Laravel (sans paramètres)
                                 const baseApproveUrl = "{{ route('offert.approuvedOffert') }}";
 
-                              
+
                                 const approveUrl =
                                     `${baseApproveUrl}?offert=${item.id}&approuved=1`;
                                 const rejectUrl =
                                     `${baseApproveUrl}?offert=${item.id}&approuved=0`;
 
-                           
+
 
 
                                 $('#buttons-datatables tbody').prepend(`
@@ -491,19 +472,19 @@
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end">
                                                         ${item.offert_statut === null ? `
-                                                                                    <li>
-                                                                                        <a href="${approveUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
-                                                                                            <i class="ri-check-line align-bottom me-2 text-muted"></i>
-                                                                                            Approuver
-                                                                                        </a>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <a href="${rejectUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
-                                                                                            <i class="ri-close-line align-bottom me-2 text-muted"></i>
-                                                                                            Rejeter
-                                                                                        </a>
-                                                                                    </li>
-                                                                                ` : ''}
+                                                                                        <li>
+                                                                                            <a href="${approveUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
+                                                                                                <i class="ri-check-line align-bottom me-2 text-muted"></i>
+                                                                                                Approuver
+                                                                                            </a>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <a href="${rejectUrl}" class="dropdown-item remove-item-btn" data-id="${item.id}">
+                                                                                                <i class="ri-close-line align-bottom me-2 text-muted"></i>
+                                                                                                Rejeter
+                                                                                            </a>
+                                                                                        </li>
+                                                                                    ` : ''}
                                                     </ul>
                                                 </div>
                                             </td>
