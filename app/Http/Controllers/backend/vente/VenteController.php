@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Http\Controllers\backend\user\AdminController;
+use App\Models\OffertNotification;
 
 class VenteController extends Controller
 {
@@ -368,7 +369,7 @@ class VenteController extends Controller
     {
         try {
 
-           
+
             // appeler la fonction calculeQteVarianteProduit
             $this->calculeQteVarianteProduit(); // calcule la quantité de chaque produit variantes
 
@@ -563,7 +564,7 @@ class VenteController extends Controller
             // Obtenir la date et l'heure actuelles
             $dateHeure = now()->format('dmYHi');
 
-            
+
 
             // Générer le code de vente
             // $codeVente = strtoupper($initialesCaissiere) . '-' . strtoupper($initialesCaisse) . $numeroOrdre . $dateHeure;
@@ -740,6 +741,12 @@ class VenteController extends Controller
 
             // Vérifier si la vente a des produits offerts en attente
             $offertsEnAttente = $vente->offerts->whereNull('offert_statut')->count();
+
+
+            // marquer notification de la vente offert comme vue
+            if ($vente) {
+                OffertNotification::where('vente_id', $vente->id)->update(['is_read' => true]);
+            }
 
 
             return view('backend.pages.vente.show', compact('vente', 'client', 'sessionDate', 'offertsEnAttente'));
@@ -1133,9 +1140,47 @@ class VenteController extends Controller
             })->filter()->values();
 
 
-            $produitsVendus =  $produitsVendus->concat($platsVendus);
 
-            // dd($produitsVendus->toArray());
+            //RECUPERER LES PRODUITS VENDUS MAIS OFFERTS
+            $queryProduitsOfferts = Vente::with(['offerts.produit'])
+                ->where('caisse_id', auth()->user()->caisse_id) // Récupérer les ventes de la caisse actuelle
+                ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                ->where('user_id', auth()->user()->id) // Récupérer les ventes de l'utilisateur actuel
+                ->withWhereHas('produits', function ($query) {
+                    $query->where('offert_statut', 1);
+                    $query->where('offert', 1);
+                })
+                ->where('statut_cloture', true)
+                ->get();
+
+
+            // mapper les produits offerts
+            $produitsOfferts = $queryProduitsOfferts->flatMap(function ($vente) {
+                return $vente->produits;
+            })->groupBy('id')->map(function ($groupe) {
+                $produit = $groupe->first();
+
+                return [
+                    'id' => $produit->id,
+                    'code' => $produit->code,
+                    'designation' => $produit->nom,
+                    'categorie' => $produit->categorie->name,
+                    'famille' => 'Offerts',
+                    'quantite_vendue' => $groupe->sum('pivot.quantite'),
+                    'prix_vente' => $groupe->first()->pivot->prix_unitaire,
+                    'montant_total' => $groupe->sum(function ($item) {
+                        return $item->pivot->quantite * $item->pivot->prix_unitaire;
+                    }),
+                ];
+            })->filter()->values();
+
+
+
+
+
+            $produitsVendus =  $produitsVendus->
+                concat($produitsOfferts)->concat($platsVendus);
+
 
 
             /**Recuperer les billetteries */
@@ -1225,7 +1270,10 @@ class VenteController extends Controller
 
 
 
-            return view('backend.pages.vente.rapportVente', compact('reglementImpayes', 'platsVendus', 'produitsVendus', 'caisses', 'categorieFamille', 'famille', 'modes', 'type_mobile_money', 'resultats',));
+            // dd($produitsOfferts->toArray());
+
+
+            return view('backend.pages.vente.rapportVente', compact('reglementImpayes', 'platsVendus', 'produitsVendus', 'caisses', 'categorieFamille', 'famille', 'modes', 'type_mobile_money', 'resultats', 'produitsOfferts'));
         } catch (\Exception $e) {
             return back()->with('error', 'Une erreur s\'est produite : ' . $e->getMessage());
         }

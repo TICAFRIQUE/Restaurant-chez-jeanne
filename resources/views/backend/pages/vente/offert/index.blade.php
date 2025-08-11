@@ -411,16 +411,16 @@
 
                         const newItems = offerts.filter(o => !lastIds.includes(o.id));
 
-                        if (newItems.length > 0) {
-                            Swal.fire({
-                                position: 'center',
-                                icon: 'warning',
-                                title: 'Vous avez ' + newItems.length +
-                                    ' offerts non approuvés',
-                                showConfirmButton: false,
-                                timer: 5000
-                            });
-                        }
+                        // if (newItems.length > 0) {
+                        //     Swal.fire({
+                        //         position: 'center',
+                        //         icon: 'warning',
+                        //         title: 'Vous avez ' + newItems.length +
+                        //             ' offerts non approuvés',
+                        //         showConfirmButton: false,
+                        //         timer: 5000
+                        //     });
+                        // }
 
                         // Ajouter les nouveaux offerts au tableau uniquement s'ils ne sont pas déjà dans le DOM
                         newItems.forEach(item => {

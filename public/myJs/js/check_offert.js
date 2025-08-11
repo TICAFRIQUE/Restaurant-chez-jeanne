@@ -112,7 +112,7 @@ function checkOfferts() {
 
                 alertDiv.innerHTML = `
                     <i class="ri-notification-off-line label-icon"></i>
-                    <strong>Succès : Vous avez ${newItems.length} offerts non approuvés! veuillez les consulter et les approuver pour que la vente soit validée</strong> .
+                    <strong>Notification : Vous avez ${newItems.length} offerts non approuvés! veuillez les consulter et les approuver pour que la vente soit validée</strong> .
                     <a href="${offertIndexUrl}" class="btn btn-sm btn-success ms-2">Voir les offerts</a>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 `;

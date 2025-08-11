@@ -260,7 +260,7 @@
 
                                 @can('voir-offert')
                                     <li class="nav-item active">
-                                        <a href="{{ route('offert.index') }}"
+                                        <a href="{{ route('offert.index' , ['statut' => 'null']) }}"
                                             class="nav-link {{ Route::is('offert.*') ? 'active' : '' }}">Offerts</a>
                                     </li>
                                 @endcan

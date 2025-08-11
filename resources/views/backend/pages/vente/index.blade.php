@@ -21,6 +21,7 @@
     @endcomponent
 
 
+    
     <style>
         /* css pour les cartes */
         .card-custom {

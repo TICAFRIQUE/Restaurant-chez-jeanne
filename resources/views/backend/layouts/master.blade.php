@@ -79,9 +79,6 @@
 
                     <!-- ========== Start afficher la notification lorsque un offert est approuvé pour la caisse ========== -->
 
-                    @if (auth()->user()->hasRole(['caisse', 'supercaisse']))
-                        <div id="alert-ApprouvedOffert" class="mt-3"></div>
-                    @endif
                     <!-- ========== End Section ========== -->
 
 

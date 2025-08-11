@@ -20,7 +20,6 @@
 <script src="{{ URL::asset('myJs/js/delete_row.js') }}"></script>
 
 <script src="{{ URL::asset('myJs/js/check_offert.js') }}"></script>
-<script src="{{ URL::asset('myJs/js/check_offertApprouved.js') }}"></script>
 
 
 {{-- <!-- Pusher JS -->

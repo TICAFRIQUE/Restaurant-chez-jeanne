@@ -21,6 +21,12 @@
     </div>
 </div>
 
+@if (auth()->user()->hasRole(['caisse', 'supercaisse']))
+    <div id="alert-ApprouvedOffert" class="mt-3"></div>
+    <script src="{{ URL::asset('myJs/js/check_offertApprouved.js') }}"></script>
+@endif
+
+
 <!-- Script intégré pour retour + rechargement -->
 <script>
     document.getElementById('goBack').addEventListener('click', function(e) {

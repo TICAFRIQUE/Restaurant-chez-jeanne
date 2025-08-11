@@ -20,7 +20,6 @@ class OffertController extends Controller
             $dateDebut = $request->input('date_debut');
             $dateFin = $request->input('date_fin');
             $selectedStatut = $request->input('statut'); // Récupérer le statut sélectionné
-            // dd($selectedStatut);
 
             $data_offerts = Offert::with([
                 'vente',
@@ -30,20 +29,17 @@ class OffertController extends Controller
                 'vente.produits' => function ($query) {
                     $query->where('offert', true);
                 }
-
             ])
                 ->when($dateDebut && $dateFin, function ($query) use ($dateDebut, $dateFin) {
                     $query->whereBetween('created_at', [$dateDebut, $dateFin]);
                 })
-                ->when($selectedStatut, function ($query) use ($selectedStatut) {
+                // ici on enlève la condition "falsy"
+                ->when($selectedStatut !== null, function ($query) use ($selectedStatut) {
                     if ($selectedStatut === 'null') {
-                        // Si le statut est 'null', on filtre les offres en attente
                         $query->whereNull('offert_statut');
                     } elseif ($selectedStatut === '1') {
-                        // Si le statut est '1', on filtre les offres approuvées
                         $query->where('offert_statut', 1);
                     } elseif ($selectedStatut === '0') {
-                        // Si le statut est '0', on filtre les offres rejetées
                         $query->where('offert_statut', 0);
                     }
                 })
@@ -55,6 +51,7 @@ class OffertController extends Controller
                 })
                 ->orderBy('created_at', 'desc')
                 ->get();
+
 
 
             // recuperer la liste des caisses
@@ -84,8 +81,6 @@ class OffertController extends Controller
                     'vente.caisse',
                     'vente.user',
                     'userApprouved'
-
-
                 ])
                 ->get();
 

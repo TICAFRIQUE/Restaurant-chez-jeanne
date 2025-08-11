@@ -157,6 +157,7 @@
                             'menu' => 1, // Cuisine interne en premier
                             'bar' => 2, // Boissons en deuxième
                             'plat_du_menu' => 3, // Plat du menu
+                            'offerts' => 4, // Produits offerts
 
                             // Ajoute d'autres familles si nécessaire avec des numéros plus grands
 ];
@@ -172,6 +173,8 @@
                         $produitsVendus = $produitsVendus->map(function ($produits, $famille) {
                             return $produits;
                         });
+
+                        // dd($produitsVendus->toArray());
 
                         // montant total globale de toutes les familles
                         $montantTotalVente = $produitsVendus->sum(function ($produits) {
@@ -192,7 +195,7 @@
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Code</th>
+                                        {{-- <th>Code</th> --}}
                                         <th>Designation</th>
                                         <th>Catégorie</th>
                                         @if ($famille == 'bar')
@@ -209,25 +212,9 @@
                                 <tbody>
                                     @forelse ($produits as $produit)
                                         <tr>
-                                            <td>{{ $produit['code'] }}</td>
+                                            {{-- <td>{{ $produit['code'] }}</td> --}}
                                             <td>{{ $produit['designation'] }}</td>
                                             <td>{{ $produit['categorie'] }}</td>
-
-                                            <!-- ========== Start si famille est bar on affiche les details quantité et variante ========== -->
-                                            {{-- @if ($famille == 'bar')
-                                                <td>
-                                                    @foreach ($produit['details'] as $item)
-                                                        {{ $item->pivot->quantite }}
-                                                        {{ \App\Models\Variante::find($item->pivot->variante_id)->libelle ?? '' }}
-                                                        :
-
-                                                        {{ $item->pivot->prix_unitaire }}
-                                                        <br>
-                                                    @endforeach
-                                                </td>
-                                            @else
-                                                <td>{{ $produit['quantite_vendue'] }} </td>
-                                            @endif --}}
 
                                             @if ($famille == 'bar')
                                                 @php
