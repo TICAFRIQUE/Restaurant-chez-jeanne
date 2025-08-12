@@ -233,7 +233,7 @@
 
                         @if (request()->filled('statut'))
                             -
-                            {{ request('statut') == null ? 'En attente' : (request('statut') == 1 ? 'Approuvé' : 'Rejeté') }}
+                            {{ request('statut') === 'null' ? 'En attente' : (request('statut') === '1' ? 'Approuvé' : (request('statut') === '0' ? 'Rejeté' : '')) }}
                             -
                         @endif
 

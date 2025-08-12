@@ -289,7 +289,7 @@
 
                         <div class="row">
                             <!-- Mode 0 : Espèce -->
-                            <div class="col-md-4 mb-4">
+                            <div class="col-md-3 mb-4">
                                 <div class="card shadow-sm border-left-success">
                                     <div class="card-body">
                                         <h5 class="card-title text-success">{{ $modes[0] }}</h5>
@@ -301,7 +301,7 @@
                             </div>
 
                             <!-- Mode 1 : Mobile Money -->
-                            <div class="col-md-4 mb-4">
+                            <div class="col-md-3 mb-4">
                                 <div class="card shadow-sm border-left-info">
                                     <div class="card-body">
                                         <h5 class="card-title text-info">{{ $modes[1] }}</h5>
@@ -320,12 +320,24 @@
                             </div>
 
                             <!-- Mode 2 : Impayé -->
-                            <div class="col-md-4 mb-4">
+                            <div class="col-md-3 mb-4">
                                 <div class="card shadow-sm border-left-danger">
                                     <div class="card-body">
                                         <h5 class="card-title text-danger">{{ $modes[2] }}</h5>
                                         <p class="card-text fs-5 fw-bold">
                                             {{ number_format($resultats['mode_impaye'], 0, ',', ' ') ?? 0 }} FCFA
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!-- Mode 3 : Offert -->
+                            <div class="col-md-3 mb-4">
+                                <div class="card shadow-sm border-left-danger">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success">{{ $modes[3] }}</h5>
+                                        <p class="card-text fs-5 fw-bold">
+                                            {{ number_format($resultats['mode_offert'], 0, ',', ' ') ?? 0 }} FCFA
                                         </p>
                                     </div>
                                 </div>

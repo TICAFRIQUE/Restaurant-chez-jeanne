@@ -1178,8 +1178,9 @@ class VenteController extends Controller
 
 
 
-            $produitsVendus =  $produitsVendus->
-                concat($produitsOfferts)->concat($platsVendus);
+
+
+            $produitsVendus =  $produitsVendus->concat($produitsOfferts)->concat($platsVendus);
 
 
 
@@ -1194,7 +1195,8 @@ class VenteController extends Controller
             $resultats = [
                 'mode_espece' => 0, // Total pour le mode 0 (Espèce)
                 'mode_digital' => [], // Total pour le mode 1 (Mobile money) par type
-                'mode_impaye' => 0, // Total pour le mode 0 (Espèce)
+                'mode_impaye' => 0, // Total pour le mode 0 (impayé)
+                'mode_offert' => 0, // Total des ventes oferts
 
 
             ];
@@ -1221,6 +1223,8 @@ class VenteController extends Controller
 
             // Ajouter le montant impayé au résultat
             $resultats['mode_impaye'] = $montantTotalImpaye;
+            // Ajouter le montant des ventes offerts au résultat
+            $resultats['mode_offert'] = $produitsOfferts->sum('montant_total');
 
 
             // Libellés
@@ -1228,6 +1232,7 @@ class VenteController extends Controller
                 0 => 'Espèce',
                 1 => 'Mobile money',
                 2 => 'Impayées',
+                3 => 'Offerts',
 
             ];
 
