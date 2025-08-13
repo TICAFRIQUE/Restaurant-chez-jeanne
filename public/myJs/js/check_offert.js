@@ -102,7 +102,7 @@ function checkOfferts() {
                 );
 
                 // URL vers offert.index depuis Blade (à adapter si dans .js externe)
-                const offertIndexUrl = "/admin/offert";
+                const offertIndexUrl = "/admin/offert?statut=null";
 
                 // Création de l'alerte personnalisée
                 const alertDiv = document.createElement("div");

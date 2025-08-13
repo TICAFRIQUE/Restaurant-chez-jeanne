@@ -192,7 +192,7 @@
 
                     <div class="col-md-2 d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary w-100">Filtrer</button>
-                        <a href="{{ route('vente.index') }}" class="btn btn-outline-secondary w-100">Réinitialiser</a>
+                        <a href="{{ route('offert.index') }}" class="btn btn-outline-secondary w-100">Réinitialiser</a>
                     </div>
                 @endunless
 

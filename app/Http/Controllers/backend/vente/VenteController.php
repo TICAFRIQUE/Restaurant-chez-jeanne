@@ -1018,58 +1018,6 @@ class VenteController extends Controller
             $queryMenu = Vente::with(['plats.categorieMenu', 'caisse']);
 
 
-            // if ($dateDebut && $dateFin) {
-            //     $query->whereBetween('date_vente', [$dateDebut, $dateFin]);
-            //     $queryMenu->whereBetween('date_vente', [$dateDebut, $dateFin]);
-            // } elseif ($dateDebut) {
-            //     $query->where('date_vente', '>=', $dateDebut);
-            //     $queryMenu->where('date_vente', '>=', $dateDebut);
-            // } elseif ($dateFin) {
-            //     $query->where('date_vente', '<=', $dateFin);
-            //     $queryMenu->where('date_vente', '<=', $dateFin);
-            // }
-
-            // if ($categorieFamille== 'plat_menu') {
-            //     $queryMenu = Vente::with(['plats.categorieMenu', 'caisse']);
-            // }elseif ($categorieFamille== 'bar' || $categorieFamille== 'menu') {
-            //     $query = Vente::with(['plats.categorieMenu', 'caisse']);
-
-            // }
-
-            // if ($caisseId) {
-            //     $query->where('caisse_id', $caisseId);
-            //     $queryMenu->where('caisse_id', $caisseId);
-            // }
-
-
-            // Application du filtre de periode
-            // periode=> jour, semaine, mois, année
-            // if ($request->filled('periode')) {
-            //     $dates = match ($periode) {
-            //         'jour' => [Carbon::today(), Carbon::today()],
-            //         'semaine' => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
-            //         'mois' => [Carbon::now()->month, Carbon::now()->year], // Stocke mois et année pour `whereMonth`
-            //         'annee' => Carbon::now()->year, // Stocke année pour `whereYear`
-            //         default => null,
-            //     };
-
-            //     if ($dates) {
-            //         if ($periode == 'jour') {
-            //             $query->whereDate('date_vente', $dates[0]);
-            //             $queryMenu->whereDate('date_vente', $dates[1]);
-            //         } elseif ($periode == 'semaine') {
-            //             $query->whereBetween('date_vente', $dates);
-            //             $queryMenu->whereBetween('date_vente', $dates);
-            //         } elseif ($periode == 'mois') {
-            //             $query->whereMonth('date_vente', $dates[0])->whereYear('date_vente', $dates[1]);
-            //             $queryMenu->whereMonth('date_vente', $dates[0])->whereYear('date_vente', $dates[1]);
-            //         } elseif ($periode == 'annee') {
-            //             $query->whereYear('date_vente', $dates);
-            //             $queryMenu->whereYear('date_vente', $dates);
-            //         }
-            //     }
-            // }
-
 
             // pour les vente bar et restaurant
 
@@ -1078,6 +1026,12 @@ class VenteController extends Controller
                 ->where('user_id', auth()->user()->id)
                 ->where('statut_cloture', true)
                 ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                ->whereHas('produits', function ($query) {
+                    $query->where(function ($query) {
+                        $query->where('offert_statut', 0)
+                            ->orWhereNull('offert_statut');
+                    });
+                })
                 ->get();
 
 
@@ -1130,7 +1084,7 @@ class VenteController extends Controller
                     'stock' => 100,
                     'designation' => $plat->nom,
                     'categorie' => $plat->categorieMenu->nom,
-                    'famille' => 'Menu',
+                    'famille' => 'menu',
                     'quantite_vendue' => $groupe->sum('pivot.quantite'),
                     'prix_vente' => $groupe->first()->pivot->prix_unitaire,
                     'montant_total' => $groupe->sum(function ($item) {
@@ -1161,11 +1115,12 @@ class VenteController extends Controller
                 $produit = $groupe->first();
 
                 return [
+                    'details' => $groupe, // recuperer les details groupés par produit
                     'id' => $produit->id,
                     'code' => $produit->code,
                     'designation' => $produit->nom,
                     'categorie' => $produit->categorie->name,
-                    'famille' => 'Offerts',
+                    'famille' => 'offerts',
                     'quantite_vendue' => $groupe->sum('pivot.quantite'),
                     'prix_vente' => $groupe->first()->pivot->prix_unitaire,
                     'montant_total' => $groupe->sum(function ($item) {

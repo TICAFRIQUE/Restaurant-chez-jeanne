@@ -154,8 +154,8 @@
                     @php
                         // Ordre personnalisé pour trier les familles
                         $ordreFamilles = [
-                            'menu' => 1, // Cuisine interne en premier
-                            'bar' => 2, // Boissons en deuxième
+                            'bar' => 1, // Boissons en deuxième
+                            'menu' => 2, // Cuisine interne en premier
                             'plat_du_menu' => 3, // Plat du menu
                             'offerts' => 4, // Produits offerts
 
@@ -189,6 +189,7 @@
                                 Boissons
                             @else
                                 {{ $famille }}
+                               
                             @endif
                         </h3>
                         <div class="table-responsive mb-4">
@@ -198,7 +199,7 @@
                                         {{-- <th>Code</th> --}}
                                         <th>Designation</th>
                                         <th>Catégorie</th>
-                                        @if ($famille == 'bar')
+                                        @if ($famille == 'bar' ||$famille=='offerts')
                                             <th>Quantité vendue</th>
                                             <th>Montant total</th>
                                         @else
@@ -216,7 +217,7 @@
                                             <td>{{ $produit['designation'] }}</td>
                                             <td>{{ $produit['categorie'] }}</td>
 
-                                            @if ($famille == 'bar')
+                                            @if ($famille == 'bar' ||$famille=='offerts')
                                                 @php
                                                     $details = $produit['details'];
                                                     $variantes = $details->pluck('pivot.variante_id')->unique();
