@@ -132,8 +132,7 @@ class OffertController extends Controller
 
             // si l'offert n'est pas approuvé, on va ajouter le total du produit dans la vente
             if ($approuved == 0) {
-                // recuperer le produit de l'offert
-
+                // mettre a jour la vente
                 $vente->update([
                     'montant_total' => $vente->montant_total += ($offert->prix * $offert->quantite),
                     'montant_avant_remise' => $vente->montant_avant_remise += ($offert->prix * $offert->quantite),
@@ -141,6 +140,14 @@ class OffertController extends Controller
                     'statut_reglement' => 0, // non réglée
                     'statut_paiement' => 'impaye', // non payée
                 ]);
+
+                // mettre a jour le produit offert de la vente dans la table vente_produit
+                $vente->produits()->where('produit_id', $offert->produit_id)
+                    // ->where('offert', true)
+                    ->update([
+                        'offert_statut' => 0, // non approuvé
+                        'offert' => false, // non offert
+                    ]);
             }
 
 

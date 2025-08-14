@@ -470,8 +470,8 @@
 
                         {{-- Clôture caisse --}}
                         @if (
-                            ($venteAucunReglement == 0 && $totalVentesCaisse > 0 && $offertsEnAttente == 0) ||
-                                ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0 && $offertsEnAttente == 0))
+                            ($venteAucunReglement == 0 && $totalVentesCaisse >= 0 && $offertsEnAttente == 0 && $venteCaisseNonCloture > 0) ||
+                                ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0 && $offertsEnAttente == 0 && $venteCaisseNonCloture > 0))
                             <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
                                 👍 Clôturer la caisse <i class="ri ri-bill"></i>
                             </a>
@@ -482,7 +482,7 @@
                         @endif
 
                         {{-- Rapport caisse --}}
-                        @if ($venteCaisseCloture > 0)
+                        @if ($venteCaisseNonCloture == 0 && $venteCaisseCloture > 0)
                             <a href="{{ route('vente.rapport-caisse') }}" class="btn btn-success btn-lg">
                                 📊 Voir le rapport de caisse <i class="ri ri-file-list-3-line"></i>
                             </a>

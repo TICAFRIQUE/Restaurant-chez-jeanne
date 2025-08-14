@@ -204,10 +204,18 @@ class VenteController extends Controller
                 $sessionDate = $sessionDate->session_date_vente;
 
 
-                // verifier si la caisse actuelle a des ventes à cloturer
+                // recuperer les vente de la caisse actuelle qui sont cloturées
                 $venteCaisseCloture = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', true)
+                    ->whereDate('date_vente', $sessionDate) // ✅ Compare seulement la date
+                    ->count();
+
+
+                        // Verifier si il ya des vente non cloturer
+                $venteCaisseNonCloture = Vente::where('caisse_id', auth()->user()->caisse_id)
+                    ->where('user_id', auth()->user()->id)
+                    ->where('statut_cloture', false)
                     ->whereDate('date_vente', $sessionDate) // ✅ Compare seulement la date
                     ->count();
 
@@ -265,7 +273,7 @@ class VenteController extends Controller
 
 
 
-            return view('backend.pages.vente.index', compact('reglementImpayes', 'data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients', 'offertsEnAttente'));
+            return view('backend.pages.vente.index', compact('reglementImpayes', 'data_vente', 'caisses', 'sessionDate', 'venteCaisseCloture', 'venteCaisseNonCloture', 'venteAucunReglement', 'totalVentesCaisse', 'clients', 'offertsEnAttente'));
         } catch (\Exception $e) {
             Alert::error('Erreur', 'Une erreur est survenue lors du chargement des ventes : ' . $e->getMessage());
             return back();
@@ -1019,23 +1027,29 @@ class VenteController extends Controller
 
 
 
-            // pour les vente bar et restaurant
+            // pour les vente bar et plats quotidiens
 
             $ventes = $query
                 ->where('caisse_id', auth()->user()->caisse_id)
                 ->where('user_id', auth()->user()->id)
                 ->where('statut_cloture', true)
-                ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
-                ->whereHas('produits', function ($query) {
-                    $query->where(function ($query) {
-                        $query->where('offert_statut', 0)
-                            ->orWhereNull('offert_statut');
+                ->whereDate('date_vente', auth()->user()->caisse->session_date_vente)
+                ->withWhereHas('produits', function ($query) {
+                    $query->where(function ($q) {
+                        $q->where(function ($sub) {
+                            $sub->where('offert', 1)
+                                ->where('offert_statut', 0);
+                        })
+                            ->orWhere(function ($sub) {
+                                $sub->where('offert', 0);
+                            });
                     });
                 })
                 ->get();
 
 
-            // pour la vente des plats menu
+
+            // pour la vente des plats menu du jour
             $ventesMenu = $queryMenu
                 ->where('caisse_id', auth()->user()->caisse_id)
                 ->where('user_id', auth()->user()->id)
@@ -1045,53 +1059,67 @@ class VenteController extends Controller
 
 
             // pour les produits restaurant et bar
-            $produitsVendus = $ventes->flatMap(function ($vente) {
-                return $vente->produits;
-            })->groupBy('id')->map(function ($groupe) use ($categorieFamille) {
-                $produit = $groupe->first();
-                if ($categorieFamille && $produit->categorie->famille !== $categorieFamille) {
-                    return null;
-                }
-                return [
-                    'details' => $groupe, // recuperer les details groupés par produit
-                    'id' => $produit->id,
-                    'code' => $produit->code,
-                    'stock' => $produit->stock,
-                    'designation' => $produit->nom,
-                    'categorie' => $produit->categorie->name,
-                    'famille' => $produit->categorie->famille,
-                    'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                    'variante' => $groupe->first()->pivot->variante_id,
-                    'prix_vente' => $groupe->first()->pivot->prix_unitaire,
-                    'montant_total' => $groupe->sum(function ($item) {
-                        return $item->pivot->quantite * $item->pivot->prix_unitaire;
-                    }),
-                ];
-            })->filter()->values();
+            $produitsVendus = $ventes
+                ->flatMap(fn($vente) => $vente->produits)
+                ->groupBy('id')
+                ->map(function ($groupe) use ($categorieFamille) {
+                    $produit = $groupe->first();
+                    $pivotFirst = $produit->pivot;
+
+                    // Filtre par famille si demandé
+                    if ($categorieFamille && $produit->categorie->famille !== $categorieFamille) {
+                        return null;
+                    }
+
+                    // Calcul du montant total en filtrant les offerts
+                    $montantTotal = $groupe->sum(function ($item) {
+                        if ($item->pivot->offert_statut === 0 || is_null($item->pivot->offert_statut)) {
+                            return $item->pivot->quantite * $item->pivot->prix_unitaire;
+                        }
+                        return 0;
+                    });
+
+                    return [
+                        'details' => $groupe,
+                        'id' => $produit->id,
+                        'code' => $produit->code,
+                        'stock' => $produit->stock,
+                        'designation' => $produit->nom,
+                        'categorie' => $produit->categorie->name,
+                        'famille' => $produit->categorie->famille,
+                        'quantite_vendue' => $groupe->sum('pivot.quantite'),
+                        'variante' => $pivotFirst->variante_id,
+                        'prix_vente' => $pivotFirst->prix_unitaire,
+                        'montant_total' => $montantTotal,
+                    ];
+                })
+                ->filter()
+                ->values();
+
 
             // dd($produitsVendus->toArray());
 
 
             //pour les plats menu
-            $platsVendus = $ventesMenu->flatMap(function ($vente) {
-                return $vente->plats;
-            })->groupBy('id')->map(function ($groupe) {
-                $plat = $groupe->first();
+            $platsVendus = $ventesMenu
+                ->flatMap(fn($vente) => $vente->plats)
+                ->groupBy('id')
+                ->map(function ($groupe) {
+                    $plat = $groupe->first();
 
-                return [
-                    'id' => $plat->id,
-                    'code' => $plat->code,
-                    'stock' => 100,
-                    'designation' => $plat->nom,
-                    'categorie' => $plat->categorieMenu->nom,
-                    'famille' => 'menu',
-                    'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                    'prix_vente' => $groupe->first()->pivot->prix_unitaire,
-                    'montant_total' => $groupe->sum(function ($item) {
-                        return $item->pivot->quantite * $item->pivot->prix_unitaire;
-                    }),
-                ];
-            })->filter()->values();
+                    return [
+                        'id' => $plat->id,
+                        'code' => $plat->code,
+                        'stock' => 100, // À calculer si nécessaire
+                        'designation' => $plat->nom,
+                        'categorie' => $plat->categorieMenu->nom,
+                        'famille' => 'menu du jour',
+                        'quantite_vendue' => $groupe->sum('pivot.quantite'),
+                        'prix_vente' => $plat->pivot->prix_unitaire, // ou avg si ça varie
+                        'montant_total' => $groupe->sum(fn($item) => $item->pivot->quantite * $item->pivot->prix_unitaire),
+                    ];
+                })
+                ->values();
 
 
 

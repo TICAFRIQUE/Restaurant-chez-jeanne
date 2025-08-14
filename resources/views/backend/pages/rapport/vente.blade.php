@@ -30,7 +30,6 @@
                     <form action="{{ route('rapport.vente') }}" method="GET">
                         @csrf
                         <div class="row">
-
                             <div class="col-md-2">
                                 <div class="mb-3">
                                     <label for="caisse_id" class="form-label">Caisse</label>
@@ -180,7 +179,7 @@
                         </h3>
                         <span>Nombre d'articles : <b>{{ $produits->sum('quantite_vendue') }}</b></span><br>
                         <span>Montant total :
-                           <b> {{ number_format($produits->sum('montant_total'), 0, ',', ' ') }} FCFA</b>
+                            <b> {{ number_format($produits->sum('montant_total'), 0, ',', ' ') }} FCFA</b>
                         </span>
                         <div class="table-responsive mb-4">
                             <table class="table table-bordered">
@@ -249,7 +248,7 @@
                                                             $quantiteTotale = $groupe->sum('pivot.quantite');
                                                             $varianteId = $groupe->first()->pivot->variante_id;
                                                             $varianteNom =
-                                                                $varianteLibelles[$varianteId]->libelle ?? 'Inconnue';
+                                                                $varianteLibelles[$varianteId]->libelle ?? '';
                                                             $prixUnitaire = $groupe->first()->pivot->prix_unitaire;
                                                         @endphp
                                                         {{ $quantiteTotale }} {{ $varianteNom }} x

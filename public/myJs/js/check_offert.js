@@ -127,7 +127,7 @@ function checkOfferts() {
                 setTimeout(() => {
                     const alert = bootstrap.Alert.getOrCreateInstance(alertDiv);
                     alert.close();
-                }, 5000);
+                }, 50000);
             }
         },
     }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -140,4 +140,4 @@ function checkOfferts() {
 }
 
 // Vérifie toutes les 10 secondes
-setInterval(checkOfferts, 10000);
+setInterval(checkOfferts, 60000);

@@ -474,35 +474,6 @@
 
 
 
-                // gestion des offert au select 
-
-
-                // function handleOfferChange(index, value) {
-                //     cart[index].offert = parseInt(value);
-
-                //     if (cart[index].offert === 1) {
-                //         cart[index].price = 0;
-
-
-                //     } else {
-                //         // Si une variante est sélectionnée, on remet son prix
-                //         let selectedVariante = cart[index].selectedVariante;
-                //         if (selectedVariante) {
-                //             const varianteOption = $(
-                //                 `.variante-select[data-index="${index}"] option[value="${selectedVariante}"]`);
-                //             const variantePrice = parseFloat(varianteOption.data('price'));
-
-                //             if (!isNaN(variantePrice)) {
-                //                 cart[index].price = variantePrice;
-                //             }
-                //         }
-
-                //     }
-                //      updateCartTable();
-
-                //     updateGrandTotal();
-                // }
-
                 function handleOfferChange(index, value) {
                     cart[index].offert = parseInt(value);
 

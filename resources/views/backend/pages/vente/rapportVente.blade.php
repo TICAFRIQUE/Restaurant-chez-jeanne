@@ -156,7 +156,7 @@
                         $ordreFamilles = [
                             'bar' => 1, // Boissons en deuxième
                             'menu' => 2, // Cuisine interne en premier
-                            'plat_du_menu' => 3, // Plat du menu
+                            'menu du jour' => 3, // Plat du menu
                             'offerts' => 4, // Produits offerts
 
                             // Ajoute d'autres familles si nécessaire avec des numéros plus grands
@@ -180,6 +180,7 @@
                         $montantTotalVente = $produitsVendus->sum(function ($produits) {
                             return $produits->sum('montant_total');
                         });
+
                     @endphp
                     @foreach ($produitsVendus as $famille => $produits)
                         <h3>
@@ -189,7 +190,6 @@
                                 Boissons
                             @else
                                 {{ $famille }}
-                               
                             @endif
                         </h3>
                         <div class="table-responsive mb-4">
@@ -199,7 +199,7 @@
                                         {{-- <th>Code</th> --}}
                                         <th>Designation</th>
                                         <th>Catégorie</th>
-                                        @if ($famille == 'bar' ||$famille=='offerts')
+                                        @if ($famille == 'bar' || $famille == 'offerts')
                                             <th>Quantité vendue</th>
                                             <th>Montant total</th>
                                         @else
@@ -217,7 +217,7 @@
                                             <td>{{ $produit['designation'] }}</td>
                                             <td>{{ $produit['categorie'] }}</td>
 
-                                            @if ($famille == 'bar' ||$famille=='offerts')
+                                            @if ($famille == 'bar' || $famille == 'offerts')
                                                 @php
                                                     $details = $produit['details'];
                                                     $variantes = $details->pluck('pivot.variante_id')->unique();
@@ -236,6 +236,7 @@
                                                                 '_' .
                                                                 $item->pivot->prix_unitaire;
                                                         });
+
                                                     @endphp
 
                                                     @foreach ($groupes as $groupe)
@@ -243,7 +244,7 @@
                                                             $quantiteTotale = $groupe->sum('pivot.quantite');
                                                             $varianteId = $groupe->first()->pivot->variante_id;
                                                             $varianteNom =
-                                                                $varianteLibelles[$varianteId]->libelle ?? 'Inconnue';
+                                                                $varianteLibelles[$varianteId]->libelle ?? '';
                                                             $prixUnitaire = $groupe->first()->pivot->prix_unitaire;
                                                         @endphp
                                                         {{ $quantiteTotale }} {{ $varianteNom }} x
@@ -332,7 +333,7 @@
                                 </div>
                             </div>
 
-                             <!-- Mode 3 : Offert -->
+                            <!-- Mode 3 : Offert -->
                             <div class="col-md-3 mb-4">
                                 <div class="card shadow-sm border-left-danger">
                                     <div class="card-body">
@@ -347,6 +348,12 @@
 
                         <!-- Total général -->
                         <div class="alert alert-dark mt-4 text-center fs-5">
+
+                            @php
+                                // si il ya des offerts on soustrait le montant des offerts
+                                $resultats['mode_offert'] = $resultats['mode_offert'] ?? 0;
+                                $montantTotalVente = $montantTotalVente - $resultats['mode_offert'];
+                            @endphp
 
                             @if ($reglementImpayes > 0)
                                 <p>
@@ -366,19 +373,18 @@
                                 <p class=" fs-3">
                                     @php
                                         $totalCaisse = $montantTotalVente + $reglementImpayes;
+
                                     @endphp
                                     <b>💰TOTAL :</b>
                                     <span class="fw-bold text-primary">{{ number_format($totalCaisse, 0, ',', ' ') }}
                                         FCFA</span>
                                 </p>
-
-                                @else
+                            @else
                                 <p class=" fs-3">
-                                     <b>💰TOTAL :</b>
+                                    <b>💰TOTAL :</b>
                                     <span class="fw-bold text-primary">{{ number_format($montantTotalVente, 0, ',', ' ') }}
                                         FCFA</span>
                                 </p>
-                                   
                             @endif
 
                         </div>

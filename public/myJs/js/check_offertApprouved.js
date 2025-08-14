@@ -25,7 +25,7 @@ function checkNotifications() {
 
                     const alertDiv = document.createElement("div");
                     alertDiv.className =
-                        "alert alert-info alert-dismissible alert-label-icon label-arrow fade show material-shadow";
+                        "alert alert-success alert-dismissible alert-label-icon label-arrow fade show material-shadow";
                     alertDiv.setAttribute("role", "alert");
 
                     alertDiv.innerHTML = `
@@ -46,7 +46,7 @@ function checkNotifications() {
                         const alert =
                             bootstrap.Alert.getOrCreateInstance(alertDiv);
                         alert.close();
-                    }, 10000);
+                    }, 25000);
 
 
                     // Marquer la notification comme lue
