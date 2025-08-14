@@ -192,6 +192,7 @@ class VenteController extends Controller
             //Recuperer la session de la date vente manuelle et verifier si la caisse actuelle a effectuer des vente clotureé  a sa date de vente
             $sessionDate = null;
             $venteCaisseCloture = null;
+            $venteCaisseNonCloture = null;
             $venteAucunReglement = null;
             $totalVentesCaisse = null;
             $offertsEnAttente = 0;
