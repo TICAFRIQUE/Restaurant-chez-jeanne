@@ -61,8 +61,12 @@
 
                                         </option>
                                     @endforeach
-                                    <option value="plats du menu"
-                                        {{ request('categorie_famille') == 'plats du menu' ? 'selected' : '' }}>Menu
+                                    <option value="menu du jour"
+                                        {{ request('categorie_famille') == 'menu du jour' ? 'selected' : '' }}>Menu du jour
+                                    </option>
+
+                                    <option value="offerts"
+                                        {{ request('categorie_famille') == 'offerts' ? 'selected' : '' }}>Offerts
                                     </option>
                                 </select>
                             </div>
@@ -145,7 +149,8 @@
                         $ordreFamilles = [
                             'menu' => 1, // Cuisine interne en premier
                             'bar' => 2, // Boissons en deuxième
-                            'plat_du_menu' => 3, // Plat du menu
+                            'Menu du jour' => 3, // Plat du menu
+                            'Offerts' => 4, // offerts
 
                             // Ajoute d'autres familles si nécessaire avec des numéros plus grands
 ];
@@ -166,6 +171,7 @@
                         $montantTotalVente = $produitsVendus->sum(function ($produits) {
                             return $produits->sum('montant_total');
                         });
+
                     @endphp
                     @foreach ($produitsVendus as $famille => $produits)
                         <h3 class="fw-semibold">
@@ -188,7 +194,7 @@
                                         {{-- <th>Code</th> --}}
                                         <th>Designation</th>
                                         {{-- <th>Catégorie</th> --}}
-                                        @if ($famille == 'bar')
+                                        @if ($famille == 'bar' || $famille == 'Offerts')
                                             <th>Quantité vendue</th>
                                             <th>Montant total</th>
                                         @else
@@ -222,7 +228,7 @@
                                                 <td>{{ $produit['quantite_vendue'] }} </td>
                                             @endif --}}
 
-                                            @if ($famille == 'bar')
+                                            @if ($famille == 'bar' || $famille == 'Offerts')
                                                 @php
                                                     $details = $produit['details'];
                                                     $variantes = $details->pluck('pivot.variante_id')->unique();

@@ -621,78 +621,127 @@ class RapportController extends Controller
 
 
             // pour les vente bar et restaurant
-            $ventes = $query->get();
+            $ventes = $query
+                ->withWhereHas('produits', function ($query) {
+                    $query->where(function ($q) {
+                        $q->where(function ($sub) {
+                            $sub->where('offert', 1)
+                                ->where('offert_statut', 0);
+                        })
+                            ->orWhere(function ($sub) {
+                                $sub->where('offert', 0);
+                            });
+                    });
+                })
+                ->get();
+
+
 
             // pour la vente des plats menu
             $ventesMenu = $queryMenu->get();
 
+            //pour les vente avec produits offerts
+            $ventesOffertes = $query->whereHas('produits', function ($query) {
+                $query->where('offert', 1)->where('offert_statut', 1);
+            })->get();
 
-            // pour les produits restaurant et bar
-            $produitsVendus = $ventes->flatMap(function ($vente) {
-                return $vente->produits;
-            })->groupBy('id')->map(function ($groupe) use ($categorieFamille) {
-                $produit = $groupe->first();
-                if ($categorieFamille && $produit->categorie->famille !== $categorieFamille) {
-                    return null;
-                }
-                // return [
+            // dd($ventesOffertes->toArray());
 
-                //     'id' => $produit->id,
-                //     'code' => $produit->code,
-                //     'stock' => $produit->stock,
-                //     'designation' => $produit->nom,
-                //     'categorie' => $produit->categorie->name,
-                //     'famille' => $produit->categorie->famille,
-                //     'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                //     'variante' => $groupe->first()->pivot->variante_id,
-                //     'prix_vente' => $groupe->first()->pivot->prix_unitaire,
-                //     'montant_total' => $groupe->sum(function ($item) {
-                //         return $item->pivot->quantite * $item->pivot->prix_unitaire;
-                //     }),
-                // ];
+            // Produits restaurant et bar
+            $produitsVendus = $ventes->flatMap(fn($vente) => $vente->produits)
+                ->groupBy('id')
+                ->map(function ($groupe) use ($categorieFamille) {
+                    $produit = $groupe->first();
 
-                return [
-                    'details' => $groupe, // recuperer les details groupés par produit
-                    'id' => $produit->id,
-                    'code' => $produit->code,
-                    'stock' => $produit->stock,
-                    'designation' => $produit->nom,
-                    'categorie' => $produit->categorie->name,
-                    'famille' => $produit->categorie->famille,
-                    'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                    'variante' => $groupe->first()->pivot->variante_id,
-                    'prix_vente' => $groupe->first()->pivot->prix_unitaire,
-                    'montant_total' => $groupe->sum(function ($item) {
-                        return $item->pivot->quantite * $item->pivot->prix_unitaire;
-                    }),
-                ];
-            })->filter()->values();
+                    if ($categorieFamille && $categorieFamille !== $produit->categorie->famille) {
+                        return null;
+                    }
 
-            //pour les plats menu
-            $platsVendus = $ventesMenu->flatMap(function ($vente) {
-                return $vente->plats;
-            })->groupBy('id')->map(function ($groupe) {
-                $plat = $groupe->first();
-                // if ($categorieMenu && $plat->categorie->famille !== $categorieMenu) {
-                //     return null;
-                // }
-                return [
-                    'id' => $plat->id,
-                    'code' => $plat->code,
-                    'stock' => 100,
-                    'designation' => $plat->nom,
-                    'categorie' => $plat->categorieMenu->nom,
-                    'famille' => 'Menu',
-                    'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                    'prix_vente' => $groupe->first()->pivot->prix_unitaire,
-                    'montant_total' => $groupe->sum(function ($item) {
-                        return $item->pivot->quantite * $item->pivot->prix_unitaire;
-                    }),
-                ];
-            })->filter()->values();
-            $produitsVendus =  $produitsVendus->concat($platsVendus);
+                    return [
+                        'details' => $groupe,
+                        'id' => $produit->id,
+                        'code' => $produit->code,
+                        'stock' => $produit->stock,
+                        'designation' => $produit->nom,
+                        'categorie' => $produit->categorie->name,
+                        'famille' => $produit->categorie->famille,
+                        'quantite_vendue' => $groupe->sum('pivot.quantite'),
+                        'variante' => $groupe->first()->pivot->variante_id,
+                        'prix_vente' => $groupe->first()->pivot->prix_unitaire,
+                        'montant_total' => $groupe->sum(
+                            fn($item) =>
+                            $item->pivot->quantite * $item->pivot->prix_unitaire
+                        ),
+                    ];
+                })
+                ->filter()
+                ->values();
 
-            // dd($produitsVendus->toArray());
+
+            // Plats menu
+            $platsVendus = $ventesMenu->flatMap(fn($vente) => $vente->plats)
+                ->groupBy('id')
+                ->map(function ($groupe) use ($categorieFamille) {
+                    $plat = $groupe->first();
+
+                    if ($categorieFamille && $categorieFamille !== 'menu du jour') {
+                        return null;
+                    }
+
+                    return [
+                        'id' => $plat->id,
+                        'code' => $plat->code,
+                        'stock' => 100,
+                        'designation' => $plat->nom,
+                        'categorie' => $plat->categorieMenu->nom,
+                        'famille' => 'Menu du jour',
+                        'quantite_vendue' => $groupe->sum('pivot.quantite'),
+                        'prix_vente' => $groupe->first()->pivot->prix_unitaire,
+                        'montant_total' => $groupe->sum(
+                            fn($item) =>
+                            $item->pivot->quantite * $item->pivot->prix_unitaire
+                        ),
+                    ];
+                })
+                ->filter()
+                ->values();
+
+
+            // Produits offerts
+            $produitsVendusOfferts = $ventesOffertes->flatMap(fn($vente) => $vente->produits)
+                ->groupBy('id')
+                ->map(function ($groupe) use ($categorieFamille) {
+                    $produit = $groupe->first();
+
+                    if ($categorieFamille && $categorieFamille !== 'offerts') {
+                        return null;
+                    }
+
+                    return [
+                        'details' => $groupe,
+                        'id' => $produit->id,
+                        'code' => $produit->code,
+                        'stock' => $produit->stock,
+                        'designation' => $produit->nom,
+                        'categorie' => $produit->categorie->name,
+                        'famille' => 'Offerts',
+                        'quantite_vendue' => $groupe->sum('pivot.quantite'),
+                        'variante' => $groupe->first()->pivot->variante_id,
+                        'prix_vente' => $groupe->first()->pivot->prix_unitaire,
+                        'montant_total' => $groupe->sum(
+                            fn($item) =>
+                            $item->pivot->quantite * $item->pivot->prix_unitaire
+                        ),
+                    ];
+                })
+                ->filter()
+                ->values();
+
+
+            // Fusion
+            $produitsVendus = $produitsVendus
+                ->concat($platsVendus)
+                ->concat($produitsVendusOfferts);
 
 
             $caisses = Caisse::all();
