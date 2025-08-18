@@ -549,105 +549,299 @@ class RapportController extends Controller
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws \Exception
      */
+    // public function vente(Request $request)
+    // {
+    //     try {
+    //         $dateDebut = $request->input('date_debut');
+    //         $dateFin = $request->input('date_fin');
+    //         $caisseId = $request->input('caisse_id');
+    //         $categorieFamille = $request->input('categorie_famille');
+    //         $periode = $request->input('periode');
+    //         // $categorieMenu = 'plat_menu';
+
+
+    //         //Pour les vente bar et restaurant
+    //         $query = Vente::with(['produits.categorie', 'plats.categorieMenu', 'caisse']);
+
+    //         // pour la vente des plats menu
+    //         $queryMenu = Vente::with(['plats.categorieMenu', 'caisse']);
+
+
+    //         if ($dateDebut && $dateFin) {
+    //             $query->whereBetween('date_vente', [$dateDebut, $dateFin]);
+    //             $queryMenu->whereBetween('date_vente', [$dateDebut, $dateFin]);
+    //         } elseif ($dateDebut) {
+    //             $query->where('date_vente', '>=', $dateDebut);
+    //             $queryMenu->where('date_vente', '>=', $dateDebut);
+    //         } elseif ($dateFin) {
+    //             $query->where('date_vente', '<=', $dateFin);
+    //             $queryMenu->where('date_vente', '<=', $dateFin);
+    //         }
+
+
+
+    //         if ($caisseId) {
+    //             $query->where('caisse_id', $caisseId);
+    //             $queryMenu->where('caisse_id', $caisseId);
+    //         }
+
+
+    //         // Application du filtre de periode
+    //         // periode=> jour, semaine, mois, année
+    //         if ($request->filled('periode')) {
+    //             $dates = match ($periode) {
+    //                 'jour' => [Carbon::today(), Carbon::today()],
+    //                 'semaine' => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
+    //                 'mois' => [Carbon::now()->month, Carbon::now()->year], // Stocke mois et année pour `whereMonth`
+    //                 'annee' => Carbon::now()->year, // Stocke année pour `whereYear`
+    //                 default => null,
+    //             };
+
+    //             if ($dates) {
+    //                 if ($periode == 'jour') {
+    //                     $query->whereDate('date_vente', $dates[0]);
+    //                     $queryMenu->whereDate('date_vente', $dates[1]);
+    //                 } elseif ($periode == 'semaine') {
+    //                     $query->whereBetween('date_vente', $dates);
+    //                     $queryMenu->whereBetween('date_vente', $dates);
+    //                 } elseif ($periode == 'mois') {
+    //                     $query->whereMonth('date_vente', $dates[0])->whereYear('date_vente', $dates[1]);
+    //                     $queryMenu->whereMonth('date_vente', $dates[0])->whereYear('date_vente', $dates[1]);
+    //                 } elseif ($periode == 'annee') {
+    //                     $query->whereYear('date_vente', $dates);
+    //                     $queryMenu->whereYear('date_vente', $dates);
+    //                 }
+    //             }
+    //         }
+
+
+    //         // pour les vente bar et restaurant
+    //         $ventes = $query
+    //             ->withWhereHas('produits', function ($query) {
+    //                 $query->where(function ($q) {
+    //                     $q->where(function ($sub) {
+    //                         $sub->where('offert', 1)
+    //                             ->where('offert_statut', 0);
+    //                     })
+    //                         ->orWhere(function ($sub) {
+    //                             $sub->where('offert', 0);
+    //                         });
+    //                 });
+    //             })
+    //             ->get();
+
+
+
+    //         // pour la vente des plats menu
+    //         $ventesMenu = $queryMenu->get();
+
+    //         //pour les vente avec produits offerts
+    //         $ventesOffertes = $query->withWhereHas('produits', function ($query) {
+    //             $query->where('offert', 1)->where('offert_statut', 1);
+    //         })->get();
+
+    //         // dd($ventesOffertes->toArray());
+
+    //         // Produits restaurant et bar
+    //         $produitsVendus = $ventes->flatMap(fn($vente) => $vente->produits)
+    //             ->groupBy('id')
+    //             ->map(function ($groupe) use ($categorieFamille) {
+    //                 $produit = $groupe->first();
+
+    //                 if ($categorieFamille && $categorieFamille !== $produit->categorie->famille) {
+    //                     return null;
+    //                 }
+
+    //                 return [
+    //                     'details' => $groupe,
+    //                     'id' => $produit->id,
+    //                     'code' => $produit->code,
+    //                     'stock' => $produit->stock,
+    //                     'designation' => $produit->nom,
+    //                     'categorie' => $produit->categorie->name,
+    //                     'famille' => $produit->categorie->famille,
+    //                     'quantite_vendue' => $groupe->sum('pivot.quantite'),
+    //                     'variante' => $groupe->first()->pivot->variante_id,
+    //                     'prix_vente' => $groupe->first()->pivot->prix_unitaire,
+    //                     'montant_total' => $groupe->sum(
+    //                         fn($item) =>
+    //                         $item->pivot->quantite * $item->pivot->prix_unitaire
+    //                     ),
+    //                 ];
+    //             })
+    //             ->filter()
+    //             ->values();
+
+
+    //         // Plats menu
+    //         $platsVendus = $ventesMenu->flatMap(fn($vente) => $vente->plats)
+    //             ->groupBy('id')
+    //             ->map(function ($groupe) use ($categorieFamille) {
+    //                 $plat = $groupe->first();
+
+    //                 if ($categorieFamille && $categorieFamille !== 'menu du jour') {
+    //                     return null;
+    //                 }
+
+    //                 return [
+    //                     'id' => $plat->id,
+    //                     'code' => $plat->code,
+    //                     'stock' => 100,
+    //                     'designation' => $plat->nom,
+    //                     'categorie' => $plat->categorieMenu->nom,
+    //                     'famille' => 'Menu du jour',
+    //                     'quantite_vendue' => $groupe->sum('pivot.quantite'),
+    //                     'prix_vente' => $groupe->first()->pivot->prix_unitaire,
+    //                     'montant_total' => $groupe->sum(
+    //                         fn($item) =>
+    //                         $item->pivot->quantite * $item->pivot->prix_unitaire
+    //                     ),
+    //                 ];
+    //             })
+    //             ->filter()
+    //             ->values();
+
+
+    //         // Produits offerts
+    //         $produitsVendusOfferts = $ventesOffertes->flatMap(fn($vente) => $vente->produits)
+    //             ->groupBy('id')
+    //             ->map(function ($groupe) use ($categorieFamille) {
+    //                 $produit = $groupe->first();
+
+    //                 if ($categorieFamille && $categorieFamille !== 'offerts') {
+    //                     return null;
+    //                 }
+
+    //                 return [
+    //                     'details' => $groupe,
+    //                     'id' => $produit->id,
+    //                     'code' => $produit->code,
+    //                     'stock' => $produit->stock,
+    //                     'designation' => $produit->nom,
+    //                     'categorie' => $produit->categorie->name,
+    //                     'famille' => 'Offerts',
+    //                     'quantite_vendue' => $groupe->sum('pivot.quantite'),
+    //                     'variante' => $groupe->first()->pivot->variante_id,
+    //                     'prix_vente' => $groupe->first()->pivot->prix_unitaire,
+    //                     'montant_total' => $groupe->sum(
+    //                         fn($item) =>
+    //                         $item->pivot->quantite * $item->pivot->prix_unitaire
+    //                     ),
+    //                 ];
+    //             })
+    //             ->filter()
+    //             ->values();
+
+
+    //         // Fusion
+    //         $produitsVendus = $produitsVendus
+    //             ->concat($platsVendus)
+    //             ->concat($produitsVendusOfferts);
+
+
+    //         $caisses = Caisse::all();
+    //         $famille = Categorie::whereNull('parent_id')->whereIn('type', ['bar', 'menu'])->orderBy('name', 'DESC')->get();
+
+
+    //         return view('backend.pages.rapport.vente', compact('platsVendus', 'produitsVendus', 'caisses', 'dateDebut', 'dateFin', 'caisseId', 'categorieFamille', 'famille'));
+    //     } catch (\Exception $e) {
+    //         return back()->with('error', 'Une erreur s\'est produite : ' . $e->getMessage());
+    //     }
+    // }
+
+
     public function vente(Request $request)
     {
         try {
-            $dateDebut = $request->input('date_debut');
-            $dateFin = $request->input('date_fin');
-            $caisseId = $request->input('caisse_id');
+            $dateDebut       = $request->input('date_debut');
+            $dateFin         = $request->input('date_fin');
+            $caisseId        = $request->input('caisse_id');
             $categorieFamille = $request->input('categorie_famille');
-            $periode = $request->input('periode');
-            // $categorieMenu = 'plat_menu';
+            $periode         = $request->input('periode');
 
-
-            //Pour les vente bar et restaurant
-            $query = Vente::with(['produits.categorie', 'plats.categorieMenu', 'caisse']);
-
-            // pour la vente des plats menu
+            // === BASE QUERIES ===
+            $queryBase = Vente::query();
+            $query     = Vente::with(['produits.categorie', 'plats.categorieMenu', 'caisse']);
             $queryMenu = Vente::with(['plats.categorieMenu', 'caisse']);
+            $queryOffertes = Vente::with(['produits.categorie', 'caisse']);
 
-
+            // === DATES ===
             if ($dateDebut && $dateFin) {
                 $query->whereBetween('date_vente', [$dateDebut, $dateFin]);
                 $queryMenu->whereBetween('date_vente', [$dateDebut, $dateFin]);
+                $queryOffertes->whereBetween('date_vente', [$dateDebut, $dateFin]);
             } elseif ($dateDebut) {
                 $query->where('date_vente', '>=', $dateDebut);
                 $queryMenu->where('date_vente', '>=', $dateDebut);
+                $queryOffertes->where('date_vente', '>=', $dateDebut);
             } elseif ($dateFin) {
                 $query->where('date_vente', '<=', $dateFin);
                 $queryMenu->where('date_vente', '<=', $dateFin);
+                $queryOffertes->where('date_vente', '<=', $dateFin);
             }
 
-            // if ($categorieFamille== 'plat_menu') {
-            //     $queryMenu = Vente::with(['plats.categorieMenu', 'caisse']);
-            // }elseif ($categorieFamille== 'bar' || $categorieFamille== 'menu') {
-            //     $query = Vente::with(['plats.categorieMenu', 'caisse']);
-
-            // }
-
+            // === CAISSE ===
             if ($caisseId) {
                 $query->where('caisse_id', $caisseId);
                 $queryMenu->where('caisse_id', $caisseId);
+                $queryOffertes->where('caisse_id', $caisseId);
             }
 
-
-            // Application du filtre de periode
-            // periode=> jour, semaine, mois, année
+            // === PERIODE (jour / semaine / mois / année) ===
             if ($request->filled('periode')) {
                 $dates = match ($periode) {
-                    'jour' => [Carbon::today(), Carbon::today()],
+                    'jour'    => [Carbon::today(), Carbon::today()],
                     'semaine' => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
-                    'mois' => [Carbon::now()->month, Carbon::now()->year], // Stocke mois et année pour `whereMonth`
-                    'annee' => Carbon::now()->year, // Stocke année pour `whereYear`
-                    default => null,
+                    'mois'    => [Carbon::now()->month, Carbon::now()->year],
+                    'annee'   => Carbon::now()->year,
+                    default   => null,
                 };
 
                 if ($dates) {
                     if ($periode == 'jour') {
                         $query->whereDate('date_vente', $dates[0]);
                         $queryMenu->whereDate('date_vente', $dates[1]);
+                        $queryOffertes->whereDate('date_vente', $dates[0]);
                     } elseif ($periode == 'semaine') {
                         $query->whereBetween('date_vente', $dates);
                         $queryMenu->whereBetween('date_vente', $dates);
+                        $queryOffertes->whereBetween('date_vente', $dates);
                     } elseif ($periode == 'mois') {
                         $query->whereMonth('date_vente', $dates[0])->whereYear('date_vente', $dates[1]);
                         $queryMenu->whereMonth('date_vente', $dates[0])->whereYear('date_vente', $dates[1]);
+                        $queryOffertes->whereMonth('date_vente', $dates[0])->whereYear('date_vente', $dates[1]);
                     } elseif ($periode == 'annee') {
                         $query->whereYear('date_vente', $dates);
                         $queryMenu->whereYear('date_vente', $dates);
+                        $queryOffertes->whereYear('date_vente', $dates);
                     }
                 }
             }
 
+            // === REQUÊTES ===
 
-            // pour les vente bar et restaurant
-            $ventes = $query
-                ->withWhereHas('produits', function ($query) {
-                    $query->where(function ($q) {
-                        $q->where(function ($sub) {
-                            $sub->where('offert', 1)
-                                ->where('offert_statut', 0);
-                        })
-                            ->orWhere(function ($sub) {
-                                $sub->where('offert', 0);
-                            });
+            // Ventes (hors produits offerts validés)
+            $ventes = $query->withWhereHas('produits', function ($query) {
+                $query->where(function ($q) {
+                    $q->where(function ($sub) {
+                        $sub->where('offert', 1)->where('offert_statut', 0);
+                    })->orWhere(function ($sub) {
+                        $sub->where('offert', 0);
                     });
-                })
-                ->get();
+                });
+            })->get();
 
-
-
-            // pour la vente des plats menu
+            // Ventes menus
             $ventesMenu = $queryMenu->get();
 
-            //pour les vente avec produits offerts
-            $ventesOffertes = $query->whereHas('produits', function ($query) {
+            // Ventes avec produits offerts
+            $ventesOffertes = $queryOffertes->withWhereHas('produits', function ($query) {
                 $query->where('offert', 1)->where('offert_statut', 1);
             })->get();
 
-            // dd($ventesOffertes->toArray());
+            // === TRANSFORMATION ===
 
-            // Produits restaurant et bar
+            // Produits bar & resto
             $produitsVendus = $ventes->flatMap(fn($vente) => $vente->produits)
                 ->groupBy('id')
                 ->map(function ($groupe) use ($categorieFamille) {
@@ -658,27 +852,24 @@ class RapportController extends Controller
                     }
 
                     return [
-                        'details' => $groupe,
-                        'id' => $produit->id,
-                        'code' => $produit->code,
-                        'stock' => $produit->stock,
-                        'designation' => $produit->nom,
-                        'categorie' => $produit->categorie->name,
-                        'famille' => $produit->categorie->famille,
+                        'details'         => $groupe,
+                        'id'              => $produit->id,
+                        'code'            => $produit->code,
+                        'stock'           => $produit->stock,
+                        'designation'     => $produit->nom,
+                        'categorie'       => $produit->categorie->name,
+                        'famille'         => $produit->categorie->famille,
                         'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                        'variante' => $groupe->first()->pivot->variante_id,
-                        'prix_vente' => $groupe->first()->pivot->prix_unitaire,
-                        'montant_total' => $groupe->sum(
+                        'variante'        => $groupe->first()->pivot->variante_id,
+                        'prix_vente'      => $groupe->first()->pivot->prix_unitaire,
+                        'montant_total'   => $groupe->sum(
                             fn($item) =>
                             $item->pivot->quantite * $item->pivot->prix_unitaire
                         ),
                     ];
-                })
-                ->filter()
-                ->values();
+                })->filter()->values();
 
-
-            // Plats menu
+            // Plats
             $platsVendus = $ventesMenu->flatMap(fn($vente) => $vente->plats)
                 ->groupBy('id')
                 ->map(function ($groupe) use ($categorieFamille) {
@@ -689,23 +880,20 @@ class RapportController extends Controller
                     }
 
                     return [
-                        'id' => $plat->id,
-                        'code' => $plat->code,
-                        'stock' => 100,
-                        'designation' => $plat->nom,
-                        'categorie' => $plat->categorieMenu->nom,
-                        'famille' => 'Menu du jour',
+                        'id'              => $plat->id,
+                        'code'            => $plat->code,
+                        'stock'           => 100,
+                        'designation'     => $plat->nom,
+                        'categorie'       => $plat->categorieMenu->nom,
+                        'famille'         => 'Menu du jour',
                         'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                        'prix_vente' => $groupe->first()->pivot->prix_unitaire,
-                        'montant_total' => $groupe->sum(
+                        'prix_vente'      => $groupe->first()->pivot->prix_unitaire,
+                        'montant_total'   => $groupe->sum(
                             fn($item) =>
                             $item->pivot->quantite * $item->pivot->prix_unitaire
                         ),
                     ];
-                })
-                ->filter()
-                ->values();
-
+                })->filter()->values();
 
             // Produits offerts
             $produitsVendusOfferts = $ventesOffertes->flatMap(fn($vente) => $vente->produits)
@@ -718,41 +906,50 @@ class RapportController extends Controller
                     }
 
                     return [
-                        'details' => $groupe,
-                        'id' => $produit->id,
-                        'code' => $produit->code,
-                        'stock' => $produit->stock,
-                        'designation' => $produit->nom,
-                        'categorie' => $produit->categorie->name,
-                        'famille' => 'Offerts',
+                        'details'         => $groupe,
+                        'id'              => $produit->id,
+                        'code'            => $produit->code,
+                        'stock'           => $produit->stock,
+                        'designation'     => $produit->nom,
+                        'categorie'       => $produit->categorie->name,
+                        'famille'         => 'Offerts',
                         'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                        'variante' => $groupe->first()->pivot->variante_id,
-                        'prix_vente' => $groupe->first()->pivot->prix_unitaire,
-                        'montant_total' => $groupe->sum(
+                        'variante'        => $groupe->first()->pivot->variante_id,
+                        'prix_vente'      => $groupe->first()->pivot->prix_unitaire,
+                        'montant_total'   => $groupe->sum(
                             fn($item) =>
                             $item->pivot->quantite * $item->pivot->prix_unitaire
                         ),
                     ];
-                })
-                ->filter()
-                ->values();
+                })->filter()->values();
 
-
-            // Fusion
+            // Fusion finale
             $produitsVendus = $produitsVendus
                 ->concat($platsVendus)
                 ->concat($produitsVendusOfferts);
 
-
+            // Autres données
             $caisses = Caisse::all();
-            $famille = Categorie::whereNull('parent_id')->whereIn('type', ['bar', 'menu'])->orderBy('name', 'DESC')->get();
+            $famille = Categorie::whereNull('parent_id')
+                ->whereIn('type', ['bar', 'menu'])
+                ->orderBy('name', 'DESC')
+                ->get();
 
-
-            return view('backend.pages.rapport.vente', compact('platsVendus', 'produitsVendus', 'caisses', 'dateDebut', 'dateFin', 'caisseId', 'categorieFamille', 'famille'));
+            return view('backend.pages.rapport.vente', compact(
+                'platsVendus',
+                'produitsVendus',
+                'caisses',
+                'dateDebut',
+                'dateFin',
+                'caisseId',
+                'categorieFamille',
+                'famille'
+            ));
         } catch (\Exception $e) {
             return back()->with('error', 'Une erreur s\'est produite : ' . $e->getMessage());
         }
     }
+
 
     // function miseAJourStockVente()
     // {
