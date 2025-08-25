@@ -294,9 +294,9 @@
                 <div class="ticket-container"
                     style="font-family: 'Courier New', monospace; font-size: 14px; width: 300px; margin: 0 auto;">
                     <div class="ticket-header" style="text-align: center; margin-bottom: 10px;">
-                        <h3 style="margin: 0;"> {{config('app.name')}} </h3>
-                        {{-- <h5 style="margin: 0;">RESTAURANT LOUNGE</h5>
-                        <h5 style="margin: 5px 0;">AFRICAIN ET EUROPEEN</h5> --}}
+                        <h3 style="margin: 0;">CHEZ JEANNE</h3>
+                        <h5 style="margin: 0;">RESTAURANT LOUNGE</h5>
+                        <h5 style="margin: 5px 0;">AFRICAIN ET EUROPEEN</h5>
                         <p style="border-top: 1px dashed black; margin: 5px 0;"></p>
 
                         <table class="header" style="font-size: 14px ;">
@@ -467,8 +467,8 @@
                     <div class="ticket-footer" style="text-align: center; font-size: 12px; font-weight: bold;">
                         <span>MERCI DE VOTRE VISITE</span><br>
                         <span>AU REVOIR ET À BIENTÔT</span><br>
-                        <span>RESERVATIONS: 00000000</span><br>
-                        <span>www.siteweb.ci</span>
+                        <span>RESERVATIONS: 07-49-88-95-18</span><br>
+                        <span>www.chezjeanne.ci</span>
                     </div>
                 </div>
 

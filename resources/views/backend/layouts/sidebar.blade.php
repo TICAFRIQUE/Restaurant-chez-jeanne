@@ -260,7 +260,7 @@
 
                                 @can('voir-offert')
                                     <li class="nav-item active">
-                                        <a href="{{ route('offert.index' , ['statut' => 'null']) }}"
+                                        <a href="{{ route('offert.index', ['statut' => 'null']) }}"
                                             class="nav-link {{ Route::is('offert.*') ? 'active' : '' }}">Offerts</a>
                                     </li>
                                 @endcan
@@ -394,11 +394,24 @@
                             <a href="{{ route('paie.index') }}"
                                 class="nav-link {{ Route::is('paie.*') ? 'active' : '' }}">Paie</a>
                         </li>
+
+                        <li class="nav-item active">
+                            <a href="{{ route('paie.index') }}"
+                                class="nav-link {{ Route::is('paie.*') ? 'active' : '' }}">Pointage</a>
+                        </li>
                     </ul>
                 </div>
             </li>
         @endcan
 
+        @can('voir-pointage')
+            <li class="nav-item">
+                <a class="nav-link menu-link"
+                    href="https://pointage.chezjeanne.ci/admin" target="_blank">
+                    <i class="ri-cursor-line"></i> <span>POINTAGE</span>
+                </a>
+            </li>
+        @endcan
 
         @if (Auth::user()->role == 'superadmin' || Auth::user()->role == 'developpeur' || Auth::user()->can('voir-parametre'))
             <li class="nav-item">
