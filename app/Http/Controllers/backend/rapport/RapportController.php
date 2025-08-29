@@ -490,7 +490,7 @@ class RapportController extends Controller
                         'nom' => $premierProduit->nom,
                         'stock_restant' => $premierProduit->stock,
                         'achats' => $groupe->flatMap->achats,
-                        'quantite_achat' => $groupe->flatMap->achats->sum('quantite_stocke'),
+                        'quantite_achat' => $groupe->flatMap->achats->sum('quantite'),
 
                         'prix_total_format' => $groupe->flatMap->achats->sum(function ($achat) {
                             return $achat->prix_total_format;
@@ -527,7 +527,7 @@ class RapportController extends Controller
                 //         'libelle' => $groupe->first()->libelle_depense->libelle,
                 //         'montant_total' => $groupe->sum('montant'),
                 //         'details' => $groupe
-                //     ];
+                //     };
                 // })
                 // ->values();
                 // dd($depenses->toArray());
@@ -871,8 +871,7 @@ class RapportController extends Controller
 
             // Plats
             $platsVendus = $ventesMenu->flatMap(fn($vente) => $vente->plats)
-                // ->groupBy('id')
-                 ->groupBy(fn($plat) => $plat->pivot->prix_unitaire) // Groupement par prix_unitaire
+                ->groupBy(fn($plat) => $plat->id . '-' . $plat->pivot->prix_unitaire) // Groupement par plat et prix
                 ->map(function ($groupe) use ($categorieFamille) {
                     $plat = $groupe->first();
 
@@ -888,7 +887,7 @@ class RapportController extends Controller
                         'categorie'       => $plat->categorieMenu->nom,
                         'famille'         => 'Menu du jour',
                         'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                        'prix_vente'      => $groupe->first()->pivot->prix_unitaire,
+                        'prix_vente'      => $plat->pivot->prix_unitaire,
                         'montant_total'   => $groupe->sum(
                             fn($item) =>
                             $item->pivot->quantite * $item->pivot->prix_unitaire
