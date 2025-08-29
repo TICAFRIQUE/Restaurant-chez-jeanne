@@ -1104,7 +1104,7 @@ class VenteController extends Controller
             //pour les plats menu
             $platsVendus = $ventesMenu
                 ->flatMap(fn($vente) => $vente->plats)
-                ->groupBy('id')
+               ->groupBy(fn($plat) => $plat->pivot->prix_unitaire) // Groupement par prix_unitaire
                 ->map(function ($groupe) {
                     $plat = $groupe->first();
 
@@ -1121,6 +1121,9 @@ class VenteController extends Controller
                     ];
                 })
                 ->values();
+
+            // dd($platsVendus->toArray());
+
 
 
 

@@ -871,7 +871,8 @@ class RapportController extends Controller
 
             // Plats
             $platsVendus = $ventesMenu->flatMap(fn($vente) => $vente->plats)
-                ->groupBy('id')
+                // ->groupBy('id')
+                 ->groupBy(fn($plat) => $plat->pivot->prix_unitaire) // Groupement par prix_unitaire
                 ->map(function ($groupe) use ($categorieFamille) {
                     $plat = $groupe->first();
 

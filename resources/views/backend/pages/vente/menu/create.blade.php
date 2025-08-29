@@ -101,7 +101,7 @@
                                                                 class="hidden-plat-price" value="{{ $plat->prix }}">
                                                         </strong>
 
-                                                        <div class="form-check mt-2">
+                                                        {{-- <div class="form-check mt-2">
                                                             <input type="checkbox"
                                                                 class="form-check-input offert-checkbox"
                                                                 data-plat-id="{{ $plat->id }}"
@@ -110,7 +110,7 @@
                                                                 for="offert_{{ $plat->id }}">
                                                                 Offert
                                                             </label>
-                                                        </div>
+                                                        </div> --}}
                                                     </div>
                                                     <div class="row">
                                                         <div
