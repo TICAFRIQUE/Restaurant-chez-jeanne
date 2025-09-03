@@ -1186,7 +1186,7 @@ class RapportController extends Controller
             $this->miseAJourStockVente();
 
             // Appel de la fonction miseAJourStockInventaire()
-            $this->miseAjourProduitInventaire();
+            // $this->miseAjourProduitInventaire();
 
             $request->validate([
                 'produit' => '',
