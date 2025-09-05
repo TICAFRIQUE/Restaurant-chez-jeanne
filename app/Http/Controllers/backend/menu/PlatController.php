@@ -23,7 +23,7 @@ class PlatController extends Controller
         $data_plat = Produit::whereHas('categorie', function ($query) {
             $query->where('famille', 'menu');
         })
-            ->orderBy('nom', 'ASC')
+            ->alphabetique()
             ->get();
         // dd($data_plat->toArray());
         return view('backend.pages.menu.produit.index', compact('data_plat'));
@@ -112,7 +112,7 @@ class PlatController extends Controller
                 }
             }
 
-            // si categorie_menu_id != null on ajoute comme un plat de menu
+            // si categorie_menu_id != null on ajoute comme un plat de menu du jour
             if ($request['categorie_menu_id'] != null) {
 
                 $sku = 'PM-' . strtoupper(Str::random(8));

@@ -867,7 +867,10 @@ class RapportController extends Controller
                             $item->pivot->quantite * $item->pivot->prix_unitaire
                         ),
                     ];
-                })->filter()->values();
+                })
+                ->filter()
+                ->sortBy('designation')
+                ->values();
 
             // Plats
             $platsVendus = $ventesMenu->flatMap(fn($vente) => $vente->plats)
@@ -893,7 +896,9 @@ class RapportController extends Controller
                             $item->pivot->quantite * $item->pivot->prix_unitaire
                         ),
                     ];
-                })->filter()->values();
+                })->filter()
+                ->sortBy('designation')
+                ->values();
 
             // Produits offerts
             $produitsVendusOfferts = $ventesOffertes->flatMap(fn($vente) => $vente->produits)
@@ -921,7 +926,9 @@ class RapportController extends Controller
                             $item->pivot->quantite * $item->pivot->prix_unitaire
                         ),
                     ];
-                })->filter()->values();
+                })->filter()
+                ->sortBy('designation')
+                ->values();
 
             // Fusion finale
             $produitsVendus = $produitsVendus
