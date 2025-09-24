@@ -10,15 +10,27 @@
         </tr>
     </thead>
     <tbody>
+        @include('backend.fonction.convertirStockVariante')
         @forelse ($vente as $key => $item)
             <tr>
                 <td>{{ ++$key }}</td>
                 <td>{{ $item['produit']['nom'] }}
-                <b>    {{ $item['produit']['valeur_unite'] ?? '' }} {{ $item['produit']['unite']['abreviation'] ?? '' }}</b>
+                    <b> {{ $item['produit']['valeur_unite'] ?? '' }}
+                        {{ $item['produit']['unite']['abreviation'] ?? '' }}</b>
                 </td>
                 <td>{{ \Carbon\Carbon::parse($item['vente']['date_vente'])->format('d-m-Y à H:i') }}</td>
                 {{-- <td><b> {{ $item['quantite_bouteille'] ?? 0 }} {{ $item['variante']['libelle'] ?? 'bouteille' }} </b> </td> --}}
-                <td><b> {{ $item['quantite_bouteille'] ?? 0 }} bouteille</b> </td>
+                <td><b>
+
+
+                        {!! afficherStockConvertirAvecVariantes(
+                            $item['quantite_bouteille'] ?? 0,
+                            $item['produit']['uniteSortie']['libelle'] ?? '',
+                            $item->produit->variantes,
+                        ) !!}
+
+
+                    </b> </td>
 
                 <td>{{ number_format($item['prix_unitaire'], 0, ',', ' ') }} FCFA</td>
                 <td>{{ number_format($item['total'], 0, ',', ' ') }}
@@ -40,7 +52,14 @@
         <th colspan="7">
             <div class="text-start">
                 {{-- <div>Total pour {{ $famille }}</div> --}}
-                <div>Quantité de bouteille vendue : <b>{{ $vente->sum('quantite_bouteille') }}</b></div>
+                <div>Quantité de bouteille vendue : <b>
+
+                        {!! afficherStockConvertirAvecVariantes(
+                            $vente->sum('quantite_bouteille') ?? 0,
+                            $vente->first()['produit']['uniteSortie']['libelle'] ?? '',
+                            $vente->first()->produit->variantes,
+                        ) !!}
+                    </b></div>
                 <div>Montant total :
                     <b> {{ number_format($vente->sum('total'), 0, ',', ' ') }} FCFA</b>
                 </div>

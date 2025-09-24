@@ -67,7 +67,7 @@
                             </thead>
                             <tbody>
 
-                                @php
+                                {{-- @php
                                     if (!function_exists('afficherStockConvertirAvecVariantes')) {
                                         function afficherStockConvertirAvecVariantes(
                                             $valeur,
@@ -115,7 +115,10 @@
                                             return $texte ? $signe . $texte : '0';
                                         }
                                     }
-                                @endphp
+                                @endphp --}}
+                                
+                                @include('backend.fonction.convertirStockVariante')
+
                                 @foreach ($data_produit as $key => $produit)
                                     <tr>
                                         <td>{{ $key + 1 }}</td>
@@ -129,7 +132,11 @@
                                         <td>{{ $produit->categorie->name }}</td>
                                         <td>
                                             @if ($produit->categorie->famille == 'bar')
-                                                {!! afficherStockConvertirAvecVariantes($produit->inventaires->first()->pivot->stock_physique ?? 0 , $produit->uniteSortie->libelle ?? '', $produit->variantes) !!}
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $produit->inventaires->first()->pivot->stock_physique ?? 0,
+                                                    $produit->uniteSortie->libelle ?? '',
+                                                    $produit->variantes,
+                                                ) !!}
                                             @else
                                                 {{ $produit->inventaires->first()->pivot->stock_physique ?? 0 }}
                                             @endif
@@ -139,7 +146,11 @@
                                         </td>
                                         <td>
                                             @if ($produit->categorie->famille == 'bar')
-                                                {!! afficherStockConvertirAvecVariantes($produit->stock_initial , $produit->uniteSortie->libelle ?? '', $produit->variantes) !!}
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $produit->stock_initial,
+                                                    $produit->uniteSortie->libelle ?? '',
+                                                    $produit->variantes,
+                                                ) !!}
                                             @else
                                                 {{ $produit->stock_initial }}
                                             @endif
@@ -148,10 +159,12 @@
                                             @php
                                                 // Calcul du stock total
                                                 // Stock total = Stock physique (dernier inventaire) + Stock initial (ajouté depuis le dernier inventaire)
-                                                $stock_total = ($produit->inventaires->first()->pivot->stock_physique ?? 0) + $produit->stock_initial;
+                                                $stock_total =
+                                                    ($produit->inventaires->first()->pivot->stock_physique ?? 0) +
+                                                    $produit->stock_initial;
                                             @endphp
                                             @if ($produit->categorie->famille == 'bar')
-                                                {!! afficherStockConvertirAvecVariantes($stock_total , $produit->uniteSortie->libelle ?? '', $produit->variantes) !!}
+                                                {!! afficherStockConvertirAvecVariantes($stock_total, $produit->uniteSortie->libelle ?? '', $produit->variantes) !!}
                                             @else
                                                 {{ $stock_total }}
                                             @endif
@@ -160,23 +173,32 @@
                                             @php
                                                 // Quantité vendue ou utilisée depuis le dernier inventaire
                                                 // $quantite_vendue = $produit->quantite_vendue ?? ($produit->quantite_utilisee ?? 0);
-                                                $quantite_vendue = $produit->quantite_vendue ?? ($produit->quantite_utilisee ?? 0);
+                                                $quantite_vendue =
+                                                    $produit->quantite_vendue ?? ($produit->quantite_utilisee ?? 0);
                                             @endphp
                                             @if ($produit->categorie->famille == 'bar')
-                                                {!! afficherStockConvertirAvecVariantes($quantite_vendue, $produit->uniteSortie->libelle ?? '', $produit->variantes) !!}
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $quantite_vendue,
+                                                    $produit->uniteSortie->libelle ?? '',
+                                                    $produit->variantes,
+                                                ) !!}
                                             @else
                                                 {{ $quantite_vendue }}
                                             @endif
-                                        
+
                                         </td>
                                         <td>
-                                            
+
                                             @if ($produit->categorie->famille == 'bar')
-                                                {!! afficherStockConvertirAvecVariantes($produit->stock, $produit->uniteSortie->libelle ?? '', $produit->variantes) !!}
+                                                {!! afficherStockConvertirAvecVariantes(
+                                                    $produit->stock,
+                                                    $produit->uniteSortie->libelle ?? '',
+                                                    $produit->variantes,
+                                                ) !!}
                                             @else
                                                 {{ $produit->stock }}
                                             @endif
-                                        
+
                                         </td>
                                         <td>
 
