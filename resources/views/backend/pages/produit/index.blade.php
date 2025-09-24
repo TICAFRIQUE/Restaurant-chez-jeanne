@@ -65,6 +65,7 @@
                                     <th>Stock</th>
                                     <th>Stock alerte</th>
                                     <th>Date creation</th>
+                                    <th>Crée par</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -170,6 +171,7 @@
                                         {{-- <td>{{ $item['stock'] }} {{ $item['uniteSortie']['libelle'] ?? '' }}</td> --}}
                                         <td>{{ $item['stock_alerte'] }} {{ $item['uniteSortie']['libelle'] ?? '' }}</td>
                                         <td> {{ $item['created_at'] }} </td>
+                                        <td> {{ $item->user->first_name ?? '-' }} </td>
                                         <td>
                                             <div class="dropdown d-inline-block">
                                                 <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
