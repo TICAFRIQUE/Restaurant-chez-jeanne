@@ -66,6 +66,56 @@
                                 </tr>
                             </thead>
                             <tbody>
+
+                                @php
+                                    if (!function_exists('afficherStockConvertirAvecVariantes')) {
+                                        function afficherStockConvertirAvecVariantes(
+                                            $valeur,
+                                            $unite = '',
+                                            $variantes = null,
+                                        ) {
+                                            $signe = $valeur < 0 ? '-' : '';
+                                            $valeur = abs($valeur);
+
+                                            $entier = floor($valeur); // bouteilles pleines
+                                            $decimal = $valeur - $entier; // partie décimale
+                                            $texte = '';
+
+                                            if ($decimal == 0) {
+                                                if ($entier > 0) {
+                                                    $texte .= $entier . ' ' . $unite;
+                                                }
+                                            } else {
+                                                if ($entier > 0) {
+                                                    $texte .= $entier . ' ' . $unite;
+                                                }
+
+                                                if ($variantes) {
+                                                    $verre = $variantes->where('libelle', 'Verre')->first();
+                                                    $ballon = $variantes->where('libelle', 'Ballon')->first();
+
+                                                    if ($verre && ($verre->pivot->quantite ?? 0) > 0) {
+                                                        $verres_par_bouteille = $verre->pivot->quantite;
+                                                        $verres = round($decimal * $verres_par_bouteille, 2);
+                                                        if (floor($verres) > 0) {
+                                                            $texte .=
+                                                                ($texte ? ' et ' : '') . floor($verres) . ' verre(s)';
+                                                        }
+                                                    } elseif ($ballon && ($ballon->pivot->quantite ?? 0) > 0) {
+                                                        $ballons_par_bouteille = $ballon->pivot->quantite;
+                                                        $ballons = round($decimal * $ballons_par_bouteille, 2);
+                                                        if (floor($ballons) > 0) {
+                                                            $texte .=
+                                                                ($texte ? ' et ' : '') . floor($ballons) . ' ballon(s)';
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            return $texte ? $signe . $texte : '0';
+                                        }
+                                    }
+                                @endphp
                                 @foreach ($data_produit as $key => $produit)
                                     <tr>
                                         <td>{{ $key + 1 }}</td>
@@ -77,28 +127,58 @@
                                             </p>
                                         </td>
                                         <td>{{ $produit->categorie->name }}</td>
-                                        <td>{{ $produit->inventaires->first()->pivot->stock_physique ?? 0 }}</td>
-                                        <td>{{ $produit->stock_initial }}</td>
                                         <td>
-                                            {{ ($produit->inventaires->first()->pivot->stock_physique ?? 0) + $produit->stock_initial }}
-                                        </td>
-                                        <td>{{ $produit->quantite_vendue ?? ($produit->quantite_utilisee ?? 0) }}</td>
-                                        <td>{{ $produit->stock }}</td>
-                                        <td>
-                                            {{-- @php
-                                                $stock_physique =
-                                                    $produit->inventaires->first()->pivot->stock_physique ?? 0;
-                                                $quantite_utilisee =
-                                                    $produit->quantite_vendue ?? ($produit->quantite_utilisee ?? 0);
-                                                $stock_calcule =
-                                                    $stock_physique + $produit->stock_initial - $quantite_utilisee;
-                                            @endphp
-
-                                            @if ($produit->stock == $stock_calcule)
-                                                <span class="badge bg-success">Normal</span>
+                                            @if ($produit->categorie->famille == 'bar')
+                                                {!! afficherStockConvertirAvecVariantes($produit->inventaires->first()->pivot->stock_physique ?? 0) !!}
                                             @else
-                                                <span class="badge bg-danger">Alerte</span>
-                                            @endif --}}
+                                                {{ $produit->inventaires->first()->pivot->stock_physique ?? 0 }}
+                                            @endif
+
+
+
+                                        </td>
+                                        <td>
+                                            @if ($produit->categorie->famille == 'bar')
+                                                {!! afficherStockConvertirAvecVariantes($produit->stock_initial) !!}
+                                            @else
+                                                {{ $produit->stock_initial }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @php
+                                                // Calcul du stock total
+                                                // Stock total = Stock physique (dernier inventaire) + Stock initial (ajouté depuis le dernier inventaire)
+                                                $stock_total = ($produit->inventaires->first()->pivot->stock_physique ?? 0) + $produit->stock_initial;
+                                            @endphp
+                                            @if ($produit->categorie->famille == 'bar')
+                                                {!! afficherStockConvertirAvecVariantes($stock_total) !!}
+                                            @else
+                                                {{ $stock_total }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @php
+                                                // Quantité vendue ou utilisée depuis le dernier inventaire
+                                                // $quantite_vendue = $produit->quantite_vendue ?? ($produit->quantite_utilisee ?? 0);
+                                                $quantite_vendue = $produit->quantite_vendue ?? ($produit->quantite_utilisee ?? 0);
+                                            @endphp
+                                            @if ($produit->categorie->famille == 'bar')
+                                                {!! afficherStockConvertirAvecVariantes($quantite_vendue) !!}
+                                            @else
+                                                {{ $quantite_vendue }}
+                                            @endif
+                                        
+                                        </td>
+                                        <td>
+                                            
+                                            @if ($produit->categorie->famille == 'bar')
+                                                {!! afficherStockConvertirAvecVariantes($produit->stock) !!}
+                                            @else
+                                                {{ $produit->stock }}
+                                            @endif
+                                        
+                                        </td>
+                                        <td>
 
                                             @php
                                                 $stock_physique =
@@ -107,10 +187,11 @@
                                                     $produit->quantite_vendue ?? ($produit->quantite_utilisee ?? 0);
                                                 $stock_calcule =
                                                     $stock_physique + $produit->stock_initial - $quantite_utilisee;
+                                                // Arrondir à 2 décimales pour éviter les problèmes de précision flottante
+                                                $stock_calcule = round($stock_calcule, 2);
                                             @endphp
 
-                                            @if (abs($produit->stock - $stock_calcule) < 0.01)
-                                                {{-- Tolérance d'erreur de 0.01 --}}
+                                            @if ($produit->stock == $stock_calcule)
                                                 <span class="badge bg-success">Normal</span>
                                             @else
                                                 <span class="badge bg-danger">Alerte</span>

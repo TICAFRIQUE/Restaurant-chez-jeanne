@@ -180,11 +180,11 @@
                                         class="nav-link {{ Route::is('etat-stock.*') ? 'active' : '' }}">Etat du stock</a>
                                 </li>
 
-                                {{-- <li class="nav-item active">
+                                <li class="nav-item active">
                                     <a href="{{ route('etat-stock.suiviStock') }}"
                                         class="nav-link {{ Route::is('suivi-stock.*') ? 'active' : '' }}">Suivi du
                                         stock</a>
-                                </li> --}}
+                                </li>
                             </ul>
                         </div>
                     </li>
