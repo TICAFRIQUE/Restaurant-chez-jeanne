@@ -36,7 +36,7 @@
                                  <div class="mb-3">
                                     <label for="username" class="form-label">Telephone</label>
                                     <input type="number" name="phone" class="form-control" id="username"
-                                        required>
+                                        >
                                 </div>
 
                                  <div class="mb-3">

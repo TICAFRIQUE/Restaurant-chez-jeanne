@@ -155,7 +155,7 @@ class AdminController extends Controller
                 'last_name' => 'required',
                 'first_name' => 'required',
                 'email' => 'required|email',
-                'phone' => 'required|',
+                'phone' => 'nullable',
                 'role' => 'required',
                 'password' => 'required|min:6',
             ]);
