@@ -46,7 +46,7 @@
                                             <label class="form-label" for="meta-title-input">Date <span
                                                     class="text-danger">*</span>
                                             </label>
-                                            <input type="date" id="currentDate" value="{{ $menu->date_menu }}"
+                                            <input type="datetime-local" id="currentDate" value="{{ $menu->date_menu }}"
                                                 name="date_menu" class="form-control" required>
                                         </div>
 

@@ -118,9 +118,9 @@ class MenuController extends Controller
 
             //modifer l'heure
             $dateMenu = Carbon::parse($request->date_menu)
-                  ->setHour(6)
-                  ->setMinute(0)
-                  ->setSecond(0);
+                ->setHour(6)
+                ->setMinute(0)
+                ->setSecond(0);
             $menu = Menu::firstOrCreate([
                 'date_menu' => $dateMenu,
                 'libelle' => $libelle,
@@ -220,31 +220,7 @@ class MenuController extends Controller
     }
 
 
-    // public function update(Request $request, $id)
-    // {
-    //     try {
-    //         $request->validate([
-    //             'date_menu' => 'required',
-    //             // required produit min:1
-    //             'produits' => 'required|array|min:1',
-    //         ]);
 
-    //         $libelle = $request['libelle'] ? $request['libelle'] : 'Menu du ' . $request->date_menu;
-    //         $data_menu = Menu::find($id);
-    //         $data_menu->update([
-    //             'date_menu' => $request->date_menu,
-    //             'libelle' => $libelle,
-    //             'user_id' => Auth::id(),
-    //         ]);
-    //         //method attach product with menu
-    //         $data_menu->produits()->sync($request['produits']);
-    //         Alert::success('Operation réussi', 'Success Message');
-    //         return back();
-    //     } catch (\Throwable $e) {
-    //         Alert::error($e->getMessage(),  'Une erreur s\'est produite');
-    //         return back();
-    //     }
-    // }
 
     public function update(Request $request, $id)
     {
@@ -269,8 +245,13 @@ class MenuController extends Controller
 
             // Mettre à jour les informations du menu
             $libelle = $request['libelle'] ? $request['libelle'] : 'Menu du ' . $request->date_menu;
+            //modifer l'heure
+            $dateMenu = Carbon::parse($request->date_menu)
+                ->setHour(6)
+                ->setMinute(0)
+                ->setSecond(0);
             $menu->update([
-                'date_menu' => $request->date_menu,
+                'date_menu' => $dateMenu,
                 'libelle' => $libelle,
                 'user_id' => Auth::id(),
             ]);
