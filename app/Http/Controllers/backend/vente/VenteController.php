@@ -213,7 +213,7 @@ class VenteController extends Controller
                     ->count();
 
 
-                        // Verifier si il ya des vente non cloturer
+                // Verifier si il ya des vente non cloturer
                 $venteCaisseNonCloture = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
                     ->where('statut_cloture', false)
@@ -408,28 +408,36 @@ class VenteController extends Controller
 
 
             // Récupérer le menu du jour avec les produits, compléments et garnitures
-            $menu = Menu::where('date_menu', Carbon::today()->toDateString())
+
+            $now = Carbon::now();
+
+            $menu = Menu::where('date_menu', '<=', $now)             // Menu déjà commencé
+                ->where('date_menu', '>=', $now->copy()->subDay()) // Menu pas plus vieux que 24h
                 ->with([
-                    'plats' => function ($query) {
+                    'plats' => function ($query) use ($now) {
                         $query->with([
-                            'categorieMenu',  // Relation vers la catégorie de produit
-                            'complements' => function ($query) {
-                                $query->wherePivot('menu_id', function ($subQuery) {
+                            'categorieMenu',
+                            'complements' => function ($query) use ($now) {
+                                $query->wherePivot('menu_id', function ($subQuery) use ($now) {
                                     $subQuery->select('id')
                                         ->from('menus')
-                                        ->where('date_menu', Carbon::today()->toDateString());
+                                        ->where('date_menu', '<=', $now)
+                                        ->where('date_menu', '>=', $now->copy()->subDay());
                                 });
                             },
-                            'garnitures' => function ($query) {
-                                $query->wherePivot('menu_id', function ($subQuery) {
+                            'garnitures' => function ($query) use ($now) {
+                                $query->wherePivot('menu_id', function ($subQuery) use ($now) {
                                     $subQuery->select('id')
                                         ->from('menus')
-                                        ->where('date_menu', Carbon::today()->toDateString());
+                                        ->where('date_menu', '<=', $now)
+                                        ->where('date_menu', '>=', $now->copy()->subDay());
                                 });
                             }
                         ]);
                     },
-                ])->first();
+                ])
+                ->first();
+
 
             // Vérifier s'il y a un menu
             if (!$menu) {

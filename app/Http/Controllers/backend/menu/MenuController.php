@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\backend\menu;
 
+use Carbon\Carbon;
 use App\Models\Menu;
 use App\Models\Plat;
 use App\Models\Produit;
 use App\Models\Categorie;
 use App\Models\ProduitMenu;
+use function Deployer\desc;
 use Illuminate\Http\Request;
 use App\Models\CategorieMenu;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
-
-use function Deployer\desc;
 
 class MenuController extends Controller
 {
@@ -114,8 +115,14 @@ class MenuController extends Controller
 
             // Créer ou récupérer le menu
             $libelle = $request['libelle'] ? $request['libelle'] : 'Menu du ' . $request->date_menu;
+
+            //modifer l'heure
+            $dateMenu = Carbon::parse($request->date_menu)
+                  ->setHour(6)
+                  ->setMinute(0)
+                  ->setSecond(0);
             $menu = Menu::firstOrCreate([
-                'date_menu' => $request->date_menu,
+                'date_menu' => $dateMenu,
                 'libelle' => $libelle,
                 'user_id' => Auth::id(),
             ]);

@@ -47,7 +47,7 @@
                                             <label class="form-label" for="meta-title-input">Date <span
                                                     class="text-danger">*</span>
                                             </label>
-                                            <input type="date" id="currentDate" value="<?php echo date('Y-m-d'); ?>"
+                                            <input type="date" id="currentDate" value="<?php echo date('Y-m-d H:i'); ?>"
                                                 name="date_menu" class="form-control" required>
                                         </div>
 
