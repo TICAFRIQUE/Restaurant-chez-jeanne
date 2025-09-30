@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use App\Models\CategorieMenu;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Services\convertToMajuscule;
+
 
 class PlatController extends Controller
 {
@@ -76,7 +78,7 @@ class PlatController extends Controller
 
             $sku = 'PM-' . strtoupper(Str::random(8));
             $plat = Produit::firstOrCreate([
-                'nom' => $request['nom'],
+                'nom' => ConvertToMajuscule::toUpperNoAccent($request['nom']),
                 'code' =>  $sku,
                 'description' => $request['description'],
                 'categorie_id' => $request['categorie'],
@@ -213,7 +215,7 @@ class PlatController extends Controller
             $principaCat =  $principaCat->getPrincipalCategory();
 
             $plat = tap(Produit::find($id))->update([
-                'nom' => $request['nom'],
+                 'nom' => ConvertToMajuscule::toUpperNoAccent($request['nom']),
                 'description' => $request['description'],
                 'categorie_id' => $request['categorie'],
                 'categorie_menu_id' => $request['categorie_menu_id'],

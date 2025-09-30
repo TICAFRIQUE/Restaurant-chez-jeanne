@@ -35,36 +35,36 @@ class VenteController extends Controller
      *
      * @return void
      */
-    public function calculeQteVarianteProduit()
-    {
-        // Récupérer les produits appartenant à la famille "bar"
-        $data_produit_bar = Produit::withWhereHas('categorie', fn($q) => $q->where('famille', 'bar'))
-            ->orderBy('created_at', 'DESC')
-            ->get();
+    // public function calculeQteVarianteProduit()
+    // {
+    //     // Récupérer les produits appartenant à la famille "bar"
+    //     $data_produit_bar = Produit::withWhereHas('categorie', fn($q) => $q->where('famille', 'bar'))
+    //         ->orderBy('created_at', 'DESC')
+    //         ->get();
 
-        foreach ($data_produit_bar as $produit) {
-            // Mettre à zéro toutes les quantités disponibles des variantes du produit
-            DB::table('produit_variante')
-                ->where('produit_id', $produit->id)
-                ->update(['quantite_disponible' => 0]);
+    //     foreach ($data_produit_bar as $produit) {
+    //         // Mettre à zéro toutes les quantités disponibles des variantes du produit
+    //         DB::table('produit_variante')
+    //             ->where('produit_id', $produit->id)
+    //             ->update(['quantite_disponible' => 0]);
 
-            // Récupérer toutes les variantes associées au produit
-            $variantes = DB::table('produit_variante')
-                ->where('produit_id', $produit->id)
-                ->get();
+    //         // Récupérer toutes les variantes associées au produit
+    //         $variantes = DB::table('produit_variante')
+    //             ->where('produit_id', $produit->id)
+    //             ->get();
 
-            foreach ($variantes as $variante) {
-                // Calculer la nouvelle quantité disponible
-                $nouvelle_quantite = $produit->stock * $variante->quantite;
+    //         foreach ($variantes as $variante) {
+    //             // Calculer la nouvelle quantité disponible
+    //             $nouvelle_quantite = $produit->stock * $variante->quantite;
 
-                // Mettre à jour la quantité disponible
-                DB::table('produit_variante')
-                    ->where('produit_id', $produit->id)
-                    ->where('variante_id', $variante->variante_id)
-                    ->update(['quantite_disponible' => $nouvelle_quantite]);
-            }
-        }
-    }
+    //             // Mettre à jour la quantité disponible
+    //             DB::table('produit_variante')
+    //                 ->where('produit_id', $produit->id)
+    //                 ->where('variante_id', $variante->variante_id)
+    //                 ->update(['quantite_disponible' => $nouvelle_quantite]);
+    //         }
+    //     }
+    // }
 
 
     public function index(Request $request)
@@ -380,7 +380,7 @@ class VenteController extends Controller
 
 
             // appeler la fonction calculeQteVarianteProduit
-            $this->calculeQteVarianteProduit(); // calcule la quantité de chaque produit variantes
+            // $this->calculeQteVarianteProduit(); // calcule la quantité de chaque produit variantes
 
 
             $data_produit = Produit::active()

@@ -35,18 +35,36 @@ class CategorieController extends Controller
         try {
             //request validation ......
             $request->validate([
-                'name' => 'required|unique:categories',
+                'name' => 'required|string|max:255',
+                'type_produit' => 'nullable|exists:categories,id',
             ]);
 
 
-            $data_count = Categorie::where('parent_id', null)->count();
-            // dd($data_count);
+            $famille = null;
+            $parent_id = $request['type_produit'] ?? null;
+            if ($parent_id) {
+                $parent = Categorie::find($parent_id);
+                $famille = $parent ? $parent->famille : null;
+            }
 
-            $data_categorie = Categorie::firstOrCreate([
+            // Vérification de l'unicité sur name + parent_id + famille
+            $exists = Categorie::where('name', Str::lower($request['name']))
+                ->where('parent_id', $parent_id)
+                ->where('famille', $famille)
+                ->exists();
+
+            if ($exists) {
+                return back()->withErrors(['name' => 'Ce nom existe déjà pour cette famille et ce parent.'])->withInput();
+            }
+
+            $data_count = Categorie::where('parent_id', $parent_id)->count();
+
+            $data_categorie = Categorie::create([
                 'name' => Str::lower($request['name']),
                 'status' => $request['status'],
                 'url' => $request['url'],
-                'parent_id' => $request['type_produit'],
+                'parent_id' => $parent_id,
+                'famille' => $famille,
                 'position' => $data_count + 1,
             ]);
 
@@ -54,7 +72,8 @@ class CategorieController extends Controller
 
             return back();
         } catch (\Throwable $e) {
-            Alert::success($e->getMessage(), 'Une erreur s\'est produite');
+            Alert::error('Erreur', $e->getMessage());
+            return back()->withInput();
         }
     }
 
@@ -78,30 +97,40 @@ class CategorieController extends Controller
     public function addSubCatStore(Request $request)
     {
         try {
-            //request validation ......
             $request->validate([
-                'name' => 'required|unique:categories',
+                'name' => 'required|string|max:255',
+                'categorie_parent' => 'required|exists:categories,id',
             ]);
 
-            $categorie_parent = Categorie::whereId($request['categorie_parent'])->first();
+            $categorie_parent = Categorie::findOrFail($request['categorie_parent']);
 
-            // dd($categorie_parent->toArray());
-            //function for add position
-            $data_count = Categorie::where('parent_id', $categorie_parent['id'])->count();
+            // Vérification de l'unicité sur name + parent_id + famille
+            $exists = Categorie::where('name', Str::lower($request['name']))
+                ->where('parent_id', $categorie_parent->id)
+                ->where('famille', $categorie_parent->famille)
+                ->exists();
 
-            $data_categorie = Categorie::firstOrCreate([
-                'parent_id' => $categorie_parent['id'],
+            if ($exists) {
+                Alert::error('Opération échouée', 'Ce nom existe déjà pour cette famille et ce parent.');
+                return back()->withInput();
+            }
+
+            $data_count = Categorie::where('parent_id', $categorie_parent->id)->count();
+
+            $data_categorie = Categorie::create([
+                'parent_id' => $categorie_parent->id,
                 'name' => Str::lower($request['name']),
-                'status' => $request['status'],
-                'url' => $request['url'],
+                'famille' => $categorie_parent->famille,
+                'status' => $request['status'] ?? 'active',
+                'url' => $request['url'] ?? null,
                 'position' => $data_count + 1,
-                'famille' =>  $categorie_parent['famille'],
             ]);
 
-            Alert::success('Operation réussi', 'Success Message');
+            Alert::success('Opération réussie', 'La sous-catégorie a été ajoutée avec succès.');
             return redirect()->route('categorie.create');
         } catch (\Throwable $e) {
-            Alert::success($e->getMessage(), 'Une erreur s\'est produite');
+            Alert::error('Erreur', $e->getMessage());
+            return back()->withInput();
         }
     }
 
@@ -126,25 +155,37 @@ class CategorieController extends Controller
 
     public function update(Request $request, $id)
     {
-
-        //request validation ......
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
         ]);
 
         try {
+            $categorie = Categorie::findOrFail($id);
 
-            $data_categorie = Categorie::find($id)->update([
+            // Vérification de l'unicité sur name + parent_id + famille, hors catégorie courante
+            $exists = Categorie::where('name', Str::lower($request['name']))
+                ->where('parent_id', $categorie->parent_id)
+                ->where('famille', $categorie->famille)
+                ->where('id', '!=', $id)
+                ->exists();
+
+            if ($exists) {
+                Alert::error('Opération échouée', 'Ce nom existe déjà pour cette famille et ce parent.');
+                return back()->withInput();
+            }
+
+            $categorie->update([
                 'name' => Str::lower($request['name']),
                 'status' => $request['status'],
                 'url' => $request['url'],
                 'position' => $request['position'],
             ]);
 
-            Alert::success('Opération réussi', 'Success Message');
+            Alert::success('Opération réussie', 'La catégorie a été modifiée avec succès.');
             return redirect()->route('categorie.create');
         } catch (\Throwable $e) {
-            Alert::success($e->getMessage(), 'Une erreur s\'est produite');
+            Alert::error('Erreur', $e->getMessage());
+            return back()->withInput();
         }
     }
 
@@ -162,7 +203,7 @@ class CategorieController extends Controller
             }
             //supprimer
             $categorie = Categorie::find($id)->forceDelete();
-            
+
             // DB::table('categories')->whereId($id)->delete();
 
             //delete categorie

@@ -30,8 +30,8 @@
 
                                 <p>Sku : <span class="fw-bold" id="sku">{{ $data_produit['code'] }} </span></p>
                                 <p>Nom : <span class="fw-bold" id="sku">{{ $data_produit['nom'] }}
-                                        {{ $data_produit['valeur_unite'] ?? '' }}
-                                        {{ $data_produit['unite']['libelle'] ?? '' }} </span></p>
+                                       
+                                        {{ $data_produit['variante']['libelle'] ?? '' }} </span></p>
                                 <p>Stock actuel : <span class="fw-bold" id="stock">{{ $data_produit['stock'] }}</span>
                                 </p>
                                 <p>Stock alerte : <span class="fw-bold text-danger"

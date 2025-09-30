@@ -138,60 +138,7 @@ class AchatController extends Controller
             }
 
 
-            //gestion des validations 
-            // foreach ($request->produit_id as $index => $produitId) {
-            //     $produit = Produit::find($produitId);
-            //     $categorie = Categorie::find($produit->categorie_id); // catégorie du produit
-
-            //     // récupérer le type de produit
-            //     $type_produit = $categorie->famille;
-
-            //     // Validation en fonction du type de produit
-            //     if ($type_produit == 'restaurant') {
-            //         // Validation pour un produit de type "restaurant"
-            //         $request->validate([
-            //             'type' => 'required', // type facture
-            //             'numero_facture' => 'required',
-            //             'montant' => 'required', // montant de la facture
-            //             'date_achat' => 'required',
-            //             // 'magasin_id.*' => 'required|exists:magasins,id',
-            //             'produit_id.*' => 'required|exists:produits,id',
-            //             'fournisseur_id.*' => 'required|exists:fournisseurs,id',
-            //             'format_id.*' => 'required|exists:formats,id|min:1',
-            //             'quantite_format.*' => 'required',
-            //             'quantite_in_format.*' => 'required',
-            //             'quantite_stocke.*' => 'required',
-            //             'prix_unitaire_format.*' => 'required',
-            //             'prix_total_format.*' => 'required',
-            //             // Ces champs ne sont pas requis pour le restaurant
-            //             'prix_achat_unitaire.*' => 'nullable',
-            //             'prix_vente_unitaire.*' => 'nullable',
-            //             // 'unite_sortie.*' => 'required',
-            //         ]);
-            //     } elseif ($type_produit == 'bar') {
-            //         // Validation pour un produit de type "bar"
-            //         $request->validate([
-            //             'type' => 'required', // type facture
-            //             'numero_facture' => 'required',
-            //             'montant' => 'required', // montant de la facture
-            //             'date_achat' => 'required',
-            //             // 'magasin_id.*' => 'required|exists:magasins,id',
-            //             'produit_id.*' => 'required|exists:produits,id',
-            //             'fournisseur_id.*' => 'required|exists:fournisseurs,id',
-            //             'format_id.*' => 'required|exists:formats,id',
-            //             'quantite_format.*' => 'required',
-            //             'quantite_in_format.*' => 'required',
-            //             'quantite_stocke.*' => 'required',
-            //             'prix_unitaire_format.*' => 'required',
-            //             'prix_total_format.*' => 'required',
-            //             // Ces champs sont requis pour le bar
-            //             'prix_achat_unitaire.*' => 'required',
-            //             'prix_vente_unitaire.*' => 'required',
-            //             // 'unite_sortie.*' => 'required|exists:unites,id',
-            //         ]);
-            //     }
-            // }
-
+          
             // Gestion des validations
             $rules = [];
             $messages = [];
@@ -453,154 +400,7 @@ class AchatController extends Controller
     }
 
 
-    // public function delete($id)
-    // {
-    //     // recuperer l'achat liéà la facture
-    //     $achat = Achat::where('facture_id', $id)->first();
-    //     // recuperer le produit et la quantité
-    //     $produit = Produit::find($achat->produit_id); // recuperer le produit lié à l'achat
-    //     $quantite = $achat->quantite_stocke; // recuperer la quantité stockable de l'achat
-    //     // mettre a jour le stock du produit
-    //     $produit->stock -= $quantite;
-    //     $produit->stock_initial -= $quantite;
-    //     $produit->save();
 
-
-    //     // //Enlever le stock dans la table ivot produit_variante
-    //     // $variantes = DB::table('produit_variante')
-    //     //     ->where('produit_id',  $produit)
-    //     //     ->get(); // Récupérer toutes les variantes du produit
-
-    //     // foreach ($variantes as $variante) {
-    //     //     DB::table('produit_variante')
-    //     //         ->where('produit_id',  $produit)
-    //     //         ->where('variante_id', $variante->variante_id) // Vérifie que cette colonne existe
-    //     //         ->update([
-    //     //             'quantite_disponible' =>   $variante->quantite_disponible - $quantite
-    //     //         ]);
-    //     // }
-
-
-    //     // A la suppression mettre à jour la quantité disponible des variantes du produit
-
-    //     #### script pour mettre à jour la quantité disponible des variantes du produit
-
-    //     // recuperer les produit de famille bar
-    //     // Récupérer toutes les variantes associées au produit
-    //     $variantes = DB::table('produit_variante')
-    //         ->where('produit_id', $produit->id)
-    //         ->get(); // Récupérer toutes les variantes du produit
-
-
-    //     foreach ($variantes as $variante) {
-    //         DB::table('produit_variante')
-    //             ->where('produit_id', $produit->id)
-    //             ->where('variante_id', $variante->variante_id)
-    //             ->update([
-    //                 'quantite_disponible' => 0,
-    //             ]);
-
-
-
-    //         // // Récupérer la quantité disponible actuelle
-    //         // $quantite_disponible_actuelle = DB::table('produit_variante')
-    //         //     ->where('produit_id', $produit->id)
-    //         //     ->where('variante_id', $variante->variante_id)
-    //         //     ->value('quantite_disponible'); // Récupère uniquement la colonne quantite_disponible
-
-    //         // // Calculer la nouvelle quantité disponible
-    //         // $nouvelle_quantite = $quantite_disponible_actuelle + ($produit->stock * $variante->quantite);
-
-    //         // // Mettre à jour la quantité disponible
-    //         // DB::table('produit_variante')
-    //         //     ->where('produit_id', $produit->id)
-    //         //     ->where('variante_id', $variante->variante_id)
-    //         //     ->update([
-    //         //         'quantite_disponible' => $nouvelle_quantite,
-    //         //     ]);
-    //     }
-
-
-    //     // appeler la function miseAJourStock
-    //     $this->miseAJourStock($achat->produit_id); // Appelle la fonction miseAJourStock avec l'id du produit
-
-    //     Facture::find($id)->forceDelete();
-    //     return response()->json([
-    //         'status' => 200,
-    //     ]);
-    // }
-
-    public function miseAJourStock($id)
-    {
-        $produit = Produit::find($id);
-
-        if (!$produit) {
-            return; // Arrête l'exécution si le produit n'existe pas
-        }
-
-        // Récupérer toutes les variantes associées au produit
-        $variantes = DB::table('produit_variante')
-            ->where('produit_id', $produit->id)
-            ->get();
-
-        foreach ($variantes as $variante) {
-            // Récupérer la quantité disponible actuelle
-            $quantite_disponible_actuelle = DB::table('produit_variante')
-                ->where('produit_id', $produit->id)
-                ->where('variante_id', $variante->variante_id)
-                ->value('quantite_disponible');
-
-            // Calculer la nouvelle quantité disponible
-            $nouvelle_quantite = $quantite_disponible_actuelle + ($produit->stock * $variante->quantite);
-
-            // Mettre à jour la quantité disponible
-            DB::table('produit_variante')
-                ->where('produit_id', $produit->id)
-                ->where('variante_id', $variante->variante_id)
-                ->update([
-                    'quantite_disponible' => $nouvelle_quantite,
-                ]);
-        }
-    }
-
-
-
-    // public function delete($id)
-    // {
-    //     // Récupérer l'achat lié à la facture
-    //     $achat = Achat::where('facture_id', $id)->first();
-
-    //     if (!$achat) {
-    //         return response()->json(['message' => 'Achat non trouvé'], 404);
-    //     }
-
-    //     // Récupérer le produit lié à l'achat
-    //     $produit = Produit::find($achat->produit_id);
-    //     if (!$produit) {
-    //         return response()->json(['message' => 'Produit non trouvé'], 404);
-    //     }
-
-    //     // Récupérer la quantité stockable de l'achat
-    //     $quantite = $achat->quantite_stocke;
-
-    //     // Mettre à jour le stock du produit
-    //     $produit->stock -= $quantite;
-    //     $produit->stock_initial -= $quantite;
-    //     $produit->save();
-
-    //     // Mettre à jour la quantité disponible des variantes du produit
-    //     DB::table('produit_variante')
-    //         ->where('produit_id', $produit->id)
-    //         ->update(['quantite_disponible' => 0]);
-
-    //     // Appeler la fonction miseAJourStock
-    //     $this->miseAJourStock($produit->id);
-
-    //     // Supprimer la facture
-    //     Facture::find($id)->forceDelete();
-
-    //     return response()->json(['status' => 200]);
-    // }
 
 
     public function delete($id)
@@ -625,13 +425,7 @@ class AchatController extends Controller
             $produit->stock_initial -= $quantite;
             $produit->save();
 
-            // Mettre les variantes à 0 (si nécessaire)
-            DB::table('produit_variante')
-                ->where('produit_id', $produit->id)
-                ->update(['quantite_disponible' => 0]);
-
-            // Mise à jour du stock
-            $this->miseAJourStock($produit->id);
+          
         }
 
         // Supprimer la facture (et potentiellement ses achats si liés par cascade)
@@ -643,39 +437,5 @@ class AchatController extends Controller
 
 
 
-    // public function miseAJourStock($id)
-    // {
-    //     // recuperer les produit de famille bar
-    //     // $produit = Produit::withWhereHas('categorie', fn($q) => $q->where('famille', 'bar'))
-    //     //     ->orderBy('created_at', 'DESC')->get();
-    //     $produit = Produit::find($id);
-
-
-    //     foreach ($produit as $index => $value) {
-    //         // Récupérer toutes les variantes associées au produit
-    //         $variantes = DB::table('produit_variante')
-    //             ->where('produit_id', $value['id'])
-    //             ->get(); // Récupérer toutes les variantes du produit
-
-
-    //         foreach ($variantes as $variante) {
-    //             // Récupérer la quantité disponible actuelle
-    //             $quantite_disponible_actuelle = DB::table('produit_variante')
-    //                 ->where('produit_id', $value['id'])
-    //                 ->where('variante_id', $variante->variante_id)
-    //                 ->value('quantite_disponible'); // Récupère uniquement la colonne quantite_disponible
-
-    //             // Calculer la nouvelle quantité disponible
-    //             $nouvelle_quantite = $quantite_disponible_actuelle + ($value['stock'] * $variante->quantite);
-
-    //             // Mettre à jour la quantité disponible
-    //             DB::table('produit_variante')
-    //                 ->where('produit_id', $value['id'])
-    //                 ->where('variante_id', $variante->variante_id)
-    //                 ->update([
-    //                     'quantite_disponible' => $nouvelle_quantite,
-    //                 ]);
-    //         }
-    //     }
-    // } //
+    
 }

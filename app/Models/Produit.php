@@ -40,7 +40,8 @@ class Produit extends Model implements HasMedia
 
     protected $fillable = [
         'code',
-        'nom', // libellé produit
+        'nom', // nom produit
+        'libelle', // libellé produit nom + variante
         'slug',
         'description',
         'prix', // prix de vente
@@ -59,6 +60,7 @@ class Produit extends Model implements HasMedia
         'format_id', // format du produit
         'valeur_format', // valeur du format
         'unite_sortie_id', // unite de sortie ou vente
+        'variante_id', // variante du produit
     ];
 
 
@@ -76,7 +78,7 @@ class Produit extends Model implements HasMedia
     {
         return [
             'slug' => [
-                'source' => 'nom'
+                'source' => 'libelle'
             ]
         ];
     }
@@ -188,6 +190,11 @@ class Produit extends Model implements HasMedia
             'quantite_vendu',
             'bouteille_vendu'
         ])->withTimestamps();
+    }
+
+    public function variante()
+    {
+        return $this->belongsTo(Variante::class, 'variante_id');
     }
 
     //relations offerts

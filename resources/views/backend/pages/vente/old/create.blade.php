@@ -18,22 +18,22 @@
                 <div class="card-body">
                     <!-- Nav tabs -->
                     <ul class="nav nav-pills nav-custom nav-custom-light mb-3 w-100" role="tablist">
-                        <li class="nav-item " style="width: 50%">
+                        <li class="nav-item " style="width: 33%">
                             <a class="nav-link active w-100" data-bs-toggle="tab" href="#nav-vente-ordinaire" role="tab">
                                 Vente Ordinaire
                             </a>
                         </li>
-                        <li class="nav-item " style="width: 50%">
+                        <li class="nav-item " style="width: 33%">
                             <a class="nav-link w-100" data-bs-toggle="tab" href="#nav-vente-menu" role="tab">
                                 Vente Menu du jour
                             </a>
                         </li>
 
-                        {{-- <li class="nav-item " style="width: 34%">
+                        <li class="nav-item " style="width: 34%">
                             <a class="nav-link w-100" href="{{ route('commande.index', ['filter' => 'en attente']) }}">
                                 Commande en ligne
                             </a>
-                        </li> --}}
+                        </li>
                     </ul>
                     <div class="tab-content text-muted">
                         <div class="tab-pane active" id="nav-vente-ordinaire" role="tabpanel">
@@ -50,8 +50,8 @@
                                                             <option value="{{ $produit->id }}"
                                                                 data-price="{{ $produit->prix }}"
                                                                 data-stock="{{ $produit->stock }}" disabled>
-                                                                {{ $produit->libelle }}
-
+                                                                {{ $produit->libelle }} 
+                                                              
                                                                 ({{ $produit->prix }} FCFA)
                                                                 - <span style="color: red" class="text-danger">(Stock:
                                                                     {{ $produit->stock }})</span>
@@ -60,7 +60,7 @@
                                                             <option value="{{ $produit->id }}"
                                                                 data-price="{{ $produit->prix }}"
                                                                 data-stock="{{ $produit->stock }}">
-                                                                {{ $produit->nom }}
+                                                                {{ $produit->libelle }} 
                                                                 ({{ $produit->prix }} FCFA)
                                                                 {{-- - <span class="text-primary">(Stock: {{{$produit->stock}}})</span> --}}
                                                             </option>
@@ -83,11 +83,11 @@
                                             <div class="alert alert-danger d-none" role="alert">
                                                 <span id="errorMessage"></span>
                                             </div>
-                                            <table class="table table-bordered align-middle" id="cart-table">
-                                                <thead class="table-light">
+                                            <table class="table table-bordered" id="cart-table">
+                                                <thead>
                                                     <tr>
                                                         <th>Produit</th>
-                                                        <th>Stock</th>
+                                                        <th>Mode de vente</th>
                                                         <th>Prix unitaire</th>
                                                         <th>Quantité</th>
                                                         <th>Total</th>
@@ -206,10 +206,7 @@
 
                 <!-- Bouton de validation -->
                 <div class="mt-3">
-                    <button type="button" id="validate-sale" class="btn btn-success w-100 position-relative">
-                        <span id="sale-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        <span id="sale-text">Valider la vente</span>
-                    </button>
+                    <button type="button" id="validate-sale" class="btn btn-success w-100">Valider la vente</button>
                 </div>
 
                 <div class="mt-3">
@@ -282,54 +279,33 @@
 
 
 
-            // function addToCart(id, name, price, stock) {
-            //     let existingItem = cart.find(item => item.id === id);
-            //     selectedProd = dataProduct.find(dataItem => dataItem.id == id)
-
-            //     // Cherche la valeur "offert" déjà présente
-            //     let existingOffer = existingItem ? existingItem.offert : 0;
-
-            //     if (existingItem && selectedProd.categorie.famille !== 'bar') {
-            //         existingItem.quantity += 1;
-            //         existingItem.selectedVariante = variante; // garde la variante sélectionnée
-            //         existingItem.offert = existingOffer; // garde la valeur offerte
-            //     } else {
-            //         cart.push({
-            //             id: id,
-            //             name: name,
-            //             price: selectedProd.categorie.famille === 'bar' ? 0 : price,
-            //             stock: stock,
-            //             selectedVariante: variante ? variante : null,
-            //             varianteStock: variante ? variante.pivot.quantite_disponible : null,
-            //             quantity: 1,
-            //             discount: 0,
-            //             offert: 0 // valeur par défaut
-            //         });
-            //     }
-            // }
-
-
-
-            function addToCart(id, name, price, stock) {
+            function addToCart(id, name, price, stock, variante, varianteStock) {
                 let existingItem = cart.find(item => item.id === id);
-                let selectedProd = dataProduct.find(dataItem => dataItem.id == id);
+                selectedProd = dataProduct.find(dataItem => dataItem.id == id)
+
+                // Cherche la valeur "offert" déjà présente
                 let existingOffer = existingItem ? existingItem.offert : 0;
 
-                if (existingItem) {
+                if (existingItem && selectedProd.categorie.famille !== 'bar') {
                     existingItem.quantity += 1;
-                    existingItem.offert = existingOffer;
+                    existingItem.selectedVariante = variante; // garde la variante sélectionnée
+                    existingItem.offert = existingOffer; // garde la valeur offerte
                 } else {
                     cart.push({
                         id: id,
                         name: name,
-                        price: price,
+                        price: selectedProd.categorie.famille === 'bar' ? 0 : price,
                         stock: stock,
+                        selectedVariante: variante ? variante : null,
+                        varianteStock: variante ? variante.pivot.quantite_disponible : null,
                         quantity: 1,
                         discount: 0,
-                        offert: 0
+                        offert: 0 // valeur par défaut
                     });
                 }
             }
+
+
 
 
 
@@ -364,14 +340,26 @@
                     }
 
                     // Affichage du champ select pour les variantes ou texte 'Plat entier'
-                    // if (selectedProduct && selectedProduct.categorie && selectedProduct.categorie
-                    //     .famille === 'bar') {
-                    //     stockDisponible = `${!item.stock}
-                //        `;
+                    if (selectedProduct && selectedProduct.categorie && selectedProduct.categorie
+                        .famille === 'bar') {
+                        //mettre le bouton increment en disabled
+                        // disableQteInc = `<button class="btn btn-primary btn-sm decrease-qty" data-index="${index}" disabled>-</button>`
+                        // disableQteDec = `<button class="btn btn-primary btn-sm increase-qty" data-index="${index}" disabled>+</button>`
 
-                    // } else {
-                    //     stockDisponible = `<p>Stock infini</p>`;
-                    // }
+
+
+                        varianteSelectHtml = `
+                            <select   class="form-select form-control variante-select" data-index="${index}" required>
+                            <option disabled value="" ${!item.selectedVariante ? 'selected' : ''}>Sélectionnez une variante</option>
+                            
+                                ${variantesOptions}
+                            </select>`;
+
+
+
+                    } else {
+                        varianteSelectHtml = `<p>Plat entier</p>`;
+                    }
 
 
                     // Ajoute une ligne pour chaque produit dans le tableau
@@ -381,7 +369,7 @@
                                 ${item.name} 
                                 ${item.offert == 1 ? ' <span class="badge bg-success ms-2">Offert</span>' : ''}
                             </td>
-                            <td><span class="badge bg-info">${item.stock}</span> </td>
+                            <td>${varianteSelectHtml}</td>
                             <td class="price-cell">${item.price} FCFA</td>
                             <td class="d-flex justify-content-center align-items-center">
                                 <div class="d-flex align-items-center">
@@ -421,64 +409,64 @@
 
                 /*GESTION DES VARIANTES **/
                 // Ajoute un événement de changement sur chaque select de variante pour mettre à jour la sélection
-                // tbody.find('.variante-select').change(function() {
+                tbody.find('.variante-select').change(function() {
 
-                //     // si une variante est choisie desactiver les boutons + et -
-                //     $(this).closest('tr').find('.increase-qty, .decrease-qty').prop('disabled', false);
-                //     let index = $(this).data('index');
-                //     let variantePrice = $(this).find('option:selected').data('price');
-                //     let varianteStock = $(this).find('option:selected').data('qte');
-                //     let selectedVarianteId = $(this).val();
-                //     let selectedProductId = cart[index].id;
-
-
-                //     // Vérifie si cette variante est déjà utilisée pour ce produit dans une autre ligne
-                //     let duplicateVariante = cart.some((item, i) => {
-                //         return (
-                //             i !== index && // Ne pas comparer avec la ligne actuelle
-                //             item.id === selectedProductId &&
-                //             item.selectedVariante == selectedVarianteId
-                //         );
-                //     });
-
-                //     // if (duplicateVariante) {
-                //     //     Swal.fire({
-                //     //         icon: 'warning',
-                //     //         title: 'Attention !',
-                //     //         text: 'Cette variante est déjà sélectionnée pour le même produit.' +
-                //     //             cart[index].name,
-                //     //     });
-                //     //     $(this).val(''); // Réinitialiser la sélection
-                //     //     cart[index].selectedVariante = null;
-                //     //     cart[index].price = 0;
-                //     //     cart[index].varianteStock = 0;
-
-                //     //     $(this).closest('tr').find('.price-cell').text('0 FCFA');
-                //     //     $(this).closest('tr').find('.total-cell').text('0 FCFA');
-                //     //     updateGrandTotal();
-                //     //     return; // Sortir pour éviter de continuer avec une valeur invalide
-                //     // }
+                    // si une variante est choisie desactiver les boutons + et -
+                    $(this).closest('tr').find('.increase-qty, .decrease-qty').prop('disabled', false);
+                    let index = $(this).data('index');
+                    let variantePrice = $(this).find('option:selected').data('price');
+                    let varianteStock = $(this).find('option:selected').data('qte');
+                    let selectedVarianteId = $(this).val();
+                    let selectedProductId = cart[index].id;
 
 
-                //     if (variantePrice) {
-                //         // Met à jour le prix et la variante sélectionnée dans le panier
-                //         // cart[index].price = cart[index].offert === 1 ? 0 : variantePrice;
-                //         cart[index].price = variantePrice;
-                //         cart[index].selectedVariante = selectedVarianteId;
-                //         cart[index].varianteStock = varianteStock;
+                    // Vérifie si cette variante est déjà utilisée pour ce produit dans une autre ligne
+                    let duplicateVariante = cart.some((item, i) => {
+                        return (
+                            i !== index && // Ne pas comparer avec la ligne actuelle
+                            item.id === selectedProductId &&
+                            item.selectedVariante == selectedVarianteId
+                        );
+                    });
 
-                //         // Met à jour l'affichage des prix dans la ligne
-                //         $(this).closest('tr').find('.price-cell').text(variantePrice + ' FCFA');
-                //         $(this).closest('tr').find('.total-cell').text(calculateTotal(cart[index]) +
-                //             ' FCFA');
-                //         updateGrandTotal();
-                //         verifyQty();
+                    // if (duplicateVariante) {
+                    //     Swal.fire({
+                    //         icon: 'warning',
+                    //         title: 'Attention !',
+                    //         text: 'Cette variante est déjà sélectionnée pour le même produit.' +
+                    //             cart[index].name,
+                    //     });
+                    //     $(this).val(''); // Réinitialiser la sélection
+                    //     cart[index].selectedVariante = null;
+                    //     cart[index].price = 0;
+                    //     cart[index].varianteStock = 0;
 
-                //     }
+                    //     $(this).closest('tr').find('.price-cell').text('0 FCFA');
+                    //     $(this).closest('tr').find('.total-cell').text('0 FCFA');
+                    //     updateGrandTotal();
+                    //     return; // Sortir pour éviter de continuer avec une valeur invalide
+                    // }
+
+
+                    if (variantePrice) {
+                        // Met à jour le prix et la variante sélectionnée dans le panier
+                        // cart[index].price = cart[index].offert === 1 ? 0 : variantePrice;
+                        cart[index].price = variantePrice;
+                        cart[index].selectedVariante = selectedVarianteId;
+                        cart[index].varianteStock = varianteStock;
+
+                        // Met à jour l'affichage des prix dans la ligne
+                        $(this).closest('tr').find('.price-cell').text(variantePrice + ' FCFA');
+                        $(this).closest('tr').find('.total-cell').text(calculateTotal(cart[index]) +
+                            ' FCFA');
+                        updateGrandTotal();
+                        verifyQty();
+
+                    }
 
 
 
-                // });
+                });
 
 
 
@@ -611,7 +599,7 @@
                     var product = dataProduct.find(dataItem => dataItem.id == item.id);
                     // console.log(item);
 
-                    if (item.quantity > item.stock && product.categorie.famille == 'bar') {
+                    if (item.quantity > item.varianteStock && product.categorie.famille == 'bar') {
                         $('#errorMessage').text(
                             'La quantité entrée dépasse la quantité en stock pour le produit "' + item
                             .name + '"'
@@ -623,7 +611,7 @@
 
                     }
                     // si la quantité est égale au stock alors empecher d'augmenter
-                    if (item.quantity == item.stock && product.categorie.famille == 'bar') {
+                    if (item.quantity == item.varianteStock && product.categorie.famille == 'bar') {
                         $('.increase-qty[data-index="' + cart.indexOf(item) + '"]').prop('disabled', true);
                     }
 
@@ -695,7 +683,7 @@
                 updateCartTable();
                 updateGrandTotal();
             });
- 
+
 
 
 
@@ -706,7 +694,7 @@
                 updateGrandTotal();
                 verifyQty()
             });
- 
+
 
 
 
@@ -823,20 +811,20 @@
                 });
 
                 // Vérification des variantes pour les produits du bar
-                // cart.forEach((item) => {
-                //     let data = dataProduct.find(dataItem => dataItem.id == item.id);
-                //     let famille = data.categorie.famille;
-                //     let name = data.nom;
-                //     if (item.selectedVariante === null && famille === 'bar') {
-                //         validationEchouee = true;
-                //         Swal.fire({
-                //             icon: 'error',
-                //             title: 'Attention',
-                //             text: 'Veuillez choisir une variante pour ' + name
-                //         });
-                //         return;
-                //     }
-                // });
+                cart.forEach((item) => {
+                    let data = dataProduct.find(dataItem => dataItem.id == item.id);
+                    let famille = data.categorie.famille;
+                    let name = data.nom;
+                    if (item.selectedVariante === null && famille === 'bar') {
+                        validationEchouee = true;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Attention',
+                            text: 'Veuillez choisir une variante pour ' + name
+                        });
+                        return;
+                    }
+                });
 
                 if (cart.length === 0 && panier.length === 0) {
                     validationEchouee = true;

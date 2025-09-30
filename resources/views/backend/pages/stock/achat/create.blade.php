@@ -168,9 +168,8 @@
                             <option disabled selected value>Selectionner un produit
                             </option>
                             @foreach ($data_produit as $produit)
-                                <option value="{{ $produit->id }}">{{ $produit->nom }}
-                                    {{ $produit->valeur_unite ?? '' }} {{ $produit->unite->libelle ?? '' }}
-                                    {{ $produit->unite ? '(' . $produit->unite->abreviation . ')' : '' }}
+                                <option value="{{ $produit->id }}">{{ $produit->libelle }}
+                               
 
                                 </option>
                             @endforeach
