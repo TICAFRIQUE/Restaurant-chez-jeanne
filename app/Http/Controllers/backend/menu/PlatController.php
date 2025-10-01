@@ -226,6 +226,41 @@ class PlatController extends Controller
             ]);
 
 
+            //on verifie si le produit se trouve dans la table plat si oui on le met a jour si non on le cree
+            $platExist = Plat::where('nom', $request['nom'])->first();
+            if ($platExist) {
+                //on met a jour le plat
+                tap(Plat::find($platExist->id))->update([
+                    'nom' => $request['nom'],
+                    'description' => $request['description'],
+                    'categorie_menu_id' => $request['categorie_menu_id'],
+                    'prix' => $request['prix'],
+                    'statut' => $statut,
+                    'user_id' => Auth::id(),
+                ]);
+            }
+            else {
+                // si categorie_menu_id != null on ajoute comme un plat de menu du jour
+                if ($request['categorie_menu_id'] != null) {
+
+                    $sku = 'PM-' . strtoupper(Str::random(8));
+                    $plat = Plat::firstOrCreate([
+                        'nom' => $request['nom'],
+                        'code' =>  $sku,
+                        'description' => $request['description'],
+                        'categorie_menu_id' => $request['categorie_menu_id'],
+                        'prix' => $request['prix'],
+                        'statut' => $statut,
+                        'user_id' => Auth::id(),
+                    ]);
+                }
+            }
+
+
+            
+
+
+
             if (request()->hasFile('imagePrincipale')) {
                 $plat->clearMediaCollection('ProduitImage');
                 $plat->addMediaFromRequest('imagePrincipale')->toMediaCollection('ProduitImage');

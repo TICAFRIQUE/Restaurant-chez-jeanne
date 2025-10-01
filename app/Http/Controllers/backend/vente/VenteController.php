@@ -627,7 +627,6 @@ class VenteController extends Controller
                         'quantite' => $item['quantity'],
                         'prix_unitaire' => $item['price'],
                         'total' => $item['price'] * $item['quantity'],
-                        'variante_id' => $item['selectedVariante'] ?? null,
                         'offert' => $item['offert'] ?? false, // Ajout de la colonne 'offert'
                     ]);
 
@@ -636,47 +635,12 @@ class VenteController extends Controller
 
                     // Vérifier si le produit appartient à la famille "bar"
                     if ($produit && optional($produit->categorie)->famille == 'bar') {
-                        // Mise à jour dans la table produit_variante
-                        DB::table('produit_variante')
-                            ->where('produit_id', $item['id'])
-                            ->where('variante_id', $item['selectedVariante'])
-                            ->update([
-                                'quantite_vendu' => DB::raw('quantite_vendu + ' . $item['quantity']),
-                            ]);
-
-                        // Récupérer la quantité de la variante
-                        $quantite_variante = DB::table('produit_variante')
-                            ->where('produit_id', $item['id'])
-                            ->where('variante_id', $item['selectedVariante'])
-                            ->value('quantite');
-
-                        // Vérifier la division par zéro
-                        if ($quantite_variante && $quantite_variante > 0) {
-                            $bouteille_vendu = round($item['quantity'] / $quantite_variante, 2);
-                        } else {
-                            $bouteille_vendu = 0;
-                        }
-
                         // retirer la quantité de bouteilles vendues du stock du produit
-                        $produit->stock -= $bouteille_vendu;
+                        $produit->stock -= $item['quantity'];
                         $produit->save();
 
-                        // Mettre à jour la quantité disponible pour la variante spécifique
-                        DB::table('produit_variante')
-                            ->where('produit_id', $produit->id)
-                            ->where('variante_id', $item['selectedVariante'])
-                            ->update(['quantite_disponible' => 0]);
-
-                        // Mettre à jour le stock global
-                        $this->miseAJourStock($produit->id);
                     }
                 }
-
-
-
-                // Mettre à jour le stock des ventes uniquement pour les produits de la famille "bar"
-                $this->miseAJourStockVente();
-
 
 
                 // ajouter les offerts dans la vente
@@ -693,7 +657,6 @@ class VenteController extends Controller
                             'vente_id' => $vente->id,
                             'quantite' => $item['quantity'],
                             'prix' => $item['price'],
-                            'variante_id' => $item['selectedVariante'] ?? null,
                             'statut_view' => false,
                             'offert_statut' => null,
                             'user_approuved' => null,
