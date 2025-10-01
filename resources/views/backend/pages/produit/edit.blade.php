@@ -136,7 +136,7 @@
                                             </div>
 
 
-                                            <div class="col-md-3 mb-3 d-none prixVente">
+                                            <div class="col-md-3 mb-3 divPrixVente">
                                                 <label class="form-label" for="meta-title-input">Prix de vente
                                                     <span class="text-danger">*</span>
                                                 </label>
