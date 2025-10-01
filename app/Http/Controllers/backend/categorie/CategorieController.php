@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Services\convertToMajuscule;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class CategorieController extends Controller
@@ -48,7 +49,7 @@ class CategorieController extends Controller
             }
 
             // Vérification de l'unicité sur name + parent_id + famille
-            $exists = Categorie::where('name', Str::lower($request['name']))
+            $exists = Categorie::where('name', $request['name'])
                 ->where('parent_id', $parent_id)
                 ->where('famille', $famille)
                 ->exists();
@@ -60,7 +61,7 @@ class CategorieController extends Controller
             $data_count = Categorie::where('parent_id', $parent_id)->count();
 
             $data_categorie = Categorie::create([
-                'name' => Str::lower($request['name']),
+                'name' => ConvertToMajuscule::toUpperNoAccent($request['name']),
                 'status' => $request['status'],
                 'url' => $request['url'],
                 'parent_id' => $parent_id,
@@ -105,7 +106,7 @@ class CategorieController extends Controller
             $categorie_parent = Categorie::findOrFail($request['categorie_parent']);
 
             // Vérification de l'unicité sur name + parent_id + famille
-            $exists = Categorie::where('name', Str::lower($request['name']))
+            $exists = Categorie::where('name', $request['name'])
                 ->where('parent_id', $categorie_parent->id)
                 ->where('famille', $categorie_parent->famille)
                 ->exists();
@@ -119,7 +120,7 @@ class CategorieController extends Controller
 
             $data_categorie = Categorie::create([
                 'parent_id' => $categorie_parent->id,
-                'name' => Str::lower($request['name']),
+                'name' => ConvertToMajuscule::toUpperNoAccent($request['name']),
                 'famille' => $categorie_parent->famille,
                 'status' => $request['status'] ?? 'active',
                 'url' => $request['url'] ?? null,
@@ -163,7 +164,7 @@ class CategorieController extends Controller
             $categorie = Categorie::findOrFail($id);
 
             // Vérification de l'unicité sur name + parent_id + famille, hors catégorie courante
-            $exists = Categorie::where('name', Str::lower($request['name']))
+            $exists = Categorie::where('name', $request['name'])
                 ->where('parent_id', $categorie->parent_id)
                 ->where('famille', $categorie->famille)
                 ->where('id', '!=', $id)
@@ -175,7 +176,7 @@ class CategorieController extends Controller
             }
 
             $categorie->update([
-                'name' => Str::lower($request['name']),
+                'name' => ConvertToMajuscule::toUpperNoAccent($request['name']),
                 'status' => $request['status'],
                 'url' => $request['url'],
                 'position' => $request['position'],
