@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend\menu;
 use Illuminate\Http\Request;
 use App\Models\CategorieMenu;
 use App\Http\Controllers\Controller;
+use App\Services\convertToMajuscule;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class CategorieMenuController extends Controller
@@ -28,8 +29,14 @@ class CategorieMenuController extends Controller
             'nom' => 'required',
             'statut' => 'required'
         ]);
-       
-        CategorieMenu::firstOrCreate($data , ['position'=>CategorieMenu::count() +1]);
+
+        CategorieMenu::firstOrCreate(
+            [
+                'nom' => convertToMajuscule::toUpperNoAccent($request['nom']),
+                'statut' => $request['statut'],
+                'position' => CategorieMenu::count() + 1
+            ]
+        );
 
         Alert::success('Operation réussi', 'Success Message');
 
@@ -48,7 +55,7 @@ class CategorieMenuController extends Controller
         ]);
 
         $categorie = CategorieMenu::find($id)->update([
-            'name' => $request['name'],
+            'nom' => convertToMajuscule::toUpperNoAccent($request['nom']),
             'statut' => $request['statut']
         ]);
 
