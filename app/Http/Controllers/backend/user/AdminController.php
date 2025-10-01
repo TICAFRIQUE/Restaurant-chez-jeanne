@@ -167,9 +167,11 @@ class AdminController extends Controller
             }
 
             // Vérification supplémentaire pour le numéro de téléphone
-            if (!preg_match('/^[0-9]{10}$/', $request->phone)) {
+            if($request->phone != null){
+                if (!preg_match('/^[0-9]{10}$/', $request->phone)) {
                 Alert::error('Erreur', 'Le numéro de téléphone doit contenir exactement 10 chiffres.');
                 return back();
+            }
             }
 
             // Vérifier si l'email existe déjà
