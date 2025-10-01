@@ -215,7 +215,7 @@ class PlatController extends Controller
             $principaCat =  $principaCat->getPrincipalCategory();
 
             $plat = tap(Produit::find($id))->update([
-                 'nom' => ConvertToMajuscule::toUpperNoAccent($request['nom']),
+                'nom' => ConvertToMajuscule::toUpperNoAccent($request['nom']),
                 'description' => $request['description'],
                 'categorie_id' => $request['categorie'],
                 'categorie_menu_id' => $request['categorie_menu_id'],
@@ -238,8 +238,7 @@ class PlatController extends Controller
                     'statut' => $statut,
                     'user_id' => Auth::id(),
                 ]);
-            }
-            else {
+            } else {
                 // si categorie_menu_id != null on ajoute comme un plat de menu du jour
                 if ($request['categorie_menu_id'] != null) {
 
@@ -257,7 +256,7 @@ class PlatController extends Controller
             }
 
 
-            
+
 
 
 

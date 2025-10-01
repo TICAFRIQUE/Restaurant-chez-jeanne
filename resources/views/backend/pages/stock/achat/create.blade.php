@@ -168,9 +168,7 @@
                             <option disabled selected value>Selectionner un produit
                             </option>
                             @foreach ($data_produit as $produit)
-                                <option value="{{ $produit->id }}">{{ $produit->libelle }}
-                               
-
+                                <option value="{{ $produit->id }}">{{ $produit->libelle != null ? $produit->libelle : $produit->nom   }}
                                 </option>
                             @endforeach
                         </select>

@@ -238,15 +238,15 @@
                                 @foreach ($vente->plats as $key => $item)
                                     <tr id="row_{{ $item['id'] }}">
                                         <td>
-                                            <span class="badge bg-primary">Vente depuis Menu du jour</span>
+                                            <span class="badge bg-primary">Menu du jour</span>
                                         </td>
-                                        <td>
+                                        {{-- <td>
                                             <img class="rounded avatar-sm"
                                                 src="{{ $item->hasMedia('ProduitImage') ? $item->getFirstMediaUrl('ProduitImage') : asset('assets/img/logo/logo_Chez-jeanne.jpg') }}"
                                                 width="50px" alt="{{ $item['nom'] }}">
-                                        </td>
+                                        </td> --}}
                                         <td>
-                                            <p class="text-capitalize fw-bold ">{{ $item['nom'] }} * <span
+                                            <p class="text-capitalize fw-bold ">{{ $item['nom'] }} {{ $item['variante']['libelle'] ?? ''}} * <span
                                                     class="text-danger">{{ $item['pivot']['quantite'] }}</span></p>
                                             @if (json_decode($item['pivot']['garniture']))
                                                 <div>
