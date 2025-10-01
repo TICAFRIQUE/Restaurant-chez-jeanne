@@ -66,10 +66,10 @@ class AdminController extends Controller
 
                 // on verifie si l'utilisateur a une vente non reglée si oui la regler avant de se deconnecter
                 $ventes_non_reglee = Vente::where('user_id', $user->id)
-                ->where('caisse_id', $user->caisse_id)
-                ->where('statut_reglement', false)
-                ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
-                ->count();
+                    ->where('caisse_id', $user->caisse_id)
+                    ->where('statut_reglement', false)
+                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                    ->count();
                 if ($ventes_non_reglee > 0) {
                     Alert::warning('Vous devez regler les ventes non reglées avant de vous deconnecter', 'Attention!');
 
@@ -77,15 +77,15 @@ class AdminController extends Controller
                 }
 
 
-              
+
 
 
                 //on verifie si l'utilisateur a une vente non cloturer si oui la cloturer avant de se deconnecter
                 $ventes = Vente::where('user_id', $user->id)
-                ->where('caisse_id', $user->caisse_id)
-                ->where('statut_cloture', false)
-                ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
-                ->count();
+                    ->where('caisse_id', $user->caisse_id)
+                    ->where('statut_cloture', false)
+                    ->whereDate('date_vente', auth()->user()->caisse->session_date_vente) // ✅ Compare seulement la date
+                    ->count();
                 if ($ventes > 0) {
                     Alert::warning('Vous devez cloturer la caisse avant de vous deconnecter', 'Attention!');
 
@@ -161,17 +161,19 @@ class AdminController extends Controller
             ]);
 
             // Vérifier si le téléphone existe déjà
-            if (User::where('phone', $request->phone)->exists()) {
-                Alert::error('Le numéro de téléphone existe déjà associé à un utilisateur', 'Erreur');
-                return back()->withInput();
+            if (!empty($request->phone)) {
+                if (User::where('phone', $request->phone)->exists()) {
+                    Alert::error('Le numéro de téléphone existe déjà associé à un utilisateur', 'Erreur');
+                    return back()->withInput();
+                }
             }
 
             // Vérification supplémentaire pour le numéro de téléphone
-            if($request->phone != null){
+            if ($request->phone != null) {
                 if (!preg_match('/^[0-9]{10}$/', $request->phone)) {
-                Alert::error('Erreur', 'Le numéro de téléphone doit contenir exactement 10 chiffres.');
-                return back();
-            }
+                    Alert::error('Erreur', 'Le numéro de téléphone doit contenir exactement 10 chiffres.');
+                    return back();
+                }
             }
 
             // Vérifier si l'email existe déjà
