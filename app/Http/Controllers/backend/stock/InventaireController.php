@@ -127,151 +127,8 @@ class InventaireController extends Controller
         }
     }
 
-    /**
-     * Met à jour les informations de stock pour chaque produit dans l'inventaire.
-     *
-     * Cette méthode parcourt les enregistrements de la table `inventaire_produit` pour calculer
-     * le stock théorique, l'écart et l'état du stock pour chaque produit. Elle met à jour ces
-     * informations dans la base de données. Ensuite, elle récupère les données d'inventaires 
-     * actuels et précédents pour déterminer les quantités vendues et utilisées de chaque produit,
-     * et met à jour ces informations dans la base de données.
-     *
-     * @param Request $request La requête HTTP contenant les données nécessaires à la mise à jour.
-     * @return void
-     */
-
-    // public function miseAjourProduitInventaire()
-    // {
-    //     $data = DB::table('inventaire_produit')->get(); // Récupérer les données
-
-    //     foreach ($data as $value) {
-    //         // Calculer le stock théorique
-    //         $sth = ($value->stock_dernier_inventaire + $value->stock_initial) - $value->stock_vendu;
-
-    //         // Calculer l'écart
-    //         $ecart = $value->stock_physique - $sth;
-
-    //         // Déterminer l'état du stock
-    //         if ($sth == 0 && $value->stock_physique == 0) {
-    //             $etat = 'Rupture';
-    //         } elseif ($ecart < 0) {
-    //             $etat = 'Perte';
-    //         } elseif ($ecart > 0) {
-    //             $etat = 'Surplus';
-    //         } else {
-    //             $etat = 'Conforme';
-    //         }
-
-    //         // Mise à jour du stock théorique et de l'état
-    //         DB::table('inventaire_produit')
-    //             ->where('id', $value->id)
-    //             ->update([
-    //                 'stock_theorique' => $sth,
-    //                 'ecart' => $ecart,
-    //                 'etat' => $etat,
-    //             ]);
-    //     }
 
 
-
-
-    //     foreach ($data as $value) {
-    //         // Récupérer l'inventaire actuel
-    //         $inventaireActuel = Inventaire::with('produits')->find($value->inventaire_id);
-
-    //         if (!$inventaireActuel) {
-    //             continue; // Si l'inventaire actuel n'existe pas, on passe au suivant
-    //         }
-
-    //         // Récupérer l'inventaire précédent (le plus récent ayant un ID inférieur)
-    //         $inventairePrecedent = Inventaire::where('id', '<', $value->inventaire_id)
-    //             ->orderBy('id', 'desc')
-    //             ->first();
-
-    //         // Déterminer la plage de dates
-    //         $dateDebut = $inventairePrecedent ? $inventairePrecedent->date_inventaire : null;
-    //         $dateFin = $inventaireActuel->date_inventaire;
-
-    //         // Récupérer les produits avec la quantité vendue et utilisée
-    //         $data_produit = Produit::whereHas('categorie', function ($q) {
-    //             $q->whereIn('famille', ['restaurant', 'bar']);
-    //         })
-    //             ->withSum(['ventes as quantite_vendue' => function ($query) use ($dateDebut, $dateFin) {
-    //                 if ($dateDebut) {
-    //                     $query->whereBetween('ventes.date_vente', [$dateDebut, $dateFin]);
-    //                 } else {
-    //                     $query->where('ventes.date_vente', '<', $dateFin);
-    //                 }
-    //             }], 'produit_vente.quantite_bouteille')
-
-    //             ->withSum(['sorties as quantite_utilisee' => function ($query) use ($dateDebut, $dateFin) {
-    //                 if ($dateDebut) {
-    //                     $query->whereBetween('sorties.date_sortie', [$dateDebut, $dateFin]);
-    //                 } else {
-    //                     $query->where('sorties.date_sortie', '<', $dateFin);
-    //                 }
-    //             }], 'produit_sortie.quantite_utilise')
-
-    //             ->with('categorie')
-    //             ->where('id', $value->produit_id)
-    //             ->get();
-
-    //         // Vérifier s'il y a des produits avant de faire la mise à jour
-    //         if ($data_produit->isNotEmpty()) {
-    //             foreach ($data_produit as $produit) {
-    //                 DB::table('inventaire_produit')
-    //                     ->where('produit_id', $produit->id)
-    //                     ->where('inventaire_id', $value->inventaire_id)
-    //                     ->update([
-    //                         'stock_vendu' => ($produit->quantite_vendue ?? 0) + ($produit->quantite_utilisee ?? 0), // Assure que les valeurs null sont remplacées par 0
-    //                     ]);
-    //             }
-    //         }
-    //     }
-    // }
-
-
-
-    /**
-     * Mettre à jour le stock des variantes d'un produit
-     *
-     * @param int $id L'ID du produit
-     *
-     * @return void
-     */
-    //
-    public function miseAJourStock($id)
-    {
-        $produit = Produit::find($id);
-
-        if (!$produit) {
-            return; // Arrête l'exécution si le produit n'existe pas
-        }
-
-        // Récupérer toutes les variantes associées au produit
-        $variantes = DB::table('produit_variante')
-            ->where('produit_id', $produit->id)
-            ->get();
-
-        foreach ($variantes as $variante) {
-            // Récupérer la quantité disponible actuelle
-            $quantite_disponible_actuelle = DB::table('produit_variante')
-                ->where('produit_id', $produit->id)
-                ->where('variante_id', $variante->variante_id)
-                ->value('quantite_disponible');
-
-            // Calculer la nouvelle quantité disponible
-            $nouvelle_quantite = $quantite_disponible_actuelle + ($produit->stock * $variante->quantite);
-
-            // Mettre à jour la quantité disponible
-            DB::table('produit_variante')
-                ->where('produit_id', $produit->id)
-                ->where('variante_id', $variante->variante_id)
-                ->update([
-                    'quantite_disponible' => $nouvelle_quantite,
-                ]);
-        }
-    }
 
 
     /**
@@ -390,22 +247,9 @@ class InventaireController extends Controller
                 $produit->stock_initial = 0;
 
                 $produit->save();
-
-                // Vérifier si la catégorie famille est 'bar'
-                if ($produit->categorie->famille === 'bar') {
-                    // Mettre à jour la quantité disponible des variantes du produit à 0
-                    DB::table('produit_variante')
-                        ->where('produit_id', $produit_id)
-                        ->update(['quantite_disponible' => 0]);
-
-                    // Appeler la méthode miseAJourStock
-                    $this->miseAJourStock($produit_id);
-                }
             }
-
-            //Appeler la methode miseAJourStockVariante
-            // $this->miseAjourProduitInventaire();
-            $this->productsNotInInventaire();  // mettre à jour le stock des produits qui ne sont pas dans l'inventaire du mois à 0
+            // mettre à jour le stock des produits qui ne sont pas dans l'inventaire du mois à 0
+            $this->productsNotInInventaire();
 
 
 

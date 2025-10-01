@@ -491,13 +491,13 @@
                     .text(); // famille choisie par l'utilisateur bar ou restaurant
 
                 //readonly de stock physique lorque famille bar
-                // if (familleOption == 'Bar') {
-                //     form.find('.stockPhysique').prop('readonly', true);
-                // } else {
-                //     // sinon on reactive stock physique on efface les variantes du produit bar
-                //     form.find('.stockPhysique').prop('readonly', false);
-                //     form.find('.variante-inputs').html('');
-                // }
+                if (familleOption == 'Bar') {
+                    form.find('.stockPhysique').prop('readonly', true);
+                } else {
+                    // sinon on reactive stock physique on efface les variantes du produit bar
+                    form.find('.stockPhysique').prop('readonly', false);
+                    form.find('.variante-inputs').html('');
+                }
 
 
 
@@ -518,7 +518,7 @@
                 for (var i = 0; i < options.length; i++) {
                     selectProduit.append($('<option>', {
                         value: options[i].id,
-                        text: options[i].libelle +
+                        text: options[i].nom +
                             (options[i].valeur_unite ? ' ' + options[i].valeur_unite : '') +
                             (options[i].unite ? ' ' + options[i].unite.libelle : '') +
                             (options[i].unite ? ' (' + options[i].unite.abreviation + ')' : '')
@@ -597,6 +597,7 @@
                 });
 
 
+                console.log('product', product.ventes);
 
 
                 /* Gestion des variantes on affiche les inputs variantes en fonction du produit choisi*/
@@ -859,11 +860,107 @@
 
 
 
-           
+            // script for quantity stock increase and dicrease
+            function increaseValue() {
+                var input = document.getElementById("qteStockable");
+                var value = parseInt(input.value, 10);
+                value = isNaN(value) ? 0 : value;
+                value++;
+                input.value = value;
+            }
+
+            function decreaseValue() {
+                var input = document.getElementById("qteStockable");
+                var value = parseInt(input.value, 10);
+                value = isNaN(value) ? 0 : value;
+                value < 1 ? value = 1 : '';
+                if (value > 1) {
+                    value--;
+                }
+                input.value = value;
+
+
+            }
 
 
 
-      
+            // on verifie si les champs sont differents de null avant de dupliquer
+
+            // Calculer la quantité stockable
+            function qteStockable(form) {
+                var qte_acquise = form.find(".qteAcquise").val() || 0; // combien de format
+                var qte_format = form.find(".qteFormat").val() || 0; // combien dans le format
+                var qte_stockable = qte_acquise * qte_format;
+                form.find(".qteStockable").val(qte_stockable);
+
+                var dataProduct = {{ Js::from($data_produit) }}; // Données du contrôleur
+
+                console.log(dataProduct);
+
+            }
+
+            // Calculer le total dépensé
+            function prixTotalDepense(form) {
+                var qte_acquise = form.find(".qteAcquise").val() || 0; // combien de format
+                var pu_unitaire_format = form.find(".prixUnitaireFormat").val() ||
+                    0; // prix unitaire d'un format
+                var montant_facture = $("#montant_facture").val();
+                var total_depense = qte_acquise * pu_unitaire_format;
+                form.find(".prixTotalFormat").val(total_depense);
+
+                //on verifie si la montant depensé depasse le montant de la facture
+                if (total_depense > montant_facture) {
+                    $('#save').prop('disabled', true);
+
+                    $('#add-more').prop('disabled', true);
+                    Swal.fire({
+                        title: 'Erreur',
+                        text: 'Le total dépensé dépasse le montant de la facture !',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                    });
+                } else {
+                    $('#save').prop('disabled', false);
+                    $('#add-more').prop('disabled', false);
+                }
+
+
+            }
+
+            // Calculer le prix d'achat de l'unité
+            function prixAchatUnite(form) {
+                var qte_acquise = form.find(".qteAcquise").val() || 0;
+                var pu_unitaire_format = form.find(".prixUnitaireFormat").val() || 0;
+                var qte_stocke = form.find(".qteStockable").val() || 0;
+                var prix_achat_unite = qte_acquise * pu_unitaire_format / qte_stocke;
+                form.find(".prixAchatUnite").val(prix_achat_unite);
+            }
+
+            // Calculer le prix d'achat total
+            function calculatePrixAchat(form) {
+                var qte_format = form.find(".qteFormat").val() || 0;
+                var prix_achat_total = form.find(".prixAchatTotal").val() || 0;
+                var prixAchatUnitaire = prix_achat_total / qte_format;
+                var prixAchatTotal = qte_format * prixAchatUnitaire;
+                form.find(".prixAchatUnitaire").val(prixAchatUnitaire);
+            }
+
+            // Ajouter des écouteurs sur les champs dupliqués
+            $(document).on('input', '.qteAcquise, .qteFormat, .prixUnitaireFormat , #montant_facture',
+                function() {
+                    var form = $(this).closest('.row');
+                    qteStockable(form);
+                    prixTotalDepense(form);
+                    prixAchatUnite(form);
+
+                });
+
+            // Ajout d'écouteurs pour les champs qui influencent le calcul du prix d'achat
+            $(document).on('input', '.qteFormat, .prixAchatTotal', function() {
+                var form = $(this).closest('.row');
+                calculatePrixAchat(form);
+            });
+
         });
     </script>
 @endsection
