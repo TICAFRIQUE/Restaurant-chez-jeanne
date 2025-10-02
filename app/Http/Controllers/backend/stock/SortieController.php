@@ -50,7 +50,7 @@ class SortieController extends Controller
 
         try {
             $data_produit = Produit::whereHas('categorie', function ($q) {
-                $q->where('famille', 'restaurant');
+                $q->whereIn('famille', ['restaurant' , 'bar']);
             })
                 ->with(['unite', 'uniteSortie'])
                 ->get();
@@ -97,6 +97,7 @@ class SortieController extends Controller
                 // mettre la quantité utilisée dans le stock de chaque produit
                 $produit = Produit::find($item['id']);
                 $produit->stock -= $item['quantity'];
+                $produit->stock_initial -= $item['quantity'];
                 $produit->save();
             }
 

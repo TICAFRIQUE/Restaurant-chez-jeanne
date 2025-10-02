@@ -192,6 +192,14 @@
                                 {{ $famille }}
                             @endif
                         </h3>
+
+                        <div>
+                            {{-- <div>Total pour {{ $famille }}</div> --}}
+                            <div>Nombre d'articles : <b>{{ $produits->sum('quantite_vendue') }}</b></div>
+                            <div>Montant total :
+                                <b> {{ number_format($produits->sum('montant_total'), 0, ',', ' ') }} FCFA</b>
+                            </div>
+                        </div>
                         <div class="table-responsive mb-4">
                             <table class="table table-bordered">
                                 <thead>
@@ -214,7 +222,7 @@
                                     @forelse ($produits as $produit)
                                         <tr>
                                             {{-- <td>{{ $produit['code'] }}</td> --}}
-                                            <td>{{ $produit['designation'] }}</td>
+                                            <td>{{ $produit['designation'] }} {{ $produit['variante']?? '' }} </td>
                                             <td>{{ $produit['categorie'] }}</td>
 
                                             @if ($famille == 'bar' || $famille == 'offerts')
@@ -232,7 +240,7 @@
                                                     @php
                                                         // Regrouper les détails par variante_id et prix_unitaire
                                                         $groupes = $details->groupBy(function ($item) {
-                                                            return $item->pivot->variante_id .
+                                                            return $item->pivot->produit_id .
                                                                 '_' .
                                                                 $item->pivot->prix_unitaire;
                                                         });
@@ -267,11 +275,11 @@
                                         </tr>
                                     @endforelse
                                 </tbody>
-                                <tfoot>
+                                {{-- <tfoot>
                                     <tr>
                                         <th colspan="7">
                                             <div class="text-end">
-                                                {{-- <div>Total pour {{ $famille }}</div> --}}
+                                                <div>Total pour {{ $famille }}</div>
                                                 <div>Nombre d'articles : {{ $produits->sum('quantite_vendue') }}</div>
                                                 <div>Montant total :
                                                     {{ number_format($produits->sum('montant_total'), 0, ',', ' ') }} FCFA
@@ -279,7 +287,7 @@
                                             </div>
                                         </th>
                                     </tr>
-                                </tfoot>
+                                </tfoot> --}}
 
                             </table>
                         </div>

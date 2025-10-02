@@ -210,6 +210,7 @@
                                                 alt="{{ $item['nom'] }}">
                                         </td> --}}
                                         <td>{{ $item['nom'] }}
+                                            {{ $item['variante'] ? '* ' . $item['variante']['libelle'] : '' }}
 
                                             @if ($item['pivot']['offert'] === 1 && $item['pivot']['offert_statut'] === 1)
                                                 <span class="badge bg-success">Offert</span>
@@ -246,7 +247,8 @@
                                                 width="50px" alt="{{ $item['nom'] }}">
                                         </td> --}}
                                         <td>
-                                            <p class="text-capitalize fw-bold ">{{ $item['nom'] }} {{ $item['variante']['libelle'] ?? ''}} * <span
+                                            <p class="text-capitalize fw-bold ">{{ $item['nom'] }}
+                                                {{ $item['variante']['libelle'] ?? '' }} * <span
                                                     class="text-danger">{{ $item['pivot']['quantite'] }}</span></p>
                                             @if (json_decode($item['pivot']['garniture']))
                                                 <div>
@@ -342,15 +344,7 @@
                                         <td style="text-align: center;">
 
                                             {{ formatNomCourt($produit->nom) }}
-                                            @if ($produit->categorie->famille == 'bar' && isset($produit['pivot']['variante_id']))
-                                                @php
-                                                    $variante = \App\Models\Variante::find(
-                                                        $produit['pivot']['variante_id'],
-                                                    );
-                                                @endphp
-                                                x {{ $variante ? Str::substr($variante->libelle, 0, 1) : '' }}
-                                            @endif
-
+                                            {{ $produit->variante ? '*'.Str::substr($produit->variante->libelle, 0, 1) : '' }}
                                         </td>
 
 

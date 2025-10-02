@@ -1057,10 +1057,10 @@ class VenteController extends Controller
                         'code' => $produit->code,
                         'stock' => $produit->stock,
                         'designation' => $produit->nom,
+                        'variante' => $produit->variante->libelle ?? '',
                         'categorie' => $produit->categorie->name,
                         'famille' => $produit->categorie->famille,
                         'quantite_vendue' => $groupe->sum('pivot.quantite'),
-                        'variante' => $pivotFirst->variante_id,
                         'prix_vente' => $pivotFirst->prix_unitaire,
                         'montant_total' => $montantTotal,
                     ];

@@ -62,7 +62,7 @@ class EtatStockController extends Controller
                 ->withSum(['ventes as quantite_vendue' => function ($query) use ($date_dernier_inventaire, $date_jour) {
                     // Filtrer les ventes entre la date du dernier inventaire et la date du jour
                     $query->whereBetween('ventes.date_vente', [$date_dernier_inventaire, $date_jour]);
-                }], 'produit_vente.quantite_bouteille') // Somme de la quantité vendue dans le pivot produit_vente
+                }], 'produit_vente.quantite') // Somme de la quantité vendue dans le pivot produit_vente
 
 
                 ->withSum(['sorties as quantite_utilisee' => function ($query) use ($date_dernier_inventaire, $date_jour) {

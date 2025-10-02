@@ -61,11 +61,7 @@
                                         </td>
 
                                         <td>
-                                            <img class="rounded avatar-sm mb-2"
-                                                src="{{ $item->produit->hasMedia('ProduitImage') ? $item->produit->getFirstMediaUrl('ProduitImage') : asset('assets/img/logo/logo_Chez-jeanne.jpg') }}"
-                                                width="50px" alt="">
-
-                                           <br> {{ $item['produit']['libelle'] ! = null ? $item['produit']['libelle'] : 'N/D' }} {{ $item['produit']['valeur_unite'] ?? ''}} {{ $item['produit']['unite']['libelle'] ?? '' }} 
+                                           <br> {{ $item['produit']['libelle'] != null ? $item['produit']['libelle'] : 'N/D' }} {{ $item['produit']['valeur_unite'] ?? ''}} {{ $item['produit']['unite']['libelle'] ?? '' }} 
                                         </td>
                                         <td>{{ $item['magasin']['libelle'] ?? 'N/D' }}</td>
                                         <td>{{ $item['fournisseur']['nom'] ?? 'N/D' }}</td>
