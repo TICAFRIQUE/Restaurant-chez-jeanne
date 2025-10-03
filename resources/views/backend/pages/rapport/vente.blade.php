@@ -231,26 +231,24 @@
                                             @if ($famille == 'bar' || $famille == 'Offerts')
                                                 @php
                                                     $details = $produit['details'];
-                                                    // Regrouper les détails par  prix_unitaire
-                                                    $groupes = $details->groupBy(function ($item) {
-                                                        $item->pivot->prix_unitaire;
-                                                    });
 
+                                                    // Regrouper uniquement par prix_unitaire
+                                                    $groupesPrix = $details->groupBy(function ($item) {
+                                                        return $item->pivot->prix_unitaire;
+                                                    });
                                                 @endphp
 
                                                 <td>
-
-
-                                                    @foreach ($groupes as $groupe)
+                                                    @foreach ($groupesPrix as $prixUnitaire => $groupe)
                                                         @php
                                                             $quantiteTotale = $groupe->sum('pivot.quantite');
-                                                           
-                                                            $prixUnitaire = $groupe->first()->pivot->prix_unitaire;
                                                         @endphp
-                                                        {{ $quantiteTotale }}  x
+
+                                                        {{ $quantiteTotale }} x
                                                         {{ number_format($prixUnitaire, 0, ',', ' ') }} FCFA<br>
                                                     @endforeach
                                                 </td>
+
                                                 <td>{{ number_format($produit['montant_total'], 0, ',', ' ') }} FCFA</td>
                                             @else
                                                 <!-- ========== End si famille est bar on affiche les details quantité et variante ========== -->
