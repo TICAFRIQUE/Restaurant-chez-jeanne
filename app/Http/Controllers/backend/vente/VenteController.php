@@ -247,8 +247,7 @@ class VenteController extends Controller
                     ->get();
 
                 // Récupération des règlements faits aujourd'hui sur ces ventes impayées
-                $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
-                    ->whereDate('date_reglement', $sessionDate)
+                $reglementImpayes = Reglement::whereDate('date_reglement', $sessionDate)
                     ->where('user_id', auth()->user()->id)
                     ->get();
 
@@ -266,7 +265,7 @@ class VenteController extends Controller
 
 
 
-                // dd($offertsEnAttente);
+                // dd($reglementImpayes , $venteImpayes->toArray());
             }
 
 
@@ -333,7 +332,7 @@ class VenteController extends Controller
 
             $query = Vente::with('produits')
                 ->whereStatut('confirmée')
-                ->where('statut_cloture', true)
+                // ->where('statut_cloture', true)
                 ->orderBy('created_at', 'desc');
 
             // Application du filtre de client
@@ -638,7 +637,6 @@ class VenteController extends Controller
                         // retirer la quantité de bouteilles vendues du stock du produit
                         $produit->stock -= $item['quantity'];
                         $produit->save();
-
                     }
                 }
 
@@ -917,8 +915,7 @@ class VenteController extends Controller
                     ->get();
 
                 // Récupération des règlements faits aujourd'hui sur ces ventes impayées
-                $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
-                    ->whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
+                $reglementImpayes = Reglement::whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
                     ->where('user_id', auth()->user()->id)
                     ->sum('montant_reglement');
 
@@ -1225,8 +1222,7 @@ class VenteController extends Controller
                 ->get();
 
             // Récupération des règlements faits aujourd'hui sur ces ventes impayées
-            $reglementImpayes = Reglement::whereIn('vente_id', $venteImpayes->pluck('id'))
-                ->whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
+            $reglementImpayes = Reglement::whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
                 ->where('user_id', auth()->user()->id)
                 ->sum('montant_reglement');
 

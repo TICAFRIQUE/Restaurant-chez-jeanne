@@ -84,23 +84,11 @@
                                     <tr id="row_{{ $item['id'] }}">
                                         <td>{{ ++$key }}</td>
                                         <td>{{ $item['code'] }}</td>
-                                        <td>{{ $item['nom'] }} {{ $item['valeur_unite'] ?? '' }}</td>
+                                        <td>{{ $item['libelle'] != null ? $item['libelle'] : $item['nom'] }} {{ $item['valeur_unite'] ?? '' }}</td>
                                         @role('developpeur')
-                                            @if ($item->categorie->famille == 'bar')
-                                                <td>
-                                                    <ul>
-                                                        @foreach ($item->variantes->sortBy('libelle') as $variantes)
-                                                        <li>{{ $variantes->libelle }} : {{ $variantes->pivot->quantite_disponible }}</li>
-                                                    @endforeach
-                                                    
-                                                    </ul>
-
-                                                </td>
-                                            @else
-                                                <td>{{ $item['stock'] }}</td>
-                                            @endif
+                                            <td>{{ $item['stock'] }}</td>
                                         @endrole
-                                        <td></td>
+                                      
                                     </tr>
                                 @endforeach
                             </tbody>

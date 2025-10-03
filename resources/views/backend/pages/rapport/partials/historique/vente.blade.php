@@ -10,11 +10,11 @@
         </tr>
     </thead>
     <tbody>
-        @include('backend.fonction.convertirStockVariante')
+
         @forelse ($vente as $key => $item)
             <tr>
                 <td>{{ ++$key }}</td>
-                <td>{{ $item['produit']['nom'] }}
+                <td>{{ $item['produit']['libelle'] != null ? $item['produit']['libelle'] : $item['produit']['nom'] }}
                     <b> {{ $item['produit']['valeur_unite'] ?? '' }}
                         {{ $item['produit']['unite']['abreviation'] ?? '' }}</b>
                 </td>
@@ -22,14 +22,7 @@
                 {{-- <td><b> {{ $item['quantite_bouteille'] ?? 0 }} {{ $item['variante']['libelle'] ?? 'bouteille' }} </b> </td> --}}
                 <td><b>
 
-
-                        {!! afficherStockConvertirAvecVariantes(
-                            $item['quantite_bouteille'] ?? 0,
-                            $item['produit']['uniteSortie']['libelle'] ?? '',
-                            $item->produit->variantes,
-                        ) !!}
-
-
+                        {{ $item['quantite_bouteille'] ?? 0 }}
                     </b> </td>
 
                 <td>{{ number_format($item['prix_unitaire'], 0, ',', ' ') }} FCFA</td>
@@ -54,11 +47,7 @@
                 {{-- <div>Total pour {{ $famille }}</div> --}}
                 <div>Quantité de bouteille vendue : <b>
 
-                        {!! afficherStockConvertirAvecVariantes(
-                            $vente->sum('quantite_bouteille') ?? 0,
-                            $vente->first()['produit']['uniteSortie']['libelle'] ?? '',
-                            $vente->first()->produit->variantes,
-                        ) !!}
+                        {{ $vente->sum('quantite_bouteille') ?? 0 }}
                     </b></div>
                 <div>Montant total :
                     <b> {{ number_format($vente->sum('total'), 0, ',', ' ') }} FCFA</b>

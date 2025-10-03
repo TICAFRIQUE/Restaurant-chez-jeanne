@@ -89,9 +89,9 @@
                                             @if ($item['variante'])
                                                 <span class="badge bg-info">{{ $item['variante']['libelle'] }}</span>
                                             @endif
-                                            
 
-                                   
+
+
 
                                         </td>
                                         <td>{{ $item['categorie']['famille'] ?? '' }}({{ $item['categorie']['name'] ?? '' }})
@@ -128,6 +128,14 @@
                                                                     class="ri-eye-fill align-bottom me-2 text-muted"></i>
                                                                 Detail</a>
                                                         </li>
+
+                                                        @if ($item->categorie->famille == 'bar' && $item->variante->slug == 'bouteille' && $item['stock'] > 0)
+                                                            <li><a href="{{ route('stock-transfert.create', $item['id']) }}"
+                                                                    class="dropdown-item"><i
+                                                                        class=" ri-exchange-fill align-bottom me-2 text-muted"></i>
+                                                                    Transferer des quantites</a>
+                                                            </li>
+                                                        @endif
                                                     @endcan
                                                     @can('modifier-produit')
                                                         <li><a href="{{ route('produit.edit', $item['id']) }}" type="button"

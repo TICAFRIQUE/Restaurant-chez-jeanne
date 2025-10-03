@@ -13,11 +13,12 @@
                         </div>
                         <div class="modal-body">
 
-                            <form class="row g-3 needs-validation" method="post" action="{{route('role.store')}}" novalidate>
+                            <form class="row g-3 needs-validation" method="post" action="{{ route('role.store') }}"
+                                novalidate>
                                 @csrf
                                 <div class="col-md-12">
                                     <label for="validationCustom01" class="form-label">Role name</label>
-                                    <input type="text" name="name" class="form-control" id="validationCustom01" 
+                                    <input type="text" name="name" class="form-control" id="validationCustom01"
                                         required>
                                     <div class="valid-feedback">
                                         Looks good!
@@ -36,7 +37,7 @@
         </div><!-- end col -->
     </div><!-- end row -->
 </div><!-- end col -->
-</div>
+
 <!--end row-->
 
 {{-- @section('script')

@@ -108,8 +108,8 @@ class ClientController extends Controller
                 $query->where('name', 'client');
             })
                 ->whereHas('ventesClient', function ($query) {
-                    $query->where('statut_paiement', 'impaye')
-                        ->where('statut_cloture', true);
+                    $query->where('statut_paiement', 'impaye');
+                        // ->where('statut_cloture', true);
                 })
                 ->with(['ventesClient' => function ($query) {
                     $query->where('statut_paiement', 'impaye');

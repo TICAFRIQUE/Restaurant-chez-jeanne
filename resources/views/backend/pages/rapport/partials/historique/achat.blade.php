@@ -13,7 +13,7 @@
         @forelse ($achat as $key => $item)
             <tr>
                 <td>{{ ++$key }}</td>
-                <td>{{ $item['produit']['nom'] }}
+                <td>{{ $item['produit']['libelle']!= null ? $item['produit']['libelle'] : $item['produit']['nom'] }}
                    <b> {{ $item['produit']['valeur_unite'] ?? '' }} {{ $item['produit']['unite']['abreviation'] ?? '' }}</b>
 
                 </td>

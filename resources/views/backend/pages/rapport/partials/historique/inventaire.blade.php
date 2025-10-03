@@ -22,7 +22,7 @@
                     <tr id="row_{{ $item['id'] }}">
                         <td>{{ ++$key }}</td>
                         <td>{{ \Carbon\Carbon::parse($item['inventaire']['date_inventaire'])->format('d-m-Y à H:i') }}</td>
-                        <td>{{ $item['produit']['nom'] }} <b>{{ $item['produit'] ['valeur_unite'] ?? '' }} {{ $item['produit']['unite']['abreviation'] ?? '' }}</b> </td>
+                        <td>{{ $item['produit']['libelle'] != null ? $item['produit']['libelle'] : $item['produit']['nom'] }} <b>{{ $item['produit'] ['valeur_unite'] ?? '' }} {{ $item['produit']['unite']['abreviation'] ?? '' }}</b> </td>
                         <td>{{ $item['stock_dernier_inventaire'] ?? '' }}</td>
                         <td>{{ $item['stock_initial'] }}
                             {{ $item['produit']['uniteSortie']['abreviation'] ?? '' }}</td>

@@ -21,7 +21,7 @@
     @endcomponent
 
 
-    
+
     <style>
         /* css pour les cartes */
         .card-custom {
@@ -469,9 +469,29 @@
                     <div class="btn-group-actions">
 
                         {{-- Clôture caisse --}}
-                        @if (
-                            ($venteAucunReglement == 0 && $totalVentesCaisse >= 0 && $offertsEnAttente == 0 && $venteCaisseNonCloture > 0) ||
-                                ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0 && $offertsEnAttente == 0 && $venteCaisseNonCloture > 0))
+                        {{-- @if (($venteAucunReglement == 0 && $totalVentesCaisse >= 0 && $offertsEnAttente == 0 && $venteCaisseNonCloture > 0) || ($reglementImpayes->sum('montant_reglement') > 0 && $venteAucunReglement == 0 && $offertsEnAttente == 0 && $venteCaisseNonCloture > 0))
+                            <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
+                                👍 Clôturer la caisse <i class="ri ri-bill"></i>
+                            </a>
+                        @else
+                            <button class="btn btn-danger btn-lg" disabled>
+                                Clôturer la caisse <i class="ri ri-lock-line"></i>
+                            </button>
+                        @endif --}}
+
+
+                        @php
+                            $canCloseCaisse =
+                                $offertsEnAttente == 0 && // Cas 1 : ventes présentes
+                                (($venteAucunReglement == 0 &&
+                                    $venteCaisseNonCloture > 0 &&
+                                    ($totalVentesCaisse >= 0 || $reglementImpayes->sum('montant_reglement') > 0)) ||
+                                    // Cas 2 : aucune vente mais un règlement impayé a été effectué
+                                    ($venteCaisseNonCloture == 0 && $reglementImpayes->sum('montant_reglement') > 0));
+                        @endphp
+
+
+                        @if ($canCloseCaisse)
                             <a href="{{ route('vente.billeterie-caisse') }}" class="btn btn-danger btn-lg">
                                 👍 Clôturer la caisse <i class="ri ri-bill"></i>
                             </a>
@@ -480,6 +500,7 @@
                                 Clôturer la caisse <i class="ri ri-lock-line"></i>
                             </button>
                         @endif
+
 
                         {{-- Rapport caisse --}}
                         @if ($venteCaisseNonCloture == 0 && $venteCaisseCloture > 0)

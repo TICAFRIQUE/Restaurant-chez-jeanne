@@ -50,9 +50,10 @@ class SortieController extends Controller
 
         try {
             $data_produit = Produit::whereHas('categorie', function ($q) {
-                $q->whereIn('famille', ['restaurant' , 'bar']);
+                $q->where('famille', 'restaurant');
             })
                 ->with(['unite', 'uniteSortie'])
+                ->active()
                 ->get();
 
             $data_unite = Unite::all();

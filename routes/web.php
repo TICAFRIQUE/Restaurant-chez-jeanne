@@ -41,6 +41,7 @@ use App\Http\Controllers\backend\menu\CategorieMenuController;
 use App\Http\Controllers\backend\categorie\CategorieController;
 use App\Http\Controllers\backend\configuration\CaisseController;
 use App\Http\Controllers\backend\configuration\FormatController;
+use App\Http\Controllers\backend\stock\StockTransfertController;
 use App\Http\Controllers\backend\configuration\MagasinController;
 use App\Http\Controllers\backend\permission\PermissionController;
 use App\Http\Controllers\backend\depense\LibelleDepenseController;
@@ -315,7 +316,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('ajustement')->controller(AjustementController::class)->group(function () {
         route::get('', 'index')->name('ajustement.index');
         route::get('create/{id}', 'create')->name('ajustement.create');
-        route::post('store', 'store')->name('ajustement.store');
+        route::post('store', 'store')->name('ajustement.store');   
     });
 
     // stock -sortie
@@ -324,6 +325,13 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::get('show/{id}', 'show')->name('sortie.show');
         route::get('create', 'create')->name('sortie.create')->middleware('check.inventaire');
         route::post('store', 'store')->name('sortie.store');
+    });
+
+
+        // stock -transfert
+    Route::prefix('stock-transfert')->controller(StockTransfertController::class)->group(function () {
+        route::get('create/{id}', 'create')->name('stock-transfert.create');
+        route::post('store', 'store')->name('stock-transfert.store');
     });
 
 

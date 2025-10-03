@@ -1,6 +1,6 @@
 @extends('backend.layouts.master')
 @section('title')
-   Historiques
+    Historiques
 @endsection
 @section('css')
     <!--datatable css-->
@@ -17,7 +17,7 @@
             Rapports
         @endslot
         @slot('title')
-           Historiques
+            Historiques
         @endslot
     @endcomponent
 
@@ -38,7 +38,8 @@
                                         <option value="">Sélectionnez un produit</option>
                                         @foreach ($data_produit as $produit)
                                             <option value="{{ $produit->id }}" @selected(request('produit') == $produit->id)>
-                                                {{ $produit->nom }} {{ $produit->valeur_unite ?? '' }}
+                                                {{ $produit->libelle != null ? $produit->libelle : $produit->nom }}
+                                                {{ $produit->valeur_unite ?? '' }}
                                                 {{ $produit->unite ? '(' . $produit->unite->abreviation . ')' : '' }}
 
                                             </option>
@@ -90,7 +91,7 @@
                 <div class="card-header">
                     @if (request('type'))
                         <h5 class="card-title mb-0">{{ request('type') }} - Produit
-                            {{ \App\Models\Produit::find(request('produit'))->nom }}
+                            {{ \App\Models\Produit::find(request('produit'))->libelle != null ? \App\Models\Produit::find(request('produit'))->libelle : \App\Models\Produit::find(request('produit'))->nom }}
 
                             @if (request('date_debut') && request('date_fin'))
                                 du
