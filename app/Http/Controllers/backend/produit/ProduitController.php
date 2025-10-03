@@ -105,14 +105,14 @@ class ProduitController extends Controller
                 'description' => '',
                 'categorie_id' => 'required',
                 'stock' => '',
-                'stock_alerte' => 'required',
+                'stock_alerte' => '',
                 'statut' => '',
                 'prix' => $categorie->famille == 'bar' ? 'required' : '',
                 'variante_id' => $categorie->famille == 'bar' ? 'required' : '',
 
                 'valeur_unite' => '',
                 'unite_id' => '',
-                'unite_sortie_id' => 'required',
+                'unite_sortie_id' => '',
                 'imagePrincipale' => '',
             ]);
 
@@ -144,7 +144,7 @@ class ProduitController extends Controller
                 'code' => $sku,
                 'description' => $request['description'],
                 'categorie_id' => $request['categorie_id'],
-                'stock_alerte' => $request['stock_alerte'],
+                'stock_alerte' => 10,
                 'type_id' => $principaCat['id'], // Type produit
                 'prix' => $categorie->famille == 'bar'  ? $request['prix'] : null,
                 'valeur_unite' => $request['valeur_unite'],
@@ -255,12 +255,12 @@ class ProduitController extends Controller
                 'nom' => 'required',
                 'description' => '',
                 'categorie_id' => 'required',
-                'stock_alerte' => 'required',
+                'stock_alerte' => '',
                 'prix' => $categorie->famille == 'bar' ? 'required' : '',
                 'variante_id' => $categorie->famille == 'bar' ? 'required' : '',
                 'valeur_unite' => '',
                 'unite_id' => '',
-                'unite_sortie_id' => 'required',
+                'unite_sortie_id' => '',
                 'imagePrincipale' => '',
             ]);
 
@@ -289,7 +289,7 @@ class ProduitController extends Controller
                 'libelle' => ConvertToMajuscule::toUpperNoAccent($libelle), // nom + variante
                 'description' => $request['description'],
                 'categorie_id' => $request['categorie_id'],
-                'stock_alerte' => $request['stock_alerte'],
+                'stock_alerte' => 10,
                 'type_id' => $principaCat['id'],
                 'prix' => $categorie->famille == 'bar' ? $request['prix'] : null,
                 'valeur_unite' => $request['valeur_unite'],

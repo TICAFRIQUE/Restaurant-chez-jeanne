@@ -78,6 +78,7 @@ class PlatController extends Controller
 
             //verifier si le plat existe deja
             $platExist = Produit::where('categorie_id', $request['categorie'])
+                ->where('type_id', $principaCat['id'])
                 ->where('nom', ConvertToMajuscule::toUpperNoAccent($request['nom']))->first();
             if ($platExist) {
                 return back()->with('error', 'Le plat existe déjà.');
@@ -152,7 +153,7 @@ class PlatController extends Controller
 
             $data_plat = Produit::find($id);
 
-            return view('backend.pages.menu.produit.edit', compact('data_plat', 'data_categorie', 'galleryProduit',  'data_categorie_menu'));
+            return view('backend.pages.menu.produit.edit', compact('data_plat', 'data_categorie','data_categorie_menu'));
         } catch (\Throwable $e) {
             return $e->getMessage();
         }
@@ -185,6 +186,13 @@ class PlatController extends Controller
             //get principal category of categorie request
             $principaCat = Categorie::find($request['categorie']);
             $principaCat =  $principaCat->getPrincipalCategory();
+            //verifier si le plat existe deja
+            $platExist = Produit::where('categorie_id', $request['categorie'])
+                ->where('type_id', $principaCat['id'])
+                ->where('nom', ConvertToMajuscule::toUpperNoAccent($request['nom']))->first();
+            if ($platExist && $platExist->id != $id) {
+                return back()->with('error', 'Le plat existe déjà.');
+            }
 
             $plat = tap(Produit::find($id))->update([
                 'nom' => ConvertToMajuscule::toUpperNoAccent($request['nom']),

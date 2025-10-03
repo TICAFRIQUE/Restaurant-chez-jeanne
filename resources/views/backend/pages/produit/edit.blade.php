@@ -119,12 +119,12 @@
                                                     @endforeach
                                                 </select>
                                             </div> --}}
-                                            <div class="col-md-3 mb-3 divUniteSortie">
+                                            {{-- <div class="col-md-3 mb-3 divUniteSortie">
                                                 <label class="form-label" for="meta-title-input">Unité de sortie ou vente
                                                     <span class="text-danger">*</span>
                                                 </label>
                                                 <select class="form-control js-example-basic-single uniteSortie"
-                                                    name="unite_sortie_id" required>
+                                                    name="unite_sortie_id" >
                                                     <option value="" disabled selected>Choisir</option>
                                                     @foreach ($data_unite as $unite)
                                                         <option value="{{ $unite->id }}" @selected($data_produit->unite_sortie_id == $unite->id)>
@@ -133,7 +133,7 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                            </div>
+                                            </div> --}}
 
 
                                             <div class="col-md-3 mb-3 divPrixVente">

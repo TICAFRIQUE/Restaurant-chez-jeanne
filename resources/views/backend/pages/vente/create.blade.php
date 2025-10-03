@@ -50,7 +50,7 @@
                                                             <option value="{{ $produit->id }}"
                                                                 data-price="{{ $produit->prix }}"
                                                                 data-stock="{{ $produit->stock }}" disabled>
-                                                                {{ $produit->libelle }}
+                                                                {{ $produit->libelle ? $produit->libelle : $produit->nom }}
 
                                                                 ({{ $produit->prix }} FCFA)
                                                                 - <span style="color: red" class="text-danger">(Stock:
@@ -60,7 +60,7 @@
                                                             <option value="{{ $produit->id }}"
                                                                 data-price="{{ $produit->prix }}"
                                                                 data-stock="{{ $produit->stock }}">
-                                                                {{ $produit->nom }}
+                                                                {{ $produit->libelle ? $produit->libelle : $produit->nom }}
                                                                 ({{ $produit->prix }} FCFA)
                                                                 {{-- - <span class="text-primary">(Stock: {{{$produit->stock}}})</span> --}}
                                                             </option>

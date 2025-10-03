@@ -99,7 +99,7 @@
                                             </div> --}}
 
 
-                                            <div class="col-md-3 mb-3 divUniteSortie ">
+                                            {{-- <div class="col-md-3 mb-3 divUniteSortie ">
                                                 <label class="form-label" for="meta-title-input">Unité de vente ou sortie
                                                     <span class="text-danger">*</span>
                                                 </label>
@@ -112,7 +112,7 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                            </div>
+                                            </div> --}}
 
                                             <div class="col-md-2 mb-3 divPrixVente">
                                                 <label class="form-label" for="meta-title-input">Prix de vente
@@ -127,7 +127,7 @@
                                                 <label class="form-label" for="meta-title-input">Stock alerte <span
                                                         class="text-danger">*</span>
                                                 </label>
-                                                <input type="number" name="stock_alerte" class="form-control"
+                                                <input type="number" name="stock_alerte" value="10" class="form-control"
                                                     id="stockAlerte" required>
                                             </div>
 
