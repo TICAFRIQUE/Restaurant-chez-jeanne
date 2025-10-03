@@ -53,7 +53,7 @@ class PlatMenuController extends Controller
             //request validation
             $request->validate(
                 [
-                    'nom' => 'required|unique:plats',
+                    'nom' => 'required',
                     'description' => '',
                     'categorie' => 'required',
                     'prix' => 'required',

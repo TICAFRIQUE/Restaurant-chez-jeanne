@@ -43,14 +43,17 @@ class AppServiceProvider extends ServiceProvider
         //
         Schema::defaultStringLength(191);
 
-        //fonction qui récupère tous les produits de catégorie famille menu et met le stock à 100
+        //fonction qui récupère tous les produits de catégorie famille menu et bar et met le stock à 100
         $this->app->booted(function () {
             if (Schema::hasTable('produits')) {
                 Produit::whereHas('categorie', function ($query) {
-                    $query->where('famille', 'menu');
+                    $query->whereIn('famille', ['menu', 'bar']);
                 })->chunk(100, function ($produits) {
                     foreach ($produits as $produit) {
-                        $produit->update(['stock' => 100]);
+                        $produit->update([
+                            'stock' => 1000,
+                            'stock_initial' => 1000,
+                        ]);
                     }
                 });
             }

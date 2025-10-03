@@ -56,7 +56,7 @@ class PlatController extends Controller
         try {
             //request validation
             $request->validate([
-                'nom' => 'required|unique:produits',
+                'nom' => 'required',
                 'description' => '',
                 'categorie' => 'required',
                 'categorie_menu_id' => '',
@@ -76,6 +76,13 @@ class PlatController extends Controller
             $principaCat = Categorie::find($request['categorie']);
             $principaCat =  $principaCat->getPrincipalCategory();
 
+            //verifier si le plat existe deja
+            $platExist = Produit::where('categorie_id', $request['categorie'])
+                ->where('nom', ConvertToMajuscule::toUpperNoAccent($request['nom']))->first();
+            if ($platExist) {
+                return back()->with('error', 'Le plat existe déjà.');
+            }
+
             $sku = 'PM-' . strtoupper(Str::random(8));
             $plat = Produit::firstOrCreate([
                 'nom' => ConvertToMajuscule::toUpperNoAccent($request['nom']),
@@ -94,25 +101,7 @@ class PlatController extends Controller
             }
 
 
-            if ($request->images) {
 
-                foreach ($request->input('images') as $fileData) {
-                    // Decode base64 file
-                    $fileData = explode(',', $fileData);
-                    $fileExtension = explode('/', explode(';', $fileData[0])[0])[1];
-                    $decodedFile = base64_decode($fileData[1]);
-
-                    // Create a temporary file
-                    $tempFilePath = sys_get_temp_dir() . '/' . uniqid() . '.' . $fileExtension;
-                    file_put_contents($tempFilePath, $decodedFile);
-
-                    // Add file to media library
-                    $plat->addMedia($tempFilePath)->toMediaCollection('galleryProduit');
-
-                    // // Delete the temporary file
-                    // unlink($tempFilePath);
-                }
-            }
 
             // si categorie_menu_id != null on ajoute comme un plat de menu du jour
             if ($request['categorie_menu_id'] != null) {
@@ -132,9 +121,7 @@ class PlatController extends Controller
 
 
 
-            return response([
-                'message' => 'operation reussi'
-            ]);
+            return redirect()->route('plat.index')->with('success', 'Le plat a été créé avec succès.');
         } catch (\Throwable $e) {
             return $e->getMessage();
         }
@@ -165,22 +152,7 @@ class PlatController extends Controller
 
             $data_plat = Produit::find($id);
 
-            //get Image from database
-            $galleryProduit = [];
-
-            foreach ($data_plat->getMedia('galleryProduit') as $value) {
-                // Read the file content
-                $fileContent = file_get_contents($value->getPath());
-
-                // Encode the file content to base64
-                $base64File = base64_encode($fileContent);
-                array_push($galleryProduit, $base64File);
-            }
-
-            // dd($galleryProduit);
-
-            $id = $id;
-            return view('backend.pages.menu.produit.edit', compact('data_plat', 'data_categorie', 'galleryProduit', 'id', 'data_categorie_menu'));
+            return view('backend.pages.menu.produit.edit', compact('data_plat', 'data_categorie', 'galleryProduit',  'data_categorie_menu'));
         } catch (\Throwable $e) {
             return $e->getMessage();
         }
@@ -266,35 +238,7 @@ class PlatController extends Controller
             }
 
 
-            if ($request->images) {
-                $plat->clearMediaCollection('galleryProduit');
-
-                foreach ($request->input('images') as $fileData) {
-                    // Decode base64 file
-                    $fileData = explode(',', $fileData);
-                    $fileExtension = explode('/', explode(';', $fileData[0])[0])[1];
-                    $decodedFile = base64_decode($fileData[1]);
-
-                    // Create a temporary file
-                    $tempFilePath = sys_get_temp_dir() . '/' . uniqid() . '.' . $fileExtension;
-                    file_put_contents($tempFilePath, $decodedFile);
-
-                    // Add file to media library
-                    $plat->addMedia($tempFilePath)->toMediaCollection('galleryProduit');
-
-                    // // Delete the temporary file
-                    // unlink($tempFilePath);
-                }
-            }
-
-
-
-            return response([
-                'message' => 'operation reussi',
-                'data' => $principaCat
-
-
-            ], 200);
+            return back()->with('success', 'Le plat a été mis à jour avec succès.');
         } catch (\Throwable $e) {
             return $e->getMessage();
         }

@@ -99,66 +99,23 @@
                             </div>
                             <!-- end col -->
 
-                            <div class="col-lg-4">
-                                <div class="card">
-
-
-                                    <div class="card-body">
-
-                                        <div class="mb-4">
-                                            <h5 class="fs-14 mb-1">Image principale <span class="text-danger">*</span></h5>
-                                            <div class="text-center">
-                                                <div class="position-relative d-inline-block">
-                                                    <div class="position-absolute top-100 start-100 translate-middle">
-                                                        <label for="product-image-input" class="mb-0"
-                                                            data-bs-toggle="tooltip" data-bs-placement="right"
-                                                            title="Select Image">
-                                                            <div class="avatar-xs">
-                                                                <div
-                                                                    class="avatar-title bg-light border rounded-circle text-muted cursor-pointer">
-                                                                    <i class="ri-image-fill"></i>
-                                                                </div>
-                                                            </div>
-                                                        </label>
-                                                        <input class="form-control d-none" id="product-image-input"
-                                                            type="file" name="imagePrincipale" accept="image/*">
-                                                        <div class="invalid-feedback">Ajouter une image</div>
-                                                    </div>
-                                                    <div class="avatar-lg">
-                                                        <div class="avatar-title bg-light rounded">
-                                                            <img src="{{ $data_plat->getFirstMediaUrl('ProduitImage') }}"
-                                                                id="product-img" class="avatar-md h-auto" />
-                                                        </div>
+                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="formFile" class="form-label">Image</label>
+                                                    <input class="form-control" type="file" id="formFile"
+                                                        name="imagePrincipale" accept="image/*">
+                                                    <div class="mt-2 position-relative" style="display: inline-block;">
+                                                        <img id="previewImage"
+                                                            src="{{ URL::asset($data_produit->getFirstMediaUrl('imagePrincipale')) }}"
+                                                            alt="Aperçu" style="max-width: 200px; display: none;" />
+                                                        <button type="button" id="removeImageBtn"
+                                                            class="btn btn-danger btn-sm"
+                                                            style="position: absolute; top: 5px; right: 5px; display: none;">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-
-
-                                        <div class="col-md-12 mt-3">
-                                            <label for="imageInput" class="form-label col-12">
-                                                <div class="col-md-12 border border-dark rounded border-dashed text-center px-5 mt-4"
-                                                    style=" cursor: pointer;">
-                                                    <i class="ri ri-image-add-fill fs-1 "></i>
-                                                    <h5>Ajouter des images</h5>
-                                                </div>
-                                            </label>
-                                            <input type="file" id="imageInput" accept="image/*"
-                                                class="form-control d-none" multiple>
-
-                                            <div class="row" id="imageTableBody"></div>
-
-                                            <div class="valid-feedback">
-                                                Success!
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <!-- end card -->
-
-
-                            </div>
                         </div>
                         <!-- end row -->
                         <!-- end card -->
