@@ -248,10 +248,12 @@ class VenteController extends Controller
 
                 // Récupération des règlements faits aujourd'hui sur ces ventes impayées
                 $reglementImpayes = Reglement::whereDate('date_reglement', $sessionDate)
+                    ->whereIn('vente_id', $venteImpayes->pluck('id'))
                     ->where('user_id', auth()->user()->id)
                     ->get();
 
 
+                    // dd($reglementImpayes);
 
                 // recuperer les offerts en attente
                 $offertsEnAttente = Vente::where('caisse_id', auth()->user()->caisse_id)
@@ -917,8 +919,10 @@ class VenteController extends Controller
                 // Récupération des règlements faits aujourd'hui sur ces ventes impayées
                 $reglementImpayes = Reglement::whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
                     ->where('user_id', auth()->user()->id)
+                    ->whereIn('vente_id', $venteImpayes->pluck('id'))
                     ->sum('montant_reglement');
 
+                    // dd($reglementImpayes);
 
 
 
@@ -1224,6 +1228,7 @@ class VenteController extends Controller
             // Récupération des règlements faits aujourd'hui sur ces ventes impayées
             $reglementImpayes = Reglement::whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
                 ->where('user_id', auth()->user()->id)
+                ->whereIn('vente_id', $venteImpayes->pluck('id'))
                 ->sum('montant_reglement');
 
 
