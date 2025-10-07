@@ -19,6 +19,7 @@ class Caisse extends Model
         'description',
         'statut',
         'session_date_vente',
+        'id_session_caisse',
         'created_at',
         'updated_at'
     ];

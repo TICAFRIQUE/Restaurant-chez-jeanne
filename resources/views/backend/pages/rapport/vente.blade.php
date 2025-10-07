@@ -193,15 +193,10 @@
                                     <tr>
                                         {{-- <th>Code</th> --}}
                                         <th>Designation</th>
-                                        {{-- <th>Catégorie</th> --}}
-                                        @if ($famille == 'bar' || $famille == 'Offerts')
-                                            <th>Quantité vendue</th>
-                                            <th>Montant total</th>
-                                        @else
-                                            <th>Quantité vendue</th>
-                                            <th>Prix de vente</th>
-                                            <th>Montant total</th>
-                                        @endif
+                                        <th>Catégorie</th>
+                                        <th>Quantité vendue</th>
+                                        <th>Montant total</th>
+
 
                                     </tr>
                                 </thead>
@@ -210,52 +205,31 @@
                                         <tr>
                                             {{-- <td>{{ $produit['code'] }}</td> --}}
                                             <td>{{ $produit['designation'] }}</td>
-                                            {{-- <td>{{ $produit['categorie'] }}</td> --}}
+                                            <td>{{ $produit['categorie'] }}</td>
 
-                                            <!-- ========== Start si famille est bar on affiche les details quantité et variante ========== -->
-                                            {{-- @if ($famille == 'bar')
-                                                <td>
-                                                    @foreach ($produit['details'] as $item)
-                                                        {{ $item->pivot->quantite }}
-                                                        {{ \App\Models\Variante::find($item->pivot->variante_id)->libelle ?? '' }}
-                                                        :
 
-                                                        {{ $item->pivot->prix_unitaire }}
-                                                        <br>
-                                                    @endforeach
-                                                </td>
-                                            @else
-                                                <td>{{ $produit['quantite_vendue'] }} </td>
-                                            @endif --}}
 
-                                            @if ($famille == 'bar' || $famille == 'Offerts')
-                                                @php
-                                                    $details = $produit['details'];
+                                            @php
+                                                $details = $produit['details'];
 
-                                                    // Regrouper uniquement par prix_unitaire
-                                                    $groupesPrix = $details->groupBy(function ($item) {
-                                                        return $item->pivot->prix_unitaire;
-                                                    });
-                                                @endphp
+                                                // Regrouper uniquement par prix_unitaire
+                                                $groupesPrix = $details->groupBy(function ($item) {
+                                                    return $item->pivot->prix_unitaire;
+                                                });
+                                            @endphp
 
-                                                <td>
-                                                    @foreach ($groupesPrix as $prixUnitaire => $groupe)
-                                                        @php
-                                                            $quantiteTotale = $groupe->sum('pivot.quantite');
-                                                        @endphp
+                                            <td>
+                                                @foreach ($groupesPrix as $prixUnitaire => $groupe)
+                                                    @php
+                                                        $quantiteTotale = $groupe->sum('pivot.quantite');
+                                                    @endphp
 
-                                                        {{ $quantiteTotale }} x
-                                                        {{ number_format($prixUnitaire, 0, ',', ' ') }} FCFA<br>
-                                                    @endforeach
-                                                </td>
+                                                    {{ $quantiteTotale }} x
+                                                    {{ number_format($prixUnitaire, 0, ',', ' ') }} FCFA<br>
+                                                @endforeach
+                                            </td>
 
-                                                <td>{{ number_format($produit['montant_total'], 0, ',', ' ') }} FCFA</td>
-                                            @else
-                                                <!-- ========== End si famille est bar on affiche les details quantité et variante ========== -->
-                                                <td>{{ $produit['quantite_vendue'] }} </td>
-                                                <td>{{ number_format($produit['prix_vente'], 0, ',', ' ') }} FCFA</td>
-                                                <td>{{ number_format($produit['montant_total'], 0, ',', ' ') }} FCFA</td>
-                                            @endif
+                                            <td>{{ number_format($produit['montant_total'], 0, ',', ' ') }} FCFA</td>
 
                                         </tr>
                                     @empty

@@ -101,6 +101,23 @@ class ReglementController extends Controller
     // }
 
 
+    // public function verifierTypeReglement($venteId)
+    // {
+    //     $vente = Vente::find($venteId);
+
+    //     if (!$vente) {
+    //         return back()->with('error', 'Vente non trouvée');
+    //     }
+
+    //     if ($vente->statut_reglement == 1 && $vente->statut_paiement == 'impaye') {
+    //         // mise à jour du type de reglement dans la table reglement
+    //         Reglement::where('vente_id', $venteId)->update(['type_reglement' => 'impaye']);
+    //     } else {
+    //         Reglement::where('vente_id', $venteId)->update(['type_reglement' => 'nouveau']);
+    //     }
+    // }
+
+
     public function store(Request $request)
     {
 
@@ -116,15 +133,37 @@ class ReglementController extends Controller
                 'montant_restant' => 'required|numeric',
                 'mode_paiement' => 'required|string',
                 'montant_rendu' => 'required|numeric',
+                'type_reglement' => 'nullable|string',
+                'id_session_caisse' => 'nullable|string',
             ]);
+            // vérifier le type de reglement si c'est un impaye ou un nouveau
+            $vente_verifier = Vente::find($request->vente_id);
 
-            // 🔐 2. Générer le code et associer l'utilisateur
+            // Vérification du type de règlement
+            $isNouvelleVente = ($vente_verifier->statut_reglement == 0);
+            $isReglementImpayee = ($vente_verifier->statut_reglement == 1 && $vente_verifier->statut_paiement == 'impaye');
+
+            //  2. Générer le code et associer l'utilisateur
             $data['code'] = 'REG-' . strtoupper(Str::random(5));
             $data['user_id'] = auth()->id();
             $data['date_reglement'] = auth()->user()->caisse->session_date_vente; // Statut de la vente
+            $data['type_reglement'] = $isNouvelleVente ? 'nouveau' : ($isReglementImpayee ? 'impaye' : 'nouveau');
+            $data['id_session_caisse'] = auth()->user()->caisse->id_session_caisse;
 
-            // 💾 3. Créer le règlement
+
+            //  3. Créer le règlement
             $reglement = Reglement::create($data);
+
+
+
+
+
+
+
+
+
+
+
 
             // 👤 4. Gérer le client si nécessaire
             $vente = Vente::find($request->vente_id);
@@ -169,7 +208,7 @@ class ReglementController extends Controller
                 'mode_paiement' => $data['montant_restant'] == 0 ? $data['mode_paiement'] : 'impaye',
                 'statut_paiement' => $data['montant_restant'] == 0 ? 'paye' : 'impaye',
                 'statut_reglement' => 1,
-                'statut' =>'confirmée', // Statut de la vente,
+                'statut' => 'confirmée', // Statut de la vente,
             ]);
 
             DB::commit(); // ✅ Si tout va bien, on valide la transaction
@@ -180,7 +219,7 @@ class ReglementController extends Controller
             DB::rollBack(); // ❌ Une erreur → on annule tout
             Log::error('Erreur règlement : ' . $th->getMessage());
 
-            
+
 
             return back()->with('error', 'Une erreur est survenue : ' . $th->getMessage());
         }

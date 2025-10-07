@@ -205,6 +205,8 @@ class VenteController extends Controller
                 $sessionDate = $sessionDate->session_date_vente;
 
 
+
+
                 // recuperer les vente de la caisse actuelle qui sont cloturées
                 $venteCaisseCloture = Vente::where('caisse_id', auth()->user()->caisse_id)
                     ->where('user_id', auth()->user()->id)
@@ -248,12 +250,14 @@ class VenteController extends Controller
 
                 // Récupération des règlements faits aujourd'hui sur ces ventes impayées
                 $reglementImpayes = Reglement::whereDate('date_reglement', $sessionDate)
-                    ->whereIn('vente_id', $venteImpayes->pluck('id'))
+                    // ->whereIn('vente_id', $venteImpayes->pluck('id'))
+                    ->where('type_reglement', 'impaye')
+                    ->where('id_session_caisse', auth()->user()->caisse->id_session_caisse)
                     ->where('user_id', auth()->user()->id)
                     ->get();
 
 
-                    // dd($reglementImpayes);
+                // dd($reglementImpayes);
 
                 // recuperer les offerts en attente
                 $offertsEnAttente = Vente::where('caisse_id', auth()->user()->caisse_id)
@@ -767,6 +771,10 @@ class VenteController extends Controller
                 'statut_cloture' => true,
             ]);
 
+            //une fois les vente cloturer on change la session id de la caisse
+            $caisse->id_session_caisse = Str::uuid();
+            $caisse->save();
+
             // //desactive la caisse
             // $caisse->statut = 'desactive';
             // $caisse->save();
@@ -823,6 +831,7 @@ class VenteController extends Controller
                 $caisse = Caisse::find($user->caisse_id);
                 $caisse->statut = 'desactive';
                 $caisse->session_date_vente = null;
+                $caisse->id_session_caisse = null;
                 $caisse->save();
 
                 // mettre caisse_id a null du user connecté
@@ -919,10 +928,12 @@ class VenteController extends Controller
                 // Récupération des règlements faits aujourd'hui sur ces ventes impayées
                 $reglementImpayes = Reglement::whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
                     ->where('user_id', auth()->user()->id)
-                    ->whereIn('vente_id', $venteImpayes->pluck('id'))
+                    // ->whereIn('vente_id', $venteImpayes->pluck('id'))
+                    ->where('type_reglement', 'impaye')
+                    ->where('id_session_caisse', auth()->user()->caisse->id_session_caisse)
                     ->sum('montant_reglement');
 
-                    // dd($reglementImpayes);
+                // dd($reglementImpayes);
 
 
 
@@ -1081,6 +1092,7 @@ class VenteController extends Controller
                     $plat = $groupe->first();
 
                     return [
+                        'details' => $groupe, // recuperer les details groupés par plat
                         'id' => $plat->id,
                         'code' => $plat->code,
                         'stock' => 100, // À calculer si nécessaire
@@ -1095,7 +1107,6 @@ class VenteController extends Controller
                 ->values();
 
             // dd($platsVendus->toArray());
-
 
 
 
@@ -1228,7 +1239,9 @@ class VenteController extends Controller
             // Récupération des règlements faits aujourd'hui sur ces ventes impayées
             $reglementImpayes = Reglement::whereDate('date_reglement', auth()->user()->caisse->session_date_vente)
                 ->where('user_id', auth()->user()->id)
-                ->whereIn('vente_id', $venteImpayes->pluck('id'))
+                // ->whereIn('vente_id', $venteImpayes->pluck('id'))
+                ->where('type_reglement', 'impaye')
+                // ->where('id_session_caisse', auth()->user()->caisse->id_session_caisse)
                 ->sum('montant_reglement');
 
 

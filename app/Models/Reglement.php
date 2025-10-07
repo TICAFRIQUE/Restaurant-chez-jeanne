@@ -19,6 +19,8 @@ class Reglement extends Model
         'montant_restant', // montant restant
         'mode_paiement', // mode de paiement
         'date_reglement', // date du reglement
+        'type_reglement', // type de reglement (nouveau ou impaye)
+        'id_session_caisse', // id de la session de caisse
     ];
 
 

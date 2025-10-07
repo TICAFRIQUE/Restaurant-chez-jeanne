@@ -316,7 +316,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('ajustement')->controller(AjustementController::class)->group(function () {
         route::get('', 'index')->name('ajustement.index');
         route::get('create/{id}', 'create')->name('ajustement.create');
-        route::post('store', 'store')->name('ajustement.store');   
+        route::post('store', 'store')->name('ajustement.store');
     });
 
     // stock -sortie
@@ -328,7 +328,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
 
-        // stock -transfert
+    // stock -transfert
     Route::prefix('stock-transfert')->controller(StockTransfertController::class)->group(function () {
         route::get('create/{id}', 'create')->name('stock-transfert.create');
         route::post('store', 'store')->name('stock-transfert.store');

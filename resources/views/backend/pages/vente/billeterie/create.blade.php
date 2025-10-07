@@ -29,53 +29,55 @@
                                             <span class="fw-bold">Gestion de la billetterie</span>
                                             <p>-------------------------------</p>
                                         </div> --}}
-                                        <div class="alert alert-primary fs-5">
-                                            <strong>Important !</strong> Veuillez effectuer la billetterie pour vérifier si
-                                            le montant physique en caisse correspond à votre montant de vente du systeme
+                                      <!-- Tableau récapitulatif billetterie -->
+<!-- Tableau récapitulatif billetterie amélioré -->
+<div class="table-responsive my-4">
+    <table class="table table-bordered table-hover align-middle shadow-sm bg-white">
+        <thead class="table-primary text-center fs-5">
+            <tr>
+                <th>Libellé</th>
+                <th>Montant (FCFA)</th>
+            </tr>
+        </thead>
+        <tbody class="fs-5">
+            <tr>
+                <td class="fw-semibold">💰 Total de la vente</td>
+                <td class="text-end fw-bold text-dark">
+                    {{ number_format($totalVente, 0, ',', ' ') }}
+                </td>
+            </tr>
 
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <ul>
-                                                        <li> Total de la vente:
-                                                            <strong>{{ number_format($totalVente, 0, ',', ' ') }}
-                                                                FCFA</strong>.
-                                                        </li>
-                                                        <li> Total Impayées:
-                                                            <strong>{{ number_format($totalVenteImpayer, 0, ',', ' ') }}
-                                                                FCFA</strong>.
-                                                        </li>
+            <tr>
+                <td class="fw-semibold">❌ Total des impayés</td>
+                <td class="text-end fw-bold text-danger">
+                    {{ number_format($totalVenteImpayer, 0, ',', ' ') }}
+                </td>
+            </tr>
 
-                                                        <li> Total en caisse:
-                                                            <strong>{{ number_format($totalVenteCaisse, 0, ',', ' ') }}
-                                                                FCFA</strong>.
-                                                        </li>
-                                                    </ul>
-                                                </div>
+            <tr>
+                <td class="fw-semibold">✅ Impayés réglés</td>
+                <td class="text-end fw-bold text-success">
+                    {{ number_format($reglementImpayes, 0, ',', ' ') }}
+                </td>
+            </tr>
 
+            <tr class="table-info">
+                <td class="fw-bold text-primary">🧾 Montant physique en caisse</td>
+                <td class="text-end fw-bold text-primary">
+                    {{ number_format($totalVenteCaisse, 0, ',', ' ') }}
+                </td>
+            </tr>
 
-                                                <div class="col-md-6">
-                                                    <ul>
+            {{-- <tr class="table-warning">
+                <td class="fw-bold text-dark">⚖️ Différence (Caisse - Vente)</td>
+                <td class="text-end fw-bold text-dark">
+                    {{ number_format($totalVenteCaisse - $totalVente, 0, ',', ' ') }}
+                </td>
+            </tr> --}}
+        </tbody>
+    </table>
+</div>
 
-                                                        <li class="text-danger"> Total des impayées réglées:
-                                                            <strong>{{ number_format($reglementImpayes, 0, ',', ' ') }}
-                                                                FCFA</strong>.
-                                                        </li>
-
-                                                    </ul>
-                                                </div>
-
-                                                <div>
-                                                    <p class="fw-bold fs-4">
-                                                        Total en caisse:
-                                                        <strong>{{ number_format($totalVenteCaisse, 0, ',', ' ') }}
-                                                            FCFA</strong>.
-
-                                                    </p>
-                                                </div>
-                                            </div>
-
-
-                                        </div>
 
                                         {{-- <a href="{{ route('vente.rapport-caisse') }}" class="btn btn-primary">Rapport de
                                             vente</a> --}}

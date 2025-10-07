@@ -207,14 +207,8 @@
                                         {{-- <th>Code</th> --}}
                                         <th>Designation</th>
                                         <th>Catégorie</th>
-                                        @if ($famille == 'bar' || $famille == 'offerts')
-                                            <th>Quantité vendue</th>
-                                            <th>Montant total</th>
-                                        @else
-                                            <th>Quantité vendue</th>
-                                            <th>Prix de vente</th>
-                                            <th>Montant total</th>
-                                        @endif
+                                        <th>Quantité vendue</th>
+                                        <th>Montant total</th>
 
                                     </tr>
                                 </thead>
@@ -222,50 +216,30 @@
                                     @forelse ($produits as $produit)
                                         <tr>
                                             {{-- <td>{{ $produit['code'] }}</td> --}}
-                                            <td>{{ $produit['designation'] }} {{ $produit['variante']?? '' }} </td>
+                                            <td>{{ $produit['designation'] }} {{ $produit['variante'] ?? '' }} </td>
                                             <td>{{ $produit['categorie'] }}</td>
+                                            @php
+                                                $details = $produit['details'];
 
-                                            @if ($famille == 'bar' || $famille == 'offerts')
-                                                @php
-                                                    $details = $produit['details'];
-                                                    $variantes = $details->pluck('pivot.variante_id')->unique();
+                                                // Regrouper uniquement par prix_unitaire
+                                                $groupesPrix = $details->groupBy(function ($item) {
+                                                    return $item->pivot->prix_unitaire;
+                                                });
+                                            @endphp
 
-                                                    // Préchargement facultatif pour éviter requêtes multiples
-                                                    $varianteLibelles = \App\Models\Variante::whereIn('id', $variantes)
-                                                        ->get()
-                                                        ->keyBy('id');
-                                                @endphp
-
-                                                <td>
+                                            <td>
+                                                @foreach ($groupesPrix as $prixUnitaire => $groupe)
                                                     @php
-                                                        // Regrouper les détails par variante_id et prix_unitaire
-                                                        $groupes = $details->groupBy(function ($item) {
-                                                            return $item->pivot->produit_id .
-                                                                '_' .
-                                                                $item->pivot->prix_unitaire;
-                                                        });
-
+                                                        $quantiteTotale = $groupe->sum('pivot.quantite');
                                                     @endphp
 
-                                                    @foreach ($groupes as $groupe)
-                                                        @php
-                                                            $quantiteTotale = $groupe->sum('pivot.quantite');
-                                                            $varianteId = $groupe->first()->pivot->variante_id;
-                                                            $varianteNom =
-                                                                $varianteLibelles[$varianteId]->libelle ?? '';
-                                                            $prixUnitaire = $groupe->first()->pivot->prix_unitaire;
-                                                        @endphp
-                                                        {{ $quantiteTotale }} {{ $varianteNom }} x
-                                                        {{ number_format($prixUnitaire, 0, ',', ' ') }} FCFA<br>
-                                                    @endforeach
-                                                </td>
-                                                <td>{{ number_format($produit['montant_total'], 0, ',', ' ') }} FCFA</td>
-                                            @else
-                                                <!-- ========== End si famille est bar on affiche les details quantité et variante ========== -->
-                                                <td>{{ $produit['quantite_vendue'] }} </td>
-                                                <td>{{ number_format($produit['prix_vente'], 0, ',', ' ') }} FCFA</td>
-                                                <td>{{ number_format($produit['montant_total'], 0, ',', ' ') }} FCFA</td>
-                                            @endif
+                                                    {{ $quantiteTotale }} x
+                                                    {{ number_format($prixUnitaire, 0, ',', ' ') }} FCFA<br>
+                                                @endforeach
+                                            </td>
+
+                                            <td>{{ number_format($produit['montant_total'], 0, ',', ' ') }} FCFA</td>
+
 
                                         </tr>
                                     @empty

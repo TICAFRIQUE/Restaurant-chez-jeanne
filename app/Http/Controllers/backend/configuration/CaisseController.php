@@ -132,9 +132,10 @@ class CaisseController extends Controller
                 'session_date' => 'required|date',
             ]);
 
-            // Stocker la date dans la session 
+            // Stocker la date de session et ID SESSION dans la table caisse
             Caisse::whereId(Auth::user()->caisse_id)->update([
-                'session_date_vente' => $request->session_date
+                'session_date_vente' => $request->session_date,
+                'id_session_caisse' => Str::uuid()
             ]);
 
             // enregistrer la date dans l'historique

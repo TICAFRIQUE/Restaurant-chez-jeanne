@@ -883,6 +883,7 @@ class RapportController extends Controller
                     }
 
                     return [
+                        'details'         => $groupe,
                         'id'              => $plat->id,
                         'code'            => $plat->code,
                         'stock'           => 100,

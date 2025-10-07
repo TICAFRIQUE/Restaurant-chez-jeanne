@@ -100,7 +100,8 @@ class AdminController extends Controller
                     // Mettre a Null la session de vente et desactiver la caisse
                     Caisse::whereId($user->caisse_id)->update([
                         'statut' => 'desactive',
-                        'session_date_vente' => null
+                        'session_date_vente' => null,
+                        'id_session_caisse' => null
                     ]);
 
                     User::whereId($user->id)->update([
