@@ -14,12 +14,21 @@ use App\Models\ProduitVente;
 use Illuminate\Http\Request;
 use App\Models\ProduitSortie;
 use App\Models\CategorieDepense;
+use App\Services\ActivityLogger;
 use App\Models\InventaireProduit;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class RapportController extends Controller
 {
+
+     protected $logger;
+
+    public function __construct(ActivityLogger $logger)
+    {
+        $this->logger = $logger;
+    }
     //NO USE
     public function categorie(Request $request)
     {
@@ -229,6 +238,7 @@ class RapportController extends Controller
 
     public function exploitation(Request $request)
     {
+        $this->logger->log('Accès au rapport d\'exploitation');
         try {
             // 1. Récupération des catégories de dépense
             $categories_depense = CategorieDepense::with('libelleDepenses')->orderBy('libelle')->get(); //categorie pour recuperer les libelles de cat_depense selectionner
@@ -752,6 +762,11 @@ class RapportController extends Controller
 
     public function vente(Request $request)
     {
+
+          //activité du user
+             $this->logger->log('Consultation du rapport des ventes');
+       
+            
         try {
             $dateDebut       = $request->input('date_debut');
             $dateFin         = $request->input('date_fin');
@@ -1188,6 +1203,8 @@ class RapportController extends Controller
 
     public function historique(Request $request)
     {
+            //activité de l'utilisateur
+            $this->logger->log('Accès à la liste des rapports historiques des produits');
         try {
 
             // Appel de la fonction miseAJourStockVente()

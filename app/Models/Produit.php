@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Traits\AutoLogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Illuminate\Database\Eloquent\Model;
+
 use Cviebrock\EloquentSluggable\Sluggable;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
@@ -14,27 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Produit extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes, InteractsWithMedia, sluggable;
+    use HasFactory, SoftDeletes, InteractsWithMedia, sluggable, AutoLogsActivity;
 
-    // public function registerMediaConversions(Media $media = null): void
-    // {
-
-    //     // $this->addMediaConversion('large-size')
-    //     // ->width(570) // par exemple 300px de large
-    //     // ->height(470) // 300px de hauteur
-    //     // ->sharpen(10); // pour améliorer la qualité si besoin
-
-    //     $this->addMediaConversion('standard-size')
-    //         ->width(300) // par exemple 300px de large
-    //         ->height(300) // 300px de hauteur
-    //         ->sharpen(10); // pour améliorer la qualité si besoin
-
-
-    //     $this->addMediaConversion('small-size')
-    //         ->width(150) // par exemple 300px de large
-    //         ->height(150) // 300px de hauteur
-    //         ->sharpen(10); // pour améliorer la qualité si besoin
-    // }
 
     public $incrementing = false;
 
@@ -63,6 +46,17 @@ class Produit extends Model implements HasMedia
         'variante_id', // variante du produit
     ];
 
+
+    // public function getActivitylogOptions(): LogOptions
+    // {
+    //     return LogOptions::defaults()
+    //         ->logAll()
+    //         ->logOnlyDirty()
+    //         ->setDescriptionForEvent(
+    //             fn(string $eventName) =>
+    //             class_basename($this) . " {$eventName} par " . auth()->user()?->name
+    //         );
+    // }
 
     public static function boot()
     {

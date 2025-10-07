@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Spatie\Activitylog\Models\Activity;
 
 class DashboardController extends Controller
 {
@@ -35,6 +36,8 @@ class DashboardController extends Controller
     //
     public function index(Request $request)
     {
+
+
         // Vérifier si l'utilisateur a le rôle 'caisse'
         if ($request->user()->hasRole(['caisse', 'supercaisse'])) {
             // Vérifier si l'utilisateur n'a pas sélectionné de caisse
@@ -129,7 +132,7 @@ class DashboardController extends Controller
             'montantTotalVentes', // Montant total des ventes annee en cours
             'montantTotalDepenses', // Montant total des depenses annee en cours
             'montantTotalVentesMois', // Montant total des ventes mois en cours
-            'montantTotalDepensesMois',// Montant total des depenses mois en cours
+            'montantTotalDepensesMois', // Montant total des depenses mois en cours
             'produitsEnAlerte',
 
             // 'chiffreAffaireParMois',
@@ -137,4 +140,6 @@ class DashboardController extends Controller
             'data'
         ));
     }
+
+    
 }

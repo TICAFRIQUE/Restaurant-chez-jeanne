@@ -71,6 +71,7 @@ class Kernel extends HttpKernel
         'admin' => Admin::class,
         'check.session' => \App\Http\Middleware\CheckSession::class,
         'check.inventaire' => \App\Http\Middleware\CheckInventaireMensuel::class,
+        'activity.logger' => \App\Http\Middleware\ActivityLoggerMiddleware::class,
 
 
         // Autres middlewares

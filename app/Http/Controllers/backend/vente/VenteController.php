@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\ClotureCaisse;
 use App\Models\HistoriqueCaisse;
+use App\Services\ActivityLogger;
+use App\Models\OffertNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Routing\RouteAction;
 use App\Http\Controllers\Controller;
@@ -24,7 +26,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Http\Controllers\backend\user\AdminController;
-use App\Models\OffertNotification;
 
 class VenteController extends Controller
 {
@@ -66,6 +67,13 @@ class VenteController extends Controller
     //     }
     // }
 
+
+     protected $logger;
+
+    public function __construct(ActivityLogger $logger)
+    {
+        $this->logger = $logger;
+    }
 
     public function index(Request $request)
     {
@@ -994,6 +1002,11 @@ class VenteController extends Controller
     //Rapport de vente de la caisse
     public function rapportVente(Request $request)
     {
+        //activité de l'utilisateur
+        activity()
+            ->causedBy(Auth::user())
+            ->withProperties(['ip' => request()->ip(), 'user_agent' => request()->userAgent()])
+            ->log('Accès au rapport de vente de la caisse');
         try {
             // $dateDebut = $request->input('date_debut');
             // $dateFin = $request->input('date_fin');

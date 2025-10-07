@@ -419,7 +419,7 @@
                     aria-controls="sidebarAuth">
                     <i class=" ri-settings-2-fill"></i> <span>PARAMETRE</span>
                 </a>
-                <div class="collapse menu-dropdown {{ Route::is('setting.*') || Route::is('module.*') || Route::is('role.*') || Route::is('permission.*') || Route::is('admin-register.*') ? 'show' : '' }}"
+                <div class="collapse menu-dropdown {{ Route::is('activity-logs.*') || Route::is('setting.*') || Route::is('module.*') || Route::is('role.*') || Route::is('permission.*') || Route::is('admin-register.*') ? 'show' : '' }}"
                     id="sidebarAuth">
                     <ul class="nav nav-sm flex-column">
                         <li class="nav-item active">
@@ -444,6 +444,11 @@
                             <a href="{{ route('permission.index') }}"
                                 class="nav-link {{ Route::is('permission.*') ? 'active' : '' }}">Permissions/
                                 Roles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('activity-logs.index') }}"
+                                class="nav-link {{ Route::is('activity-logs.*') ? 'active' : '' }}">Journal
+                                d'activité</a>
                         </li>
                     </ul>
                 </div>

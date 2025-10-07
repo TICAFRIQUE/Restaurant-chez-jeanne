@@ -46,9 +46,13 @@ class ProduitController extends Controller
 
         // dd($data_produit->toArray());
 
-
-
-
+        // activity('system')
+        //     ->causedBy(auth()->user())
+        //     ->withProperties([
+        //         'route' => request()->path(),
+        //         'ip' => request()->ip(),
+        //     ])
+        //     ->log('Utilisateur connecté à la caisse');
         return view('backend.pages.produit.index', compact('data_produit'));
     }
 

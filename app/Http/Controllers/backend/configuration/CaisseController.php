@@ -8,16 +8,26 @@ use App\Models\Caisse;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\HistoriqueCaisse;
+use App\Services\ActivityLogger;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class CaisseController extends Controller
 {
+    protected $logger;
+
+    public function __construct(ActivityLogger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     //
     //
     public function index()
     {
+        //appelé l'activité de l'utilisateur
+        $this->logger->log('Accès à la liste des caisses');
 
         $data_caisse = Caisse::get();
         $data_caisse->sortBy('libelle');
@@ -28,6 +38,8 @@ class CaisseController extends Controller
 
     public function store(Request $request)
     {
+         //appelé l'activité de l'utilisateur
+        $this->logger->log('Création d\'une nouvelle caisse');
         try {
             $data =  $request->validate([
                 'libelle' => 'required',

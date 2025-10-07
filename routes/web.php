@@ -45,6 +45,7 @@ use App\Http\Controllers\backend\stock\StockTransfertController;
 use App\Http\Controllers\backend\configuration\MagasinController;
 use App\Http\Controllers\backend\permission\PermissionController;
 use App\Http\Controllers\backend\depense\LibelleDepenseController;
+use App\Http\Controllers\backend\parametre\ActivityLogsController;
 use App\Http\Controllers\backend\fournisseur\FournisseurController;
 use App\Http\Controllers\backend\depense\CategorieDepenseController;
 use App\Http\Controllers\backend\configuration\UniteMesureController;
@@ -207,6 +208,15 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         }
     )->name('setting.maintenance-down');
 
+    //activity logs
+    Route::prefix('activity-logs')->controller(ActivityLogsController::class)->group(function () {
+        route::get('', 'index')->name('activity-logs.index');
+        route::get('delete/{id}', 'delete')->name('activity-logs.delete');
+        route::delete('clear', 'clearAll')->name('activity-logs.clear-all');
+    });
+
+    
+
     //rapport
     Route::prefix('rapport')->controller(RapportController::class)->group(function () {
         route::get('categorie', 'categorie')->name('rapport.categorie');
@@ -233,7 +243,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
 
     //caisse
-    Route::prefix('caisse')->controller(CaisseController::class)->group(function () {
+    Route::prefix('caisse')->middleware('activity.logger')->controller(CaisseController::class)->group(function () {
         route::get('', 'index')->name('caisse.index');
         route::post('store', 'store')->name('caisse.store');
         route::post('update/{id}', 'update')->name('caisse.update');
@@ -282,7 +292,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
     // produit
-    Route::prefix('produit')->controller(ProduitController::class)->group(function () {
+    Route::prefix('produit')->middleware('activity.logger')->controller(ProduitController::class)->group(function () {
         route::get('', 'index')->name('produit.index')->middleware('can:voir-produit'); // liste des produit
         route::get('create', 'create')->name('produit.create')->middleware('can:creer-produit'); // vue de la page de creation produit
         route::post('store', 'store')->name('produit.store')->middleware('can:creer-produit'); // ajouter produit
@@ -299,7 +309,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
     // stock -achat
-    Route::prefix('achat')->controller(AchatController::class)->group(function () {
+    Route::prefix('achat')->middleware('activity.logger')->controller(AchatController::class)->group(function () {
         route::get('index', 'index')->name('achat.index');  // liste des facture
         route::get('show/{id}', 'show')->name('achat.show');
         route::get('create', 'create')->name('achat.create')->middleware('check.inventaire'); // 
@@ -320,7 +330,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
     // stock -sortie
-    Route::prefix('sortie')->controller(SortieController::class)->group(function () {
+    Route::prefix('sortie')->middleware('activity.logger')->controller(SortieController::class)->group(function () {
         route::get('', 'index')->name('sortie.index');
         route::get('show/{id}', 'show')->name('sortie.show');
         route::get('create', 'create')->name('sortie.create')->middleware('check.inventaire');
@@ -329,14 +339,14 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
 
     // stock -transfert
-    Route::prefix('stock-transfert')->controller(StockTransfertController::class)->group(function () {
+    Route::prefix('stock-transfert')->middleware('activity.logger')->controller(StockTransfertController::class)->group(function () {
         route::get('create/{id}', 'create')->name('stock-transfert.create');
         route::post('store', 'store')->name('stock-transfert.store');
     });
 
 
     // stock -inventaire
-    Route::prefix('inventaire')->controller(InventaireController::class)->group(function () {
+    Route::prefix('inventaire')->middleware('activity.logger')->controller(InventaireController::class)->group(function () {
         route::get('', 'index')->name('inventaire.index');
         route::get('show/{id}', 'show')->name('inventaire.show');
         route::get('create', 'create')->name('inventaire.create');
@@ -347,7 +357,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
 
     // vente
-    Route::prefix('vente')->controller(VenteController::class)->group(function () {
+    Route::prefix('vente')->middleware('activity.logger')->controller(VenteController::class)->group(function () {
         route::get('vente-en-attente', 'venteEnAttente')->name('vente.attente')->middleware('can:voir-vente'); // liste des vente en attente en localStorage js
         route::get('', 'index')->name('vente.index')->middleware('can:voir-vente');
         route::get('historique-vente-client', 'historiqueVenteClient')->name('vente.client')->middleware('can:voir-vente'); // Historique des ventes client
@@ -373,7 +383,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
     // Réglement
-    Route::prefix('reglement')->controller(ReglementController::class)->group(function () {
+    Route::prefix('reglement')->middleware('activity.logger')->controller(ReglementController::class)->group(function () {
         route::get('', 'index')->name('reglement.index');
         route::post('store', 'store')->name('reglement.store');
         route::get('show/{id}', 'show')->name('reglement.show');
@@ -399,7 +409,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
 
-    Route::prefix('categorie-depense')->controller(CategorieDepenseController::class)->group(function () {
+    Route::prefix('categorie-depense')->middleware('activity.logger')->controller(CategorieDepenseController::class)->group(function () {
         route::get('', 'index')->name('categorie-depense.index');
         route::get('create', 'create')->name('categorie-depense.create');
         route::post('store', 'store')->name('categorie-depense.store');
@@ -410,7 +420,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
 
-    Route::prefix('libelle-depense')->controller(LibelleDepenseController::class)->group(function () {
+    Route::prefix('libelle-depense')->middleware('activity.logger')->controller(LibelleDepenseController::class)->group(function () {
         route::get('', 'index')->name('libelle-depense.index');
         route::get('create', 'create')->name('libelle-depense.create');
         route::post('store', 'store')->name('libelle-depense.store');
@@ -420,7 +430,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::post('position/{id}', 'position')->name('libelle-depense.position');
     });
 
-    Route::prefix('depense')->controller(DepenseController::class)->group(function () {
+    Route::prefix('depense')->middleware('activity.logger')->controller(DepenseController::class)->group(function () {
         route::get('', 'index')->name('depense.index');
         route::get('getList', 'getList')->name('depense.getList');
         route::get('create', 'create')->name('depense.create')->middleware('check.inventaire');
@@ -432,7 +442,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
 
     // produit restaurant
-    Route::prefix('plat')->controller(PlatController::class)->group(function () {
+    Route::prefix('plat')->middleware('activity.logger')->controller(PlatController::class)->group(function () {
         route::get('', 'index')->name('plat.index');
         route::get('create', 'create')->name('plat.create');
         route::post('store', 'store')->name('plat.store');
@@ -444,7 +454,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
 
 
-    Route::prefix('plat-menu')->controller(PlatMenuController::class)->group(function () {
+    Route::prefix('plat-menu')->middleware('activity.logger')->controller(PlatMenuController::class)->group(function () {
         route::get('', 'index')->name('plat-menu.index');
         route::get('create', 'create')->name('plat-menu.create');
         route::post('store', 'store')->name('plat-menu.store');
@@ -456,7 +466,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
 
     //  menu
-    Route::prefix('menu')->controller(MenuController::class)->group(function () {
+    Route::prefix('menu')->middleware('activity.logger')->controller(MenuController::class)->group(function () {
         route::get('', 'index')->name('menu.index');
         route::get('create', 'create')->name('menu.create');
         route::get('getOptions', 'getOptions')->name('menu.options'); // recuperer en temps reel les nouvel enregistrements plat , complemet .....
@@ -468,7 +478,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
     // categorie menu
-    Route::prefix('categorie-menu')->controller(CategorieMenuController::class)->group(function () {
+    Route::prefix('categorie-menu')->middleware('activity.logger')->controller(CategorieMenuController::class)->group(function () {
         route::get('', 'index')->name('categorie-menu.index');
         route::post('store', 'store')->name('categorie-menu.store');
         route::post('update/{id}', 'update')->name('categorie-menu.update');
