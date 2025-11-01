@@ -312,7 +312,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('achat')->controller(AchatController::class)->group(function () {
         route::get('index', 'index')->name('achat.index');  // liste des facture
         route::get('show/{id}', 'show')->name('achat.show');
-        route::get('create', 'create')->name('achat.create')->middleware('check.inventaire'); // 
+        route::get('create', 'create')->name('achat.create'); // 
         route::post('store', 'store')->name('achat.store');
         route::get('edit/{id}', 'edit')->name('achat.edit');
         route::post('update/{id}', 'update')->name('achat.update');
@@ -333,7 +333,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('sortie')->middleware('activity.logger')->controller(SortieController::class)->group(function () {
         route::get('', 'index')->name('sortie.index');
         route::get('show/{id}', 'show')->name('sortie.show');
-        route::get('create', 'create')->name('sortie.create')->middleware('check.inventaire');
+        route::get('create', 'create')->name('sortie.create');
         route::post('store', 'store')->name('sortie.store');
     });
 
@@ -363,7 +363,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::get('historique-vente-client', 'historiqueVenteClient')->name('vente.client')->middleware('can:voir-vente'); // Historique des ventes client
 
         route::get('show/{id}', 'show')->name('vente.show')->middleware('can:voir-vente'); // detail vente
-        route::get('create', 'create')->name('vente.create')->middleware(['can:creer-vente', 'check.inventaire']); // vue de la page de creation vente
+        route::get('create', 'create')->name('vente.create')->middleware('can:creer-vente'); // vue de la page de creation vente
         route::post('store', 'store')->name('vente.store')->middleware('can:creer-vente'); // ajouter vente
         route::get('cloture-caisse', 'clotureCaisse')->name('vente.cloture-caisse')->middleware('can:voir-vente'); // cloture caisse
         route::get('billeterie-caisse', 'billeterieCaisse')->name('vente.billeterie-caisse')->middleware('can:voir-vente'); // billeterie caisse
@@ -433,7 +433,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('depense')->controller(DepenseController::class)->group(function () {
         route::get('', 'index')->name('depense.index');
         route::get('getList', 'getList')->name('depense.getList');
-        route::get('create', 'create')->name('depense.create')->middleware('check.inventaire');
+        route::get('create', 'create')->name('depense.create')
         route::post('store', 'store')->name('depense.store');
         route::get('edit/{id}', 'edit')->name('depense.edit');
         route::post('update/{id}', 'update')->name('depense.update');
