@@ -35,8 +35,8 @@
                                                                                 )->first();
                                                                             @endphp
                                                                             <option selected 
-                                                                                value="{{ $data_categorie->id }}">
-                                                                                {{ $data_categorie->nom }}
+                                                                                value="{{ $data_categorie->id ?? '' }}">
+                                                                                {{ $data_categorie->nom  ?? '' }}
                                                                             </option>
                                                                         </select>
                                                                     </div>
