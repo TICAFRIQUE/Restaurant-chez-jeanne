@@ -27,7 +27,7 @@ class SettingController extends Controller
 
 
         // dd($backup_db);
-        return view('backend.pages.setting.index', compact('data_setting', 'data_maintenance' , 'backup'));
+        return view('backend.pages.setting.index', compact('data_setting', 'data_maintenance', 'backup'));
     }
 
     // Télécharger un fichier de sauvegarde
@@ -41,9 +41,9 @@ class SettingController extends Controller
         $appName = config('app.name');
         $path = storage_path("app/" . $appName . "/" . $file);
 
-    if (file_exists($path)) {
-        return response()->download($path);
-    }
+        if (file_exists($path)) {
+            return response()->download($path);
+        }
 
         Alert::error('Fichier non trouvé.', 'Error Message');
 
@@ -182,12 +182,12 @@ class SettingController extends Controller
             $fileName = $request->file;
             $appName = config('app.name');
             $filePath = $appName . '/' . $fileName;
-            
+
             if (Storage::disk('local')->exists($filePath)) {
                 Storage::disk('local')->delete($filePath);
                 return response()->json(['success' => true, 'message' => 'Sauvegarde supprimée']);
             }
-            
+
             return response()->json(['success' => false, 'message' => 'Fichier introuvable']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
@@ -199,11 +199,11 @@ class SettingController extends Controller
         try {
             $appName = config('app.name');
             $files = Storage::disk('local')->files($appName);
-            
+
             foreach ($files as $file) {
                 Storage::disk('local')->delete($file);
             }
-            
+
             return response()->json(['success' => true, 'message' => 'Toutes les sauvegardes supprimées']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);

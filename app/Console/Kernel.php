@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -40,23 +41,43 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
+    // protected function schedule(Schedule $schedule)
+    // {
+    //     // $schedule->command('inspire')->hourly();
+
+    //     // Planifier la sauvegarde tous les jours à 16h
+    //     $schedule->command('backup:run')->dailyAt('16:00')
+    //         ->after(function () {
+    //             $this->purgerAnciennesSauvegardes();
+    //         })
+    //         ->onFailure(function () {
+    //             Log::error('La sauvegarde a échoué.');
+    //         });
+
+
+    //     // // executer chaque minute
+    //     // $schedule->command('backup:run')->everyMinute();
+    // }
+
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-
         // Planifier la sauvegarde tous les jours à 16h
-        $schedule->command('backup:run')->dailyAt('16:00')
+        // $schedule->command('backup:run')->dailyAt('16:00')
+        //     ->after(function () {
+        //         // Nettoyer les anciens backups et garder seulement les 3 derniers
+        //         Artisan::call('backup:clean');
+        //     })
+        //     ->onFailure(function () {
+        //         Log::error('La sauvegarde a échoué.');
+        //     });
+
+        //Optionnel : exécuter chaque minute (pour tests rapides)
+        $schedule->command('backup:run')->everyMinute()
             ->after(function () {
-                $this->purgerAnciennesSauvegardes();
-            })
-            ->onFailure(function () {
-                Log::error('La sauvegarde a échoué.');
+                Artisan::call('backup:clean');
             });
-
-
-        // // executer chaque minute
-        // $schedule->command('backup:run')->everyMinute();
     }
+
 
     /**
      * Register the commands for the application.
