@@ -79,18 +79,24 @@ class Kernel extends ConsoleKernel
     //     //     });
     // }
 
-
     protected function schedule(Schedule $schedule)
-{
-    $schedule->command('backup:run')->everyMinute()
-        ->after(function () {
-            // Nettoyer les anciens backups directement via le service Spatie
-            $cleanupJob = app(CleanupJob::class);
-            $cleanupJob->run();
+    {
+        // Exécuter la sauvegarde toutes les minutes
+        $schedule->command('backup:run')
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->onFailure(function () {
+                Log::error('La sauvegarde a échoué.');
+            });
 
-            Log::info('Backups nettoyés via Spatie CleanupJob.');
-        });
-}
+        // Exécuter le nettoyage directement avec la commande artisan
+        $schedule->command('backup:clean')
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->onSuccess(function () {
+                Log::info('Backups nettoyés : seules les 3 dernières sauvegardes sont conservées.');
+            });
+    }
 
 
     /**
