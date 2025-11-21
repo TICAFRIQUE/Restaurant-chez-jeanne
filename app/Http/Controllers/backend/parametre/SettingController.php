@@ -165,4 +165,48 @@ class SettingController extends Controller
 
         return back();
     }
+
+    public function createBackup()
+    {
+        try {
+            Artisan::call('backup:run');
+            return response()->json(['success' => true, 'message' => 'Sauvegarde créée avec succès']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur lors de la création: ' . $e->getMessage()]);
+        }
+    }
+
+    public function deleteBackup(Request $request)
+    {
+        try {
+            $fileName = $request->file;
+            $appName = config('app.name');
+            $filePath = $appName . '/' . $fileName;
+            
+            if (Storage::disk('local')->exists($filePath)) {
+                Storage::disk('local')->delete($filePath);
+                return response()->json(['success' => true, 'message' => 'Sauvegarde supprimée']);
+            }
+            
+            return response()->json(['success' => false, 'message' => 'Fichier introuvable']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        }
+    }
+
+    public function deleteAllBackups()
+    {
+        try {
+            $appName = config('app.name');
+            $files = Storage::disk('local')->files($appName);
+            
+            foreach ($files as $file) {
+                Storage::disk('local')->delete($file);
+            }
+            
+            return response()->json(['success' => true, 'message' => 'Toutes les sauvegardes supprimées']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        }
+    }
 }

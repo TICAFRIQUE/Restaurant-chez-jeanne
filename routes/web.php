@@ -151,7 +151,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('setting')->controller(SettingController::class)->group(function () {
         route::get('', 'index')->name('setting.index');
         route::post('store', 'store')->name('setting.store');
-
+        route::post('create-backup', 'createBackup')->name('setting.create-backup');
+        route::delete('delete-backup', 'deleteBackup')->name('setting.delete-backup');
+        route::delete('delete-all-backups', 'deleteAllBackups')->name('setting.delete-all-backups');
         // download backua db
         Route::get('download-backup/{file}', 'downloadBackup')->name('setting.download-backup');
     });

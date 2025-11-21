@@ -1,34 +1,10 @@
 @extends('backend.layouts.master')
 @section('title')
-    Parametre
+    Paramètres
 @endsection
 @section('content')
-    {{-- <div class="position-relative mx-n4 mt-n4">
-        <div class="profile-wid-bg profile-setting-img">
-            <img src="{{ URL::asset('build/images/profile-bg.jpg') }}" class="profile-wid-img" alt="">
-            <div class="overlay-content">
-                <div class="text-end p-3">
-                    <div class="p-0 ms-auto rounded-circle profile-photo-edit">
-                        <input id="profile-foreground-img-file-input" type="file"
-                            class="profile-foreground-img-file-input">
-                        <label for="profile-foreground-img-file-input" class="profile-photo-edit btn btn-light">
-                            <i class="ri-image-edit-line align-bottom me-1"></i> Change Cover
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
-    <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; border: 1px solid black; text-align: left; }
-        th { background-color: #f4f4f4; }
-        a { text-decoration: none; color: blue; }
-    </style>
-
     <div class="row">
-        <div class="col-xxl-12  mt-5">
+        <div class="col-xxl-12 mt-5">
             <div class="card mt-xxl-n5">
                 <div class="card-header">
                     <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
@@ -37,22 +13,21 @@
                                 <i class="fas fa-home"></i> Informations du site
                             </a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#privacy" role="tab">
-                                <i class="far fa-envelope"></i> Application
+                                <i class="fas fa-cog"></i> Application
                             </a>
                         </li>
-
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#backup" role="tab">
-                                <i class="far fa-envelope"></i> Backups
+                                <i class="fas fa-database"></i> Sauvegardes
                             </a>
                         </li>
                     </ul>
                 </div>
                 <div class="card-body p-4">
                     <div class="tab-content">
+                        <!-- Tab Informations du site -->
                         <div class="tab-pane active" id="personalDetails" role="tabpanel">
                             <form action="{{ route('setting.store') }}" method="post" enctype="multipart/form-data">
                                 @csrf
@@ -270,8 +245,9 @@
 
                                     <div class="col-lg-12">
                                         <div class="hstack gap-2 justify-content-end">
-                                            <button type="submit" class="btn btn-primary">Valider</button>
-                                            {{-- <button type="button" class="btn btn-soft-success">A</button> --}}
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="ri-save-line"></i> Enregistrer
+                                            </button>
                                         </div>
                                     </div>
                                     <!--end col-->
@@ -279,196 +255,375 @@
 
                             </form>
                         </div>
-                        <!--end tab-pane-->
 
-
+                        <!-- Tab Application -->
                         <div class="tab-pane" id="privacy" role="tabpanel">
-                            <div class="mb-4 pb-2">
-                                {{-- <h5 class="card-title text-decoration-underline mb-3">Security:</h5> --}}
-
-                                <div class="d-flex flex-column flex-sm-row mb-4 mb-sm-0">
-                                    <input type="text" name="type_clear" value="cache" hidden>
-                                    <div class="flex-grow-1">
-                                        <h6 class="fs-14 mb-1">Cache systeme</h6>
-                                        <p class="text-muted">En cliquant sur vider le cache vous allez supprimer les
-                                            fichier temporaires stockés en memoire</p>
-                                    </div>
-                                    <div class="flex-shrink-0 ms-sm-3">
-                                        <a href="#" class="btn btn-sm btn-primary btn-clear">Vider
-                                            le
-                                            cache</a>
+                            <div class="row g-4">
+                                <!-- Cache système -->
+                                <div class="col-12">
+                                    <div class="card border">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <div class="avatar-sm">
+                                                        <div
+                                                            class="avatar-title bg-primary-subtle text-primary rounded-circle fs-20">
+                                                            <i class="ri-delete-bin-line"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h6 class="mb-1">Cache système</h6>
+                                                    <p class="text-muted mb-0">Supprimer les fichiers temporaires en
+                                                        mémoire
+                                                    </p>
+                                                </div>
+                                                <div class="flex-shrink-0">
+                                                    <button type="button" class="btn btn-outline-primary btn-clear">
+                                                        <i class="ri-refresh-line"></i> Vider le cache
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-
-
-                            </div>
-                            <div class="mb-3">
-                                {{-- <h5 class="card-title text-decoration-underline mb-3">Application </h5> --}}
-                                <ul class="list-unstyled mb-0">
-                                    <li class="d-flex">
-                                        <div class="flex-grow-1">
-                                            <label for="directMessage" class="form-check-label fs-14">Maintenance
-                                                mode</label>
-                                            <p class="text-muted">Mettre l'application en mode maintenance</p>
-                                        </div>
-                                        <div class="flex-shrink-0">
-                                            @if ($data_maintenance == null || $data_maintenance['type'] == 'up')
-                                                <div class="form-check form-switch">
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-primary btn-mode-down">Activer</a>
+                                <!-- Mode maintenance -->
+                                <div class="col-12">
+                                    <div class="card border">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <div class="avatar-sm">
+                                                        <div
+                                                            class="avatar-title bg-warning-subtle text-warning rounded-circle fs-20">
+                                                            <i class="ri-tools-line"></i>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            @else
-                                                <div class="form-check form-switch">
-                                                    <a href="#"
-                                                        class="btn btn-sm btn-primary btn-mode-up">Désactiver</a>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h6 class="mb-1">Mode maintenance</h6>
+                                                    <p class="text-muted mb-0">Mettre l'application en mode maintenance</p>
                                                 </div>
-                                            @endif
-
+                                                <div class="flex-shrink-0">
+                                                    @if ($data_maintenance == null || $data_maintenance['type'] == 'up')
+                                                        <button type="button"
+                                                            class="btn btn-outline-warning btn-mode-down">
+                                                            <i class="ri-lock-line"></i> Activer
+                                                        </button>
+                                                    @else
+                                                        <button type="button"
+                                                            class="btn btn-outline-success btn-mode-up">
+                                                            <i class="ri-lock-unlock-line"></i> Désactiver
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-                                    </li>
-
-                                </ul>
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
-                        <!--end tab-pane-->
 
+                        <!-- Tab Sauvegardes -->
                         <div class="tab-pane" id="backup" role="tabpanel">
-                            <div class="mb-3">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Nom du fichier</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($backup as $file)
-                                            <tr>
-                                                <td>{{ basename($file) }}</td>
-                                                <td>
-                                                    <a
-                                                        href="{{ route('setting.download-backup', basename($file)) }}">Télécharger <i class="ri-download-line align-bottom"></i></a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-
-
-
-
-
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">
+                                        <i class="ri-database-2-line me-2"></i>Gestion des sauvegardes
+                                    </h5>
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-success btn-sm" id="createBackup">
+                                            <i class="ri-add-line"></i> Créer une sauvegarde
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm" id="deleteAllBackups">
+                                            <i class="ri-delete-bin-line"></i> Supprimer tout
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    @if (count($backup) > 0)
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th><i class="ri-file-line me-1"></i>Nom du fichier</th>
+                                                        <th><i class="ri-calendar-line me-1"></i>Date</th>
+                                                        <th><i class="ri-file-text-line me-1"></i>Taille</th>
+                                                        <th class="text-center"><i
+                                                                class="ri-settings-line me-1"></i>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($backup as $file)
+                                                        @php
+                                                            $fileName = basename($file);
+                                                            $filePath = storage_path(
+                                                                'app/' . config('app.name') . '/' . $fileName,
+                                                            );
+                                                            $fileSize = file_exists($filePath)
+                                                                ? number_format(filesize($filePath) / 1024 / 1024, 2)
+                                                                : 'N/A';
+                                                            $fileDate = file_exists($filePath)
+                                                                ? date('d/m/Y H:i:s', filemtime($filePath))
+                                                                : 'N/A';
+                                                        @endphp
+                                                        <tr id="backup-row-{{ $loop->index }}">
+                                                            <td>
+                                                                <div class="d-flex align-items-center">
+                                                                    <div class="avatar-xs me-2">
+                                                                        <div
+                                                                            class="avatar-title bg-success-subtle text-success rounded">
+                                                                            <i class="ri-file-zip-line"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <span class="fw-medium">{{ $fileName }}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>{{ $fileDate }}</td>
+                                                            <td>
+                                                                <span
+                                                                    class="badge bg-info-subtle text-info">{{ $fileSize }}
+                                                                    MB</span>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="btn-group" role="group">
+                                                                    <a href="{{ route('setting.download-backup', $fileName) }}"
+                                                                        class="btn btn-outline-primary btn-sm"
+                                                                        title="Télécharger">
+                                                                        <i class="ri-download-line"></i>
+                                                                    </a>
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-danger btn-sm delete-backup"
+                                                                        data-file="{{ $fileName }}"
+                                                                        data-index="{{ $loop->index }}"
+                                                                        title="Supprimer">
+                                                                        <i class="ri-delete-bin-line"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @else
+                                        <div class="text-center py-5">
+                                            <div class="avatar-lg mx-auto mb-4">
+                                                <div class="avatar-title bg-light text-muted rounded-circle fs-24">
+                                                    <i class="ri-database-line"></i>
+                                                </div>
+                                            </div>
+                                            <h5 class="text-muted">Aucune sauvegarde trouvée</h5>
+                                            <p class="text-muted">Créez votre première sauvegarde pour commencer</p>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
-
-
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
-        <!--end col-->
     </div>
-    <!--end row-->
 @endsection
+
 @section('script')
     <script src="{{ URL::asset('build/js/pages/profile-setting.init.js') }}"></script>
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
 
     <script>
         $(document).ready(function() {
-
-            //cache clear
+            // Cache clear
             $('.btn-clear').click(function(e) {
                 e.preventDefault();
-                $.ajax({
-                    type: "get",
-                    url: "{{ route('setting.cache-clear') }}",
-                    // data: "data",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status == 200) {
-                            let timerInterval;
-                            Swal.fire({
-                                title: "Traitement en cour!",
-                                html: "Se termine dans <b></b> milliseconds.",
-                                timer: 6000,
-                                timerProgressBar: true,
-                                didOpen: () => {
-                                    Swal.showLoading();
-                                    const timer = Swal.getPopup().querySelector(
-                                        "b");
-                                    timerInterval = setInterval(() => {
-                                        timer.textContent =
-                                            `${Swal.getTimerLeft()}`;
-                                    }, 100);
-                                },
-                                willClose: () => {
-                                    clearInterval(timerInterval);
+                Swal.fire({
+                    title: 'Vider le cache?',
+                    text: "Cette action supprimera tous les fichiers de cache.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Oui, vider!',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "GET",
+                            url: "{{ route('setting.cache-clear') }}",
+                            dataType: "json",
+                            success: function(response) {
+                                if (response.status == 200) {
+                                    Swal.fire('Succès!',
+                                        'Le cache a été vidé avec succès.',
+                                        'success');
                                 }
-                            }).then((result) => {
-                                /* Read more about handling dismissals below */
-                                if (result.dismiss === Swal.DismissReason.timer) {
-                                    console.log("I was closed by the timer");
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Maintenance mode
+            $('.btn-mode-down, .btn-mode-up').click(function(e) {
+                e.preventDefault();
+                let isDown = $(this).hasClass('btn-mode-down');
+                let url = isDown ? "{{ route('setting.maintenance-down') }}" :
+                    "{{ route('setting.maintenance-up') }}";
+                let message = isDown ? 'activer' : 'désactiver';
+
+                Swal.fire({
+                    title: `${message.charAt(0).toUpperCase() + message.slice(1)} le mode maintenance?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: `Oui, ${message}!`,
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "GET",
+                            url: url,
+                            dataType: "json",
+                            success: function(response) {
+                                if (response.status == 200) {
+                                    Swal.fire('Succès!',
+                                            `Mode maintenance ${isDown ? 'activé' : 'désactivé'}.`,
+                                            'success')
+                                        .then(() => location.reload());
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
                 });
             });
 
-            // maintenance mode down
-            $('.btn-mode-down').click(function(e) {
-                e.preventDefault();
-                $.ajax({
-                    type: "get",
-                    url: "{{ route('setting.maintenance-down') }}",
-                    // data: "data",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status == 200) {
-                            Swal.fire({
-                                position: "top-end",
-                                icon: "success",
-                                title: "Mode maintenance activé",
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-
-                            $('btn-mode-up').html('désactivé');
-                            location.reload(true);
-                        }
+            // Créer une sauvegarde
+            $('#createBackup').click(function() {
+                Swal.fire({
+                    title: 'Créer une sauvegarde?',
+                    text: "Cette action peut prendre quelques minutes.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Oui, créer!',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ route('setting.create-backup') }}",
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            dataType: "json",
+                            beforeSend: function() {
+                                Swal.fire({
+                                    title: 'Création en cours...',
+                                    html: 'Veuillez patienter pendant la création de la sauvegarde.',
+                                    timer: 30000,
+                                    timerProgressBar: true,
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading()
+                                    }
+                                });
+                            },
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire('Succès!',
+                                            'Sauvegarde créée avec succès.', 'success')
+                                        .then(() => location.reload());
+                                } else {
+                                    Swal.fire('Erreur!', response.message, 'error');
+                                }
+                            },
+                            error: function() {
+                                Swal.fire('Erreur!', 'Une erreur est survenue.',
+                                    'error');
+                            }
+                        });
                     }
                 });
             });
 
-            // maintenance mode up
-            $('.btn-mode-up').click(function(e) {
-                e.preventDefault();
-                $.ajax({
-                    type: "get",
-                    url: "{{ route('setting.maintenance-up') }}",
-                    // data: "data",
-                    dataType: "json",
-                    success: function(response) {
-                        if (response.status == 200) {
-                            Swal.fire({
-                                position: "top-end",
-                                icon: "success",
-                                title: "Mode maintenance desactivé",
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
+            // Supprimer une sauvegarde
+            $('.delete-backup').click(function() {
+                let fileName = $(this).data('file');
+                let index = $(this).data('index');
 
-                            location.reload(true);
-                        }
+                Swal.fire({
+                    title: 'Supprimer cette sauvegarde?',
+                    text: `Voulez-vous vraiment supprimer "${fileName}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Oui, supprimer!',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: "{{ route('setting.delete-backup') }}",
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                file: fileName
+                            },
+                            dataType: "json",
+                            success: function(response) {
+                                if (response.success) {
+                                    $('#backup-row-' + index).fadeOut(400, function() {
+                                        $(this).remove();
+                                    });
+                                    Swal.fire('Supprimée!',
+                                        'La sauvegarde a été supprimée.', 'success');
+                                } else {
+                                    Swal.fire('Erreur!', response.message, 'error');
+                                }
+                            }
+                        });
                     }
                 });
             });
 
-
+            // Supprimer toutes les sauvegardes
+            $('#deleteAllBackups').click(function() {
+                Swal.fire({
+                    title: 'Supprimer TOUTES les sauvegardes?',
+                    text: "Cette action est irréversible!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Oui, tout supprimer!',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: "{{ route('setting.delete-all-backups') }}",
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            dataType: "json",
+                            success: function(response) {
+                                if (response.success) {
+                                    Swal.fire('Supprimées!',
+                                            'Toutes les sauvegardes ont été supprimées.',
+                                            'success')
+                                        .then(() => location.reload());
+                                } else {
+                                    Swal.fire('Erreur!', response.message, 'error');
+                                }
+                            }
+                        });
+                    }
+                });
+            });
         });
     </script>
-@endsection
+
+    @endsection
