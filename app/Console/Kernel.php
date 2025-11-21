@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Console\Scheduling\Schedule;
+use Spatie\Backup\Tasks\Cleanup\CleanupJob;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
@@ -59,24 +60,37 @@ class Kernel extends ConsoleKernel
     //     // $schedule->command('backup:run')->everyMinute();
     // }
 
-    protected function schedule(Schedule $schedule)
-    {
-        // Planifier la sauvegarde tous les jours à 16h
-        // $schedule->command('backup:run')->dailyAt('16:00')
-        //     ->after(function () {
-        //         // Nettoyer les anciens backups et garder seulement les 3 derniers
-        //         Artisan::call('backup:clean');
-        //     })
-        //     ->onFailure(function () {
-        //         Log::error('La sauvegarde a échoué.');
-        //     });
+    // protected function schedule(Schedule $schedule)
+    // {
+    //     // Planifier la sauvegarde tous les jours à 16h
+    //     $schedule->command('backup:run')->dailyAt('16:00')
+    //         ->after(function () {
+    //             // Nettoyer les anciens backups et garder seulement les 3 derniers
+    //             Artisan::call('backup:clean');
+    //         })
+    //         ->onFailure(function () {
+    //             Log::error('La sauvegarde a échoué.');
+    //         });
 
-        //Optionnel : exécuter chaque minute (pour tests rapides)
-        $schedule->command('backup:run')->everyMinute()
-            ->after(function () {
-                Artisan::call('backup:clean');
-            });
-    }
+    //     // Optionnel : exécuter chaque minute (pour tests rapides)
+    //     // $schedule->command('backup:run')->everyMinute()
+    //     //     ->after(function () {
+    //     //         Artisan::call('backup:clean');
+    //     //     });
+    // }
+
+
+    protected function schedule(Schedule $schedule)
+{
+    $schedule->command('backup:run')->everyMinute()
+        ->after(function () {
+            // Nettoyer les anciens backups directement via le service Spatie
+            $cleanupJob = app(CleanupJob::class);
+            $cleanupJob->run();
+
+            Log::info('Backups nettoyés via Spatie CleanupJob.');
+        });
+}
 
 
     /**
