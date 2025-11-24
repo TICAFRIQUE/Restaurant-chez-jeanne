@@ -315,7 +315,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::get('index', 'index')->name('achat.index');  // liste des facture
         route::get('show/{id}', 'show')->name('achat.show');
         route::get('create', 'create')->name('achat.create'); // 
-        route::post('store', 'store')->name('achat.store');
+        route::post('store', 'store')->name('achat.store')->middleware('activity.logger');
         route::get('edit/{id}', 'edit')->name('achat.edit');
         route::post('update/{id}', 'update')->name('achat.update');
         route::get('delete/{id}', 'delete')->name('achat.delete');
@@ -336,7 +336,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::get('', 'index')->name('sortie.index');
         route::get('show/{id}', 'show')->name('sortie.show');
         route::get('create', 'create')->name('sortie.create');
-        route::post('store', 'store')->name('sortie.store');
+        route::post('store', 'store')->name('sortie.store')->middleware('activity.logger');
     });
 
 
@@ -348,7 +348,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
 
 
     // stock -inventaire
-    Route::prefix('inventaire')->middleware('activity.logger')->controller(InventaireController::class)->group(function () {
+    Route::prefix('inventaire')->controller(InventaireController::class)->group(function () {
         route::get('', 'index')->name('inventaire.index');
         route::get('show/{id}', 'show')->name('inventaire.show');
         route::get('create', 'create')->name('inventaire.create');
@@ -385,7 +385,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     });
 
     // Réglement
-    Route::prefix('reglement')->middleware('activity.logger')->controller(ReglementController::class)->group(function () {
+    Route::prefix('reglement')->controller(ReglementController::class)->group(function () {
         route::get('', 'index')->name('reglement.index');
         route::post('store', 'store')->name('reglement.store');
         route::get('show/{id}', 'show')->name('reglement.show');
@@ -425,7 +425,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('libelle-depense')->middleware('activity.logger')->controller(LibelleDepenseController::class)->group(function () {
         route::get('', 'index')->name('libelle-depense.index');
         route::get('create', 'create')->name('libelle-depense.create');
-        route::post('store', 'store')->name('libelle-depense.store');
+        route::post('store', 'store')->name('libelle-depense.store')->middleware('activity.logger');
         route::get('edit/{id}', 'edit')->name('libelle-depense.edit');
         route::post('update/{id}', 'update')->name('libelle-depense.update');
         route::get('delete/{id}', 'delete')->name('libelle-depense.delete');
@@ -436,9 +436,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
         route::get('', 'index')->name('depense.index');
         route::get('getList', 'getList')->name('depense.getList');
         route::get('create', 'create')->name('depense.create');
-        route::post('store', 'store')->name('depense.store');
+        route::post('store', 'store')->name('depense.store')->middleware('activity.logger');
         route::get('edit/{id}', 'edit')->name('depense.edit');
-        route::post('update/{id}', 'update')->name('depense.update');
+        route::post('update/{id}', 'update')->name('depense.update')->middleware('activity.logger');
         route::get('delete/{id}', 'delete')->name('depense.delete')->middleware('activity.logger');
     });
 
