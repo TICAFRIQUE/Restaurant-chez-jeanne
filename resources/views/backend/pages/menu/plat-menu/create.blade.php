@@ -229,8 +229,8 @@
                 processData: false,
                 success: function(response) {
                     $('#imageTableBody').empty();
-                    
-console.log(response);
+
+                    console.log(response);
 
                     if (response.message == 'operation reussi') {
                         Swal.fire({
@@ -248,28 +248,27 @@ console.log(response);
                         var url = "{{ route('plat-menu.index') }}" // redirect route stock
 
                         window.location.replace(url);
-                    } 
+                    }
 
                 },
                 // afficher l'erreur si il y en a une
-                error: function(xhr, status, error , response) {
+                error: function(xhr, status, error, response) {
 
                     console.log(response);
-                    
-                     Swal.fire({
-                            title: xhr.responseText,
-                            text: $('#nom').val(),
-                            icon: 'warning',
-                            customClass: {
-                                confirmButton: 'btn btn-primary w-xs me-2 mt-2',
-                                cancelButton: 'btn btn-danger w-xs mt-2',
-                            },
-                            buttonsStyling: false,
-                            showCloseButton: true
-                        })
+
+                    Swal.fire({
+                        title: xhr.responseText,
+                        text: $('#nom').val(),
+                        icon: 'warning',
+                        customClass: {
+                            confirmButton: 'btn btn-primary w-xs me-2 mt-2',
+                            cancelButton: 'btn btn-danger w-xs mt-2',
+                        },
+                        buttonsStyling: false,
+                        showCloseButton: true
+                    })
                     // alert("Une erreur s'est produite lors de l'ajout du plat." + xhr.responseText);
                 }
-
 
             });
 

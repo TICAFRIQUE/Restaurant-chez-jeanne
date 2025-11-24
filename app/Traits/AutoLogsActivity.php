@@ -24,7 +24,7 @@ trait AutoLogsActivity
                     "%s %s par %s (%s)",
                     class_basename($this),
                     strtoupper($eventName),
-                    auth()->user()?->name ?? 'Système',
+                    auth()->user()?->first_name ?? 'Système',
                     now()->format('d/m/Y H:i:s')
                 )
             );
